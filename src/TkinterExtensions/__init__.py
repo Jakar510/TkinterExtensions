@@ -3,13 +3,14 @@
 #  Property of TrueLogic Company.
 #  Copyright (c) 2020.
 # ------------------------------------------------------------------------------
+import base64
 import io
 import os
 import pprint
 import tkinter as tk
 from abc import ABC
 from tkinter import Event as tkEvent, ttk
-from typing import Dict
+from typing import Dict, Union
 from urllib.request import urlopen
 
 from PIL import Image, ImageTk
@@ -19,8 +20,28 @@ from PIL import Image, ImageTk
 
 __all__ = [
         'TkinterEntry', 'TkinterLabel', 'TkinterButton', 'TkinterListbox', 'TkinterEvent', 'tkEvent', 'KeyBindings', 'TkinterTreeView', 'TkinterTreeViewHolder', 'TkinterCheckBox',
-        'TkinterFrame', 'TkinterLabelFrame', 'TkinterComboBox', 'tk', 'ttk'
+        'TkinterFrame', 'TkinterLabelFrame', 'TkinterComboBox', 'tk', 'ttk', 'ButtonGrid', 'ResizePhoto', 'CalculateWrapLength'
         ]
+
+
+
+def ResizePhoto(image: Image.Image, MaxWidth: int, MaxHeight: int) -> Image:
+    scalingFactor = min((MaxWidth / image.width, MaxHeight / image.height))
+    newSize = (int(scalingFactor * image.width), int(scalingFactor * image.height))
+    return image.resize(newSize)
+def CalculateWrapLength(screenWidth: int, *args: Union[int, float]) -> int:
+    """
+        Example: WrapLength = self._screenWidth * relWidgetWidth * offset
+
+    :param screenWidth: base screen width
+    :param args: a list of float or integers to be cumulatively multiplied together.
+    :return:
+    """
+    for arg in args:
+        assert (isinstance(arg, (int, float)))
+        screenWidth *= arg
+    return int(screenWidth)
+
 
 
 class KeyBindings(object):
@@ -172,6 +193,7 @@ class _LayoutManagerMixin:
 class _ImageMixin:
     configure: callable
     _master: any
+    _pi: dict
     _optionalImage: ImageTk.PhotoImage
     _defaultImage: ImageTk.PhotoImage
     _IMG: ImageTk.PhotoImage
@@ -216,6 +238,43 @@ class _ImageMixin:
         with open(path, 'rb') as f:
             with Image.open(f) as img:
                 self._IMG = ImageTk.PhotoImage(img, master=self._master)
+                self.configure(image=self._IMG)
+    def SetPhoto(self, *, Base64Data: str = None, rawData: bytes = None,
+                 parent_pi: dict = None, parentRelX: float = None, parentRelY: float = None,
+                 maxWidth: int = None, maxHeight: int = None,
+                 offset_factor: float = 0.95, screenWidth: int, screenHeight: int):
+        if parent_pi is not None:
+            parentRelX = float(parent_pi['relwidth'])
+            parentRelY = float(parent_pi['relheight'])
+
+        assert (isinstance(parentRelX, float))
+        assert (isinstance(parentRelY, float))
+
+        if maxWidth is None:
+            # if hasattr(widget, 'width'): maxHeight = widget.width
+            if 'width' in self._pi and self._pi['width'] != '':
+                maxWidth = (float(self._pi['width']) / screenWidth) * offset_factor * parentRelX
+            else:
+                maxWidth = CalculateWrapLength(screenWidth, float(self._pi['relwidth']), offset_factor, parentRelX)
+            maxWidth = int(maxWidth)
+        if maxHeight is None:
+            # if hasattr(widget, 'height'): maxHeight = widget.height
+            if 'height' in self._pi and self._pi['height'] != '':
+                maxHeight = (float(self._pi['height']) / screenHeight) * offset_factor * parentRelY
+            else:
+                maxHeight = CalculateWrapLength(screenHeight, float(self._pi['relheight']), offset_factor, parentRelY)
+            maxHeight = int(maxHeight)
+
+        if Base64Data:
+            assert (Base64Data is not None)
+            msg = base64.b64decode(Base64Data)
+        else:
+            assert (rawData is not None)
+            msg = rawData
+
+        with io.BytesIO(msg) as buf:
+            with Image.open(buf) as tempImg:
+                self._IMG = ImageTk.PhotoImage(master=self, image=ResizePhoto(tempImg, MaxWidth=maxWidth, MaxHeight=maxHeight))
                 self.configure(image=self._IMG)
 class _CommandMixin:
     _cmd: callable
