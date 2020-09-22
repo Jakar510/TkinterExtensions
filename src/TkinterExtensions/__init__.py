@@ -7,7 +7,9 @@ import io
 import os
 import pprint
 import tkinter as tk
+from abc import ABC
 from tkinter import Event as tkEvent, ttk
+from typing import Dict
 from urllib.request import urlopen
 
 from PIL import Image, ImageTk
@@ -123,7 +125,8 @@ class _LayoutManagerMixin:
     _grid = 1
     _pack = 2
     _manager_: int = None
-    def show(self) -> bool:
+    def show(self, *args, **kwargs) -> bool:
+        """         Shows the current widget or frame. Can be overridden to add additional functionality if need.        """
         if self._manager_ is None: return False
         if self._manager_ == self._pack:
             self.pack(self._pi)
@@ -136,7 +139,8 @@ class _LayoutManagerMixin:
             return True
 
         return False
-    def hide(self) -> bool:
+    def hide(self, *args, **kwargs) -> bool:
+        """         Hides the current widget or frame. Can be overridden to add additional functionality if need.        """
         if self._manager_ is None: return False
         if self._manager_ == self._pack:
             self.pack_forget()
@@ -276,6 +280,8 @@ class _BaseTkinterWidget(object):
     @property
     def height(self) -> int: return self.winfo_height()
 
+    @property
+    def __name__(self) -> str: return str(self.__class__.__name__)
 
 
 class TkinterFrame(_LayoutManagerMixin, tk.Frame, _BaseTkinterWidget):
@@ -286,6 +292,7 @@ class TkinterLabelFrame(_LayoutManagerMixin, tk.LabelFrame, _BaseTkinterWidget):
     def __init__(self, master, **kwargs):
         self._master = master
         tk.LabelFrame.__init__(self, master=self._master, **kwargs)
+
     @property
     def txt(self) -> str: return self._txt.get()
     @txt.setter
@@ -762,3 +769,68 @@ class TkinterTreeViewHolder(TkinterFrame):
         self.vsb.pack(side='right', fill='y')
         self.vsb.pi = self.vsb.place_info()
         self.TreeView.configure(yscrollcommand=self.vsb.set)
+
+
+
+class ButtonGrid(TkinterFrame, ABC):
+    __buttons: Dict[int, TkinterButton] = { }
+    def __init__(self, *, master: TkinterFrame, rows: int = None, cols: int = None, NumberOfButtons: int = None, **kwargs):
+        assert (isinstance(master, TkinterFrame))
+        TkinterFrame.__init__(self, master=master)
+        self._rows = rows or len(self.ButtonTitles)
+        self._cols = cols or 1
+        self._NumberOfButtons = NumberOfButtons or self._rows * self._cols
+
+        if len(self.ButtonCommands) != self._NumberOfButtons:
+            raise ValueError(f"len(self.ButtonCommands) [ {len(self.ButtonCommands)} ]  does not Match self._NumberOfButtons [ {self._NumberOfButtons} ]")
+        if len(self.ButtonTitles) != self._NumberOfButtons:
+            raise ValueError(f"len(self.ButtonTitles) [ {len(self.ButtonTitles)} ]  does not Match self._NumberOfButtons [ {self._NumberOfButtons} ]")
+
+        self._MakeGrid(kwargs)
+    def _MakeGrid(self, kwargs: dict):
+        for r in range(self._rows): self.grid_rowconfigure(r, weight=1)
+        for c in range(self._cols): self.grid_columnconfigure(c, weight=1)
+
+        r = 0
+        c = 0
+        for i in range(self._NumberOfButtons):
+            if c >= self._cols:
+                r += 1
+                c = 0
+            self.__buttons[i] = TkinterButton(self, Text=self.ButtonTitles[i], **kwargs)
+            self.__buttons[i].grid(row=r, column=c)
+            self.__buttons[i].SetCommand(self.ButtonCommands[i])
+            c += 1
+
+    def HideAll(self):
+        for w in self.__buttons.values():
+            w.hide()
+    def ShowAll(self):
+        for w in self.__buttons.values():
+            w.show()
+
+    @property
+    def ButtonTitles(self) -> dict: raise NotImplementedError()
+    @property
+    def ButtonCommands(self) -> dict: raise NotImplementedError()
+
+
+    def UpdateText(self, Titles: dict = None):
+        if Titles is None: Titles = self.ButtonTitles
+        if len(Titles) != self._NumberOfButtons: raise ValueError("len(Titles) Doesn't Match NumberOfButtons")
+
+        for i in range(self._NumberOfButtons):
+            self.__buttons[i].txt = Titles[i]
+    def UpdateCommands(self, commands: dict = { }, kwz: dict = { }, z: dict = { }):
+        if len(commands) != self._NumberOfButtons: raise ValueError("len(commands) Doesn't Match NumberOfButtons")
+
+        for i, Command in commands.items():
+            widget = self.__buttons[i]
+            if i in kwz and kwz[i] is not None and Command:
+                widget.cmd = lambda x=kwz[i]: Command(**x)
+                widget.configure(command=widget.cmd)
+            elif i in z and z[i] is not None and Command:
+                widget.cmd = lambda x=z[i]: Command(x)
+                widget.configure(command=widget.cmd)
+            elif Command:
+                widget.configure(command=Command)
