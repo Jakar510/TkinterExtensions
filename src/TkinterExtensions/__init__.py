@@ -9,18 +9,23 @@ import os
 import pprint
 import tkinter as tk
 from abc import ABC
+from enum import IntEnum
 from tkinter import Event as tkEvent, ttk
 from typing import Dict, Union
 from urllib.request import urlopen
 
 from PIL import Image, ImageTk
 
+from .Enumerations import *
+
 
 
 
 __all__ = [
         'TkinterEntry', 'TkinterLabel', 'TkinterButton', 'TkinterListbox', 'TkinterEvent', 'tkEvent', 'KeyBindings', 'TkinterTreeView', 'TkinterTreeViewHolder', 'TkinterCheckBox',
-        'TkinterFrame', 'TkinterLabelFrame', 'TkinterComboBox', 'tk', 'ttk', 'ButtonGrid', 'ResizePhoto', 'CalculateWrapLength', 'RoundFloat'
+        'TkinterFrame', 'TkinterLabelFrame', 'TkinterComboBox', 'tk', 'ttk', 'ButtonGrid', 'ResizePhoto', 'CalculateWrapLength', 'RoundFloat',
+
+        'ActiveStyle', 'AnchorAndSticky', 'Fill', 'Side', 'Relief', 'Orient', 'Wrap', 'BorderMode', 'Tags', 'States', 'MenuItemTypes', 'SelectionMode', 'CanvasStyles', 'ViewArguments'
         ]
 
 
@@ -28,7 +33,7 @@ __all__ = [
 def RoundFloat(Float: float, Precision: int) -> str:
     """ Rounds the Float to the given Precision and returns It as string. """
     return f"{Float:.{Precision}f}"
-def ResizePhoto(image: Image.Image, MaxWidth: int, MaxHeight: int) -> Image:
+def ResizePhoto(image: Image.Image, *, MaxWidth: int, MaxHeight: int) -> Image:
     scalingFactor = min((MaxWidth / image.width, MaxHeight / image.height))
     newSize = (int(scalingFactor * image.width), int(scalingFactor * image.height))
     return image.resize(newSize)
@@ -44,6 +49,7 @@ def CalculateWrapLength(screenWidth: int, *args: Union[int, float]) -> int:
         assert (isinstance(arg, (int, float)))
         screenWidth *= arg
     return int(screenWidth)
+
 
 
 
@@ -142,23 +148,24 @@ class TkinterEvent(tkEvent):
     #             }
 
 
+class Layout(IntEnum):
+    place = 1
+    grid = 2
+    pack = 3
 # noinspection PyUnresolvedReferences
 class _LayoutManagerMixin:
     _pi: dict = { }
-    _place = 0
-    _grid = 1
-    _pack = 2
-    _manager_: int = None
+    _manager_: Layout = None
     def show(self, *args, **kwargs) -> bool:
         """         Shows the current widget or frame. Can be overridden to add additional functionality if need.        """
         if self._manager_ is None: return False
-        if self._manager_ == self._pack:
+        if self._manager_ == Layout.pack:
             self.pack(self._pi)
             return True
-        elif self._manager_ == self._grid:
+        elif self._manager_ == Layout.grid:
             self.grid(self._pi)
             return True
-        elif self._manager_ == self._place:
+        elif self._manager_ == Layout.place:
             self.place(self._pi)
             return True
 
@@ -166,13 +173,13 @@ class _LayoutManagerMixin:
     def hide(self, *args, **kwargs) -> bool:
         """         Hides the current widget or frame. Can be overridden to add additional functionality if need.        """
         if self._manager_ is None: return False
-        if self._manager_ == self._pack:
+        if self._manager_ == Layout.pack:
             self.pack_forget()
             return True
-        elif self._manager_ == self._grid:
+        elif self._manager_ == Layout.grid:
             self.grid_forget()
             return True
-        elif self._manager_ == self._place:
+        elif self._manager_ == Layout.place:
             self.place_forget()
             return True
 
@@ -181,17 +188,30 @@ class _LayoutManagerMixin:
     def pack(self, *args, **kwargs):
         super(_LayoutManagerMixin, self).pack(*args, **kwargs)
         self._pi = self.pack_info()
-        self._manager_ = self._pack
+        self._manager_ = Layout.pack
         return self
-    def grid(self, *args, sticky: str = tk.NSEW, rowspan: int = 1, columnspan: int = 1, **kwargs):
-        super(_LayoutManagerMixin, self).grid(*args, sticky=sticky, rowspan=rowspan, columnspan=columnspan, **kwargs)
-        self._pi = self.grid_info()
-        self._manager_ = self._grid
-        return self
+
     def place(self, *args, **kwargs):
         super(_LayoutManagerMixin, self).place(*args, **kwargs)
         self._pi = self.place_info()
-        self._manager_ = self._place
+        self._manager_ = Layout.place
+        return self
+
+    def grid(self, *args, sticky: str or AnchorAndSticky = tk.NSEW, rowspan: int = 1, columnspan: int = 1, **kwargs):
+        if isinstance(sticky, AnchorAndSticky): sticky = sticky.value
+        super(_LayoutManagerMixin, self).grid(*args, sticky=sticky, rowspan=rowspan, columnspan=columnspan, **kwargs)
+        self._pi = self.grid_info()
+        self._manager_ = Layout.grid
+        return self
+    def grid_anchor(self, anchor: str or AnchorAndSticky):
+        if isinstance(anchor, AnchorAndSticky): anchor = anchor.value
+        super(_LayoutManagerMixin, self).grid_anchor(anchor)
+        return self
+    def grid_rowconfigure(self, index: int, weight: int = 1, **kwargs):
+        super(_LayoutManagerMixin, self).grid_rowconfigure(index, weight=weight, **kwargs)
+        return self
+    def grid_columnconfigure(self, index: int, weight: int = 1, **kwargs):
+        super(_LayoutManagerMixin, self).grid_columnconfigure(index, weight=weight, **kwargs)
         return self
 class _ImageMixin:
     configure: callable
@@ -350,6 +370,7 @@ class TkinterFrame(_LayoutManagerMixin, tk.Frame, _BaseTkinterWidget):
     def __init__(self, master, **kwargs):
         self._master = master
         tk.Frame.__init__(self, master=self._master, **kwargs)
+        self.place_configure()
 class TkinterLabelFrame(_LayoutManagerMixin, tk.LabelFrame, _BaseTkinterWidget):
     def __init__(self, master, **kwargs):
         self._master = master
