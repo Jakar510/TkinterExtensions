@@ -20,11 +20,14 @@ from PIL import Image, ImageTk
 
 __all__ = [
         'TkinterEntry', 'TkinterLabel', 'TkinterButton', 'TkinterListbox', 'TkinterEvent', 'tkEvent', 'KeyBindings', 'TkinterTreeView', 'TkinterTreeViewHolder', 'TkinterCheckBox',
-        'TkinterFrame', 'TkinterLabelFrame', 'TkinterComboBox', 'tk', 'ttk', 'ButtonGrid', 'ResizePhoto', 'CalculateWrapLength'
+        'TkinterFrame', 'TkinterLabelFrame', 'TkinterComboBox', 'tk', 'ttk', 'ButtonGrid', 'ResizePhoto', 'CalculateWrapLength', 'RoundFloat'
         ]
 
 
 
+def RoundFloat(Float: float, Precision: int) -> str:
+    """ Rounds the Float to the given Precision and returns It as string. """
+    return f"{Float:.{Precision}f}"
 def ResizePhoto(image: Image.Image, MaxWidth: int, MaxHeight: int) -> Image:
     scalingFactor = min((MaxWidth / image.width, MaxHeight / image.height))
     newSize = (int(scalingFactor * image.width), int(scalingFactor * image.height))
