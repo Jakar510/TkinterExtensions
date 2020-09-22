@@ -18,7 +18,7 @@ setup(
         license='GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007',
         author='Tyler Stegmaier',
         author_email='tyler.stegmaier.510@gmail.com',
-        description='A set of helpers for debugging Python 3.x.',
+        description='Strongly typed widgets and event with multiple helper functions build in to speed up development.',
         install_requires=[],
         classifiers=[
                 # How mature is this project? Common values are
@@ -42,7 +42,7 @@ setup(
                 'Programming Language :: Python :: 3',
                 ],
         keywords='Tkinter Extensions tk ttk tkinter',
-        package_dir={ 'PythonDebugTools': 'src/PythonDebugTools' },
+        package_dir={ 'TkinterExtensions': 'src/TkinterExtensions' },
         package_data={
                 'PythonDebugTools': data_files,
                 },
