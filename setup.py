@@ -14,7 +14,7 @@ setup(
         version=version,
         packages=['TkinterExtensions'],
         url='https://github.com/Jakar510/TkinterExtensions',
-        download_url='https://github.com/Jakar510/PyDebug/TkinterExtensions/tag/v1.0.0',
+        download_url=f'https://github.com/Jakar510/PyDebug/TkinterExtensions/releases/tag/{version}',
         license='GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007',
         author='Tyler Stegmaier',
         author_email='tyler.stegmaier.510@gmail.com',

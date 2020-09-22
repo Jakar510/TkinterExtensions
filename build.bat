@@ -1,4 +1,7 @@
-rm ./dist/*
+rmdir /Q /S dist
+mkdir dist
+
+pause
 
 python setup.py build sdist bdist_wheel
 
