@@ -152,38 +152,6 @@ class Layout(IntEnum):
     place = 1
     grid = 2
     pack = 3
-# noinspection PyUnresolvedReferences
-class _LayoutManagerMixin:
-    _pi: dict = { }
-    _manager_: Layout = None
-    def show(self, *args, **kwargs) -> bool:
-        """         Shows the current widget or frame. Can be overridden to add additional functionality if need.        """
-        if self._manager_ is None: return False
-        if self._manager_ == Layout.pack:
-            self.pack(self._pi)
-            return True
-        elif self._manager_ == Layout.grid:
-            self.grid(self._pi)
-            return True
-        elif self._manager_ == Layout.place:
-            self.place(self._pi)
-            return True
-
-        return False
-    def hide(self, *args, **kwargs) -> bool:
-        """         Hides the current widget or frame. Can be overridden to add additional functionality if need.        """
-        if self._manager_ is None: return False
-        if self._manager_ == Layout.pack:
-            self.pack_forget()
-            return True
-        elif self._manager_ == Layout.grid:
-            self.grid_forget()
-            return True
-        elif self._manager_ == Layout.place:
-            self.place_forget()
-            return True
-
-        return False
 class _ImageMixin:
     configure: callable
     _pi: dict
@@ -295,12 +263,13 @@ class _CommandMixin:
 
 
 
-class _BaseTkinterWidget(_LayoutManagerMixin):
+class _BaseTkinterWidget_:
     configure: callable
     winfo_width: callable
     winfo_height: callable
 
-    _pi: dict
+    _pi: dict = { }
+    _manager_: Layout = None
     _wrap: int
     _IMG = None
     _defaultImage = None
@@ -311,6 +280,13 @@ class _BaseTkinterWidget(_LayoutManagerMixin):
     imgTk: ImageTk.PhotoImage
     _screenWidth: int
     _screenHeight: int
+
+    def __init__(self, Override_var: tk.StringVar, Text: str):
+        if Override_var is not None:
+            self._txt = Override_var
+        else:
+            self._txt = tk.StringVar(master=self, value=Text)
+        self.configure(textvariable=self._txt)
 
     @property
     def wrap(self) -> int: return self._wrap
@@ -334,43 +310,76 @@ class _BaseTkinterWidget(_LayoutManagerMixin):
     @property
     def __name__(self) -> str: return str(self.__class__.__name__)
 
+    # noinspection PyUnresolvedReferences
+    def show(self, *args, **kwargs) -> bool:
+        """         Shows the current widget or frame. Can be overridden to add additional functionality if need.        """
+        if self._manager_ is None: return False
+        if self._manager_ == Layout.pack:
+            self.pack(self._pi)
+            return True
+        elif self._manager_ == Layout.grid:
+            self.grid(self._pi)
+            return True
+        elif self._manager_ == Layout.place:
+            self.place(self._pi)
+            return True
 
-class TkinterFrame(tk.Frame, _BaseTkinterWidget):
+        return False
+    # noinspection PyUnresolvedReferences
+    def hide(self, *args, **kwargs) -> bool:
+        """         Hides the current widget or frame. Can be overridden to add additional functionality if need.        """
+        if self._manager_ is None: return False
+        if self._manager_ == Layout.pack:
+            self.pack_forget()
+            return True
+        elif self._manager_ == Layout.grid:
+            self.grid_forget()
+            return True
+        elif self._manager_ == Layout.place:
+            self.place_forget()
+            return True
+
+        return False
+
+
+
+class TkinterFrame(tk.Frame, _BaseTkinterWidget_):
     def __init__(self, master, **kwargs):
         tk.Frame.__init__(self, master=master, **kwargs)
 
     def pack(self, *args, **kwargs):
-        super(self.__class__, self).pack(*args, **kwargs)
+        super().pack(*args, **kwargs)
         self._pi = self.pack_info()
         self._manager_ = Layout.pack
         return self
 
     def place(self, *args, **kwargs):
-        super(self.__class__, self).place(*args, **kwargs)
+        super().place(*args, **kwargs)
         self._pi = self.place_info()
         self._manager_ = Layout.place
         return self
 
     def grid(self, *args, sticky: str or AnchorAndSticky = tk.NSEW, rowspan: int = 1, columnspan: int = 1, **kwargs):
         if isinstance(sticky, AnchorAndSticky): sticky = sticky.value
-        super(self.__class__, self).grid(*args, sticky=sticky, rowspan=rowspan, columnspan=columnspan, **kwargs)
+        super().grid(*args, sticky=sticky, rowspan=rowspan, columnspan=columnspan, **kwargs)
         self._pi = self.grid_info()
         self._manager_ = Layout.grid
         return self
     # noinspection PyMethodOverriding
     def grid_anchor(self, anchor: str or AnchorAndSticky):
         if isinstance(anchor, AnchorAndSticky): anchor = anchor.value
-        super(self.__class__, self).grid_anchor(anchor)
+        super().grid_anchor(anchor)
         return self
     def grid_rowconfigure(self, index: int, weight: int = 1, **kwargs):
-        super(self.__class__, self).grid_rowconfigure(index, weight=weight, **kwargs)
+        super().grid_rowconfigure(index, weight=weight, **kwargs)
         return self
     def grid_columnconfigure(self, index: int, weight: int = 1, **kwargs):
-        super(self.__class__, self).grid_columnconfigure(index, weight=weight, **kwargs)
+        super().grid_columnconfigure(index, weight=weight, **kwargs)
         return self
-class TkinterLabelFrame(tk.LabelFrame, _BaseTkinterWidget):
-    def __init__(self, master, **kwargs):
+class TkinterLabelFrame(tk.LabelFrame, _BaseTkinterWidget_):
+    def __init__(self, master, Text: str = '', Override_var: tk.StringVar = None, **kwargs):
         tk.LabelFrame.__init__(self, master=master, **kwargs)
+        _BaseTkinterWidget_.__init__(self, Override_var=Override_var, Text=Text)
 
     @property
     def txt(self) -> str: return self._txt.get()
@@ -380,37 +389,37 @@ class TkinterLabelFrame(tk.LabelFrame, _BaseTkinterWidget):
         self.configure(text=value)
 
     def pack(self, *args, **kwargs):
-        super(self.__class__, self).pack(*args, **kwargs)
+        super().pack(*args, **kwargs)
         self._pi = self.pack_info()
         self._manager_ = Layout.pack
         return self
 
     def place(self, *args, **kwargs):
-        super(self.__class__, self).place(*args, **kwargs)
+        super().place(*args, **kwargs)
         self._pi = self.place_info()
         self._manager_ = Layout.place
         return self
 
     def grid(self, *args, sticky: str or AnchorAndSticky = tk.NSEW, rowspan: int = 1, columnspan: int = 1, **kwargs):
         if isinstance(sticky, AnchorAndSticky): sticky = sticky.value
-        super(self.__class__, self).grid(*args, sticky=sticky, rowspan=rowspan, columnspan=columnspan, **kwargs)
+        super().grid(*args, sticky=sticky, rowspan=rowspan, columnspan=columnspan, **kwargs)
         self._pi = self.grid_info()
         self._manager_ = Layout.grid
         return self
     # noinspection PyMethodOverriding
     def grid_anchor(self, anchor: str or AnchorAndSticky):
         if isinstance(anchor, AnchorAndSticky): anchor = anchor.value
-        super(self.__class__, self).grid_anchor(anchor)
+        super().grid_anchor(anchor)
         return self
     def grid_rowconfigure(self, index: int, weight: int = 1, **kwargs):
-        super(self.__class__, self).grid_rowconfigure(index, weight=weight, **kwargs)
+        super().grid_rowconfigure(index, weight=weight, **kwargs)
         return self
     def grid_columnconfigure(self, index: int, weight: int = 1, **kwargs):
-        super(self.__class__, self).grid_columnconfigure(index, weight=weight, **kwargs)
+        super().grid_columnconfigure(index, weight=weight, **kwargs)
         return self
 
 
-class TkinterEntry(tk.Entry, _BaseTkinterWidget):
+class TkinterEntry(tk.Entry, _BaseTkinterWidget_):
     __doc__ = """Construct an entry widget with the parent MASTER.
 
     Valid resource names: background, bd, bg, borderwidth, cursor,
@@ -422,8 +431,9 @@ class TkinterEntry(tk.Entry, _BaseTkinterWidget):
     textvariable, validate, validatecommand, vcmd, width,
     xscrollcommand.
     """
-    def __init__(self, master, Color: dict = None, **kwargs):
+    def __init__(self, master, Color: dict = None, Text: str = '', Override_var: tk.StringVar = None, **kwargs):
         tk.Entry.__init__(self, master=master, **kwargs)
+        _BaseTkinterWidget_.__init__(self, Override_var=Override_var, Text=Text)
         if Color:
             self.configure(background=Color['BG'])
             self.configure(disabledforeground='black')
@@ -445,36 +455,37 @@ class TkinterEntry(tk.Entry, _BaseTkinterWidget):
 
 
     def pack(self, *args, **kwargs):
-        super(self.__class__, self).pack(*args, **kwargs)
+        super().pack(*args, **kwargs)
         self._pi = self.pack_info()
         self._manager_ = Layout.pack
         return self
 
     def place(self, *args, **kwargs):
-        super(self.__class__, self).place(*args, **kwargs)
+        super().place(*args, **kwargs)
         self._pi = self.place_info()
         self._manager_ = Layout.place
         return self
 
     def grid(self, *args, sticky: str or AnchorAndSticky = tk.NSEW, rowspan: int = 1, columnspan: int = 1, **kwargs):
         if isinstance(sticky, AnchorAndSticky): sticky = sticky.value
-        super(self.__class__, self).grid(*args, sticky=sticky, rowspan=rowspan, columnspan=columnspan, **kwargs)
+        super().grid(*args, sticky=sticky, rowspan=rowspan, columnspan=columnspan, **kwargs)
         self._pi = self.grid_info()
         self._manager_ = Layout.grid
         return self
     # noinspection PyMethodOverriding
     def grid_anchor(self, anchor: str or AnchorAndSticky):
         if isinstance(anchor, AnchorAndSticky): anchor = anchor.value
-        super(self.__class__, self).grid_anchor(anchor)
+        super().grid_anchor(anchor)
         return self
     def grid_rowconfigure(self, index: int, weight: int = 1, **kwargs):
-        super(self.__class__, self).grid_rowconfigure(index, weight=weight, **kwargs)
+        super().grid_rowconfigure(index, weight=weight, **kwargs)
         return self
     def grid_columnconfigure(self, index: int, weight: int = 1, **kwargs):
-        super(self.__class__, self).grid_columnconfigure(index, weight=weight, **kwargs)
+        super().grid_columnconfigure(index, weight=weight, **kwargs)
         return self
 
-class TkinterButton(tk.Button, _BaseTkinterWidget, _ImageMixin, _CommandMixin):
+
+class TkinterButton(tk.Button, _BaseTkinterWidget_, _ImageMixin, _CommandMixin):
     """Construct a button widget with the parent MASTER.
 
         STANDARD OPTIONS
@@ -509,44 +520,41 @@ class TkinterButton(tk.Button, _BaseTkinterWidget, _ImageMixin, _CommandMixin):
             self.configure(highlightcolor=Color['HFG'])
 
         if Command: self.SetCommand(Command)
-        if Override_var is not None:
-            self._txt = Override_var
-        else:
-            self._txt = tk.StringVar(master=self, value=Text)
-        self.configure(textvariable=self._txt)
+        _BaseTkinterWidget_.__init__(self, Override_var=Override_var, Text=Text)
 
 
     def pack(self, *args, **kwargs):
-        super(self.__class__, self).pack(*args, **kwargs)
+        super().pack(*args, **kwargs)
         self._pi = self.pack_info()
         self._manager_ = Layout.pack
         return self
 
     def place(self, *args, **kwargs):
-        super(self.__class__, self).place(*args, **kwargs)
+        super().place(*args, **kwargs)
         self._pi = self.place_info()
         self._manager_ = Layout.place
         return self
 
     def grid(self, *args, sticky: str or AnchorAndSticky = tk.NSEW, rowspan: int = 1, columnspan: int = 1, **kwargs):
         if isinstance(sticky, AnchorAndSticky): sticky = sticky.value
-        super(self.__class__, self).grid(*args, sticky=sticky, rowspan=rowspan, columnspan=columnspan, **kwargs)
+        super().grid(*args, sticky=sticky, rowspan=rowspan, columnspan=columnspan, **kwargs)
         self._pi = self.grid_info()
         self._manager_ = Layout.grid
         return self
     # noinspection PyMethodOverriding
     def grid_anchor(self, anchor: str or AnchorAndSticky):
         if isinstance(anchor, AnchorAndSticky): anchor = anchor.value
-        super(self.__class__, self).grid_anchor(anchor)
+        super().grid_anchor(anchor)
         return self
     def grid_rowconfigure(self, index: int, weight: int = 1, **kwargs):
-        super(self.__class__, self).grid_rowconfigure(index, weight=weight, **kwargs)
+        super().grid_rowconfigure(index, weight=weight, **kwargs)
         return self
     def grid_columnconfigure(self, index: int, weight: int = 1, **kwargs):
-        super(self.__class__, self).grid_columnconfigure(index, weight=weight, **kwargs)
+        super().grid_columnconfigure(index, weight=weight, **kwargs)
         return self
 
-class TkinterCheckBox(tk.Checkbutton, _BaseTkinterWidget, _CommandMixin, _ImageMixin):
+
+class TkinterCheckBox(tk.Checkbutton, _BaseTkinterWidget_, _CommandMixin, _ImageMixin):
     """Construct a checkbutton widget with the parent MASTER.
 
         Valid resource names:
@@ -599,14 +607,10 @@ class TkinterCheckBox(tk.Checkbutton, _BaseTkinterWidget, _CommandMixin, _ImageM
     _value: tk.BooleanVar
     def __init__(self, master, Text: str = '', Override_var: tk.StringVar = None, **kwargs):
         tk.Checkbutton.__init__(self, master=master, **kwargs)
+        _BaseTkinterWidget_.__init__(self, Override_var=Override_var, Text=Text)
         self._value = tk.BooleanVar(master=self, value=False)
         self.configure(variable=self._value)
 
-        if Override_var is not None:
-            self._txt = Override_var
-        else:
-            self._txt = tk.StringVar(master=self, value=Text)
-        self.configure(textvariable=self._txt)
 
     @property
     def value(self) -> bool: return self._value.get()
@@ -620,36 +624,37 @@ class TkinterCheckBox(tk.Checkbutton, _BaseTkinterWidget, _CommandMixin, _ImageM
 
 
     def pack(self, *args, **kwargs):
-        super(self.__class__, self).pack(*args, **kwargs)
+        super().pack(*args, **kwargs)
         self._pi = self.pack_info()
         self._manager_ = Layout.pack
         return self
 
     def place(self, *args, **kwargs):
-        super(self.__class__, self).place(*args, **kwargs)
+        super().place(*args, **kwargs)
         self._pi = self.place_info()
         self._manager_ = Layout.place
         return self
 
     def grid(self, *args, sticky: str or AnchorAndSticky = tk.NSEW, rowspan: int = 1, columnspan: int = 1, **kwargs):
         if isinstance(sticky, AnchorAndSticky): sticky = sticky.value
-        super(self.__class__, self).grid(*args, sticky=sticky, rowspan=rowspan, columnspan=columnspan, **kwargs)
+        super().grid(*args, sticky=sticky, rowspan=rowspan, columnspan=columnspan, **kwargs)
         self._pi = self.grid_info()
         self._manager_ = Layout.grid
         return self
     # noinspection PyMethodOverriding
     def grid_anchor(self, anchor: str or AnchorAndSticky):
         if isinstance(anchor, AnchorAndSticky): anchor = anchor.value
-        super(self.__class__, self).grid_anchor(anchor)
+        super().grid_anchor(anchor)
         return self
     def grid_rowconfigure(self, index: int, weight: int = 1, **kwargs):
-        super(self.__class__, self).grid_rowconfigure(index, weight=weight, **kwargs)
+        super().grid_rowconfigure(index, weight=weight, **kwargs)
         return self
     def grid_columnconfigure(self, index: int, weight: int = 1, **kwargs):
-        super(self.__class__, self).grid_columnconfigure(index, weight=weight, **kwargs)
+        super().grid_columnconfigure(index, weight=weight, **kwargs)
         return self
 
-class TkinterComboBox(ttk.Combobox, _BaseTkinterWidget, _CommandMixin):
+
+class TkinterComboBox(ttk.Combobox, _BaseTkinterWidget_, _CommandMixin):
     """Construct a Ttk Combobox widget with the parent master.
 
     STANDARD OPTIONS
@@ -672,12 +677,7 @@ class TkinterComboBox(ttk.Combobox, _BaseTkinterWidget, _CommandMixin):
     """
     def __init__(self, master, Text: str = '', Override_var: tk.StringVar = None, **kwargs):
         ttk.Combobox.__init__(self, master=master, **kwargs)
-
-        if Override_var is not None:
-            self._txt = Override_var
-        else:
-            self._txt = tk.StringVar(master=self, value=Text)
-        self.configure(textvariable=self._txt)
+        _BaseTkinterWidget_.__init__(self, Override_var=Override_var, Text=Text)
 
     @property
     def value(self) -> bool: return self._txt.get()
@@ -702,36 +702,37 @@ class TkinterComboBox(ttk.Combobox, _BaseTkinterWidget, _CommandMixin):
 
 
     def pack(self, *args, **kwargs):
-        super(self.__class__, self).pack(*args, **kwargs)
+        super().pack(*args, **kwargs)
         self._pi = self.pack_info()
         self._manager_ = Layout.pack
         return self
 
     def place(self, *args, **kwargs):
-        super(self.__class__, self).place(*args, **kwargs)
+        super().place(*args, **kwargs)
         self._pi = self.place_info()
         self._manager_ = Layout.place
         return self
 
     def grid(self, *args, sticky: str or AnchorAndSticky = tk.NSEW, rowspan: int = 1, columnspan: int = 1, **kwargs):
         if isinstance(sticky, AnchorAndSticky): sticky = sticky.value
-        super(self.__class__, self).grid(*args, sticky=sticky, rowspan=rowspan, columnspan=columnspan, **kwargs)
+        super().grid(*args, sticky=sticky, rowspan=rowspan, columnspan=columnspan, **kwargs)
         self._pi = self.grid_info()
         self._manager_ = Layout.grid
         return self
     # noinspection PyMethodOverriding
     def grid_anchor(self, anchor: str or AnchorAndSticky):
         if isinstance(anchor, AnchorAndSticky): anchor = anchor.value
-        super(self.__class__, self).grid_anchor(anchor)
+        super().grid_anchor(anchor)
         return self
     def grid_rowconfigure(self, index: int, weight: int = 1, **kwargs):
-        super(self.__class__, self).grid_rowconfigure(index, weight=weight, **kwargs)
+        super().grid_rowconfigure(index, weight=weight, **kwargs)
         return self
     def grid_columnconfigure(self, index: int, weight: int = 1, **kwargs):
-        super(self.__class__, self).grid_columnconfigure(index, weight=weight, **kwargs)
+        super().grid_columnconfigure(index, weight=weight, **kwargs)
         return self
 
-class TkinterLabel(tk.Label, _BaseTkinterWidget, _ImageMixin):
+
+class TkinterLabel(tk.Label, _BaseTkinterWidget_, _ImageMixin):
     __doc__ = """Construct a label widget with the parent MASTER.
 
     STANDARD OPTIONS
@@ -751,6 +752,7 @@ class TkinterLabel(tk.Label, _BaseTkinterWidget, _ImageMixin):
     """
     def __init__(self, master, Text: str = '', Override_var: tk.StringVar = None, Color: dict = None, **kwargs):
         tk.Label.__init__(self, master=master, **kwargs)
+        _BaseTkinterWidget_.__init__(self, Override_var=Override_var, Text=Text)
 
         if Color:
             self.configure(activebackground=Color['ABG'])
@@ -763,44 +765,40 @@ class TkinterLabel(tk.Label, _BaseTkinterWidget, _ImageMixin):
             self.configure(highlightbackground=Color['HBG'])
             self.configure(highlightcolor=Color['HFG'])
 
-        if Override_var is not None:
-            self._txt = Override_var
-        else:
-            self._txt = tk.StringVar(master=self, value=Text)
-        self.configure(textvariable=self._txt)
 
 
     def pack(self, *args, **kwargs):
-        super(self.__class__, self).pack(*args, **kwargs)
+        super().pack(*args, **kwargs)
         self._pi = self.pack_info()
         self._manager_ = Layout.pack
         return self
 
     def place(self, *args, **kwargs):
-        super(self.__class__, self).place(*args, **kwargs)
+        super().place(*args, **kwargs)
         self._pi = self.place_info()
         self._manager_ = Layout.place
         return self
 
     def grid(self, *args, sticky: str or AnchorAndSticky = tk.NSEW, rowspan: int = 1, columnspan: int = 1, **kwargs):
         if isinstance(sticky, AnchorAndSticky): sticky = sticky.value
-        super(self.__class__, self).grid(*args, sticky=sticky, rowspan=rowspan, columnspan=columnspan, **kwargs)
+        super().grid(*args, sticky=sticky, rowspan=rowspan, columnspan=columnspan, **kwargs)
         self._pi = self.grid_info()
         self._manager_ = Layout.grid
         return self
     # noinspection PyMethodOverriding
     def grid_anchor(self, anchor: str or AnchorAndSticky):
         if isinstance(anchor, AnchorAndSticky): anchor = anchor.value
-        super(self.__class__, self).grid_anchor(anchor)
+        super().grid_anchor(anchor)
         return self
     def grid_rowconfigure(self, index: int, weight: int = 1, **kwargs):
-        super(self.__class__, self).grid_rowconfigure(index, weight=weight, **kwargs)
+        super().grid_rowconfigure(index, weight=weight, **kwargs)
         return self
     def grid_columnconfigure(self, index: int, weight: int = 1, **kwargs):
-        super(self.__class__, self).grid_columnconfigure(index, weight=weight, **kwargs)
+        super().grid_columnconfigure(index, weight=weight, **kwargs)
         return self
 
-class TkinterListbox(tk.Listbox, _BaseTkinterWidget, _CommandMixin):
+
+class TkinterListbox(tk.Listbox, _BaseTkinterWidget_, _CommandMixin):
     """Construct a listbox widget with the parent MASTER.
 
     Valid resource names: background, bd, bg, borderwidth, cursor,
@@ -935,36 +933,37 @@ class TkinterListbox(tk.Listbox, _BaseTkinterWidget, _CommandMixin):
 
 
     def pack(self, *args, **kwargs):
-        super(self.__class__, self).pack(*args, **kwargs)
+        super().pack(*args, **kwargs)
         self._pi = self.pack_info()
         self._manager_ = Layout.pack
         return self
 
     def place(self, *args, **kwargs):
-        super(self.__class__, self).place(*args, **kwargs)
+        super().place(*args, **kwargs)
         self._pi = self.place_info()
         self._manager_ = Layout.place
         return self
 
     def grid(self, *args, sticky: str or AnchorAndSticky = tk.NSEW, rowspan: int = 1, columnspan: int = 1, **kwargs):
         if isinstance(sticky, AnchorAndSticky): sticky = sticky.value
-        super(self.__class__, self).grid(*args, sticky=sticky, rowspan=rowspan, columnspan=columnspan, **kwargs)
+        super().grid(*args, sticky=sticky, rowspan=rowspan, columnspan=columnspan, **kwargs)
         self._pi = self.grid_info()
         self._manager_ = Layout.grid
         return self
     # noinspection PyMethodOverriding
     def grid_anchor(self, anchor: str or AnchorAndSticky):
         if isinstance(anchor, AnchorAndSticky): anchor = anchor.value
-        super(self.__class__, self).grid_anchor(anchor)
+        super().grid_anchor(anchor)
         return self
     def grid_rowconfigure(self, index: int, weight: int = 1, **kwargs):
-        super(self.__class__, self).grid_rowconfigure(index, weight=weight, **kwargs)
+        super().grid_rowconfigure(index, weight=weight, **kwargs)
         return self
     def grid_columnconfigure(self, index: int, weight: int = 1, **kwargs):
-        super(self.__class__, self).grid_columnconfigure(index, weight=weight, **kwargs)
+        super().grid_columnconfigure(index, weight=weight, **kwargs)
         return self
 
-class TkinterTreeView(ttk.Treeview, _BaseTkinterWidget, _CommandMixin):
+
+class TkinterTreeView(ttk.Treeview, _BaseTkinterWidget_, _CommandMixin):
     def __init__(self, master: tk.Frame, Color: dict = None, **kwargs):
         ttk.Treeview.__init__(self, master=master, **kwargs)
         if Color:
@@ -1022,33 +1021,33 @@ class TkinterTreeView(ttk.Treeview, _BaseTkinterWidget, _CommandMixin):
                 tree.insert(parent, 'end', uid, text=value)  # text=key, value=value)
 
     def pack(self, *args, **kwargs):
-        super(self.__class__, self).pack(*args, **kwargs)
+        super().pack(*args, **kwargs)
         self._pi = self.pack_info()
         self._manager_ = Layout.pack
         return self
 
     def place(self, *args, **kwargs):
-        super(self.__class__, self).place(*args, **kwargs)
+        super().place(*args, **kwargs)
         self._pi = self.place_info()
         self._manager_ = Layout.place
         return self
 
     def grid(self, *args, sticky: str or AnchorAndSticky = tk.NSEW, rowspan: int = 1, columnspan: int = 1, **kwargs):
         if isinstance(sticky, AnchorAndSticky): sticky = sticky.value
-        super(self.__class__, self).grid(*args, sticky=sticky, rowspan=rowspan, columnspan=columnspan, **kwargs)
+        super().grid(*args, sticky=sticky, rowspan=rowspan, columnspan=columnspan, **kwargs)
         self._pi = self.grid_info()
         self._manager_ = Layout.grid
         return self
     # noinspection PyMethodOverriding
     def grid_anchor(self, anchor: str or AnchorAndSticky):
         if isinstance(anchor, AnchorAndSticky): anchor = anchor.value
-        super(self.__class__, self).grid_anchor(anchor)
+        super().grid_anchor(anchor)
         return self
     def grid_rowconfigure(self, index: int, weight: int = 1, **kwargs):
-        super(self.__class__, self).grid_rowconfigure(index, weight=weight, **kwargs)
+        super().grid_rowconfigure(index, weight=weight, **kwargs)
         return self
     def grid_columnconfigure(self, index: int, weight: int = 1, **kwargs):
-        super(self.__class__, self).grid_columnconfigure(index, weight=weight, **kwargs)
+        super().grid_columnconfigure(index, weight=weight, **kwargs)
         return self
 class TkinterTreeViewHolder(TkinterFrame):
     """Construct a Ttk Treeview with parent scale.
@@ -1085,33 +1084,33 @@ class TkinterTreeViewHolder(TkinterFrame):
 
 
     def pack(self, *args, **kwargs):
-        super(self.__class__, self).pack(*args, **kwargs)
+        super().pack(*args, **kwargs)
         self._pi = self.pack_info()
         self._manager_ = Layout.pack
         return self
 
     def place(self, *args, **kwargs):
-        super(self.__class__, self).place(*args, **kwargs)
+        super().place(*args, **kwargs)
         self._pi = self.place_info()
         self._manager_ = Layout.place
         return self
 
     def grid(self, *args, sticky: str or AnchorAndSticky = tk.NSEW, rowspan: int = 1, columnspan: int = 1, **kwargs):
         if isinstance(sticky, AnchorAndSticky): sticky = sticky.value
-        super(self.__class__, self).grid(*args, sticky=sticky, rowspan=rowspan, columnspan=columnspan, **kwargs)
+        super().grid(*args, sticky=sticky, rowspan=rowspan, columnspan=columnspan, **kwargs)
         self._pi = self.grid_info()
         self._manager_ = Layout.grid
         return self
     # noinspection PyMethodOverriding
     def grid_anchor(self, anchor: str or AnchorAndSticky):
         if isinstance(anchor, AnchorAndSticky): anchor = anchor.value
-        super(self.__class__, self).grid_anchor(anchor)
+        super().grid_anchor(anchor)
         return self
     def grid_rowconfigure(self, index: int, weight: int = 1, **kwargs):
-        super(self.__class__, self).grid_rowconfigure(index, weight=weight, **kwargs)
+        super().grid_rowconfigure(index, weight=weight, **kwargs)
         return self
     def grid_columnconfigure(self, index: int, weight: int = 1, **kwargs):
-        super(self.__class__, self).grid_columnconfigure(index, weight=weight, **kwargs)
+        super().grid_columnconfigure(index, weight=weight, **kwargs)
         return self
 
 
