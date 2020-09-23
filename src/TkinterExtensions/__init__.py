@@ -215,7 +215,6 @@ class _LayoutManagerMixin:
         return self
 class _ImageMixin:
     configure: callable
-    _master: any
     _pi: dict
     _optionalImage: ImageTk.PhotoImage
     _defaultImage: ImageTk.PhotoImage
@@ -223,7 +222,7 @@ class _ImageMixin:
     def SetDefaultImage(self, ImagePath: str = None, ImageData: str = None, display=True):
         if ImageData and ImagePath: raise KeyError('Cannot use both ImageData and ImageName')
         elif ImageData:
-            self._defaultImage = tk.PhotoImage(master=self._master, data=ImageData)
+            self._defaultImage = tk.PhotoImage(master=self, data=ImageData)
             if display: self.configure(image=self._defaultImage)
         elif ImagePath:
             self.OpenImage(ImagePath)
@@ -247,11 +246,11 @@ class _ImageMixin:
             raw_data = urlopen(url).read()
             with io.BytesIO(raw_data) as buf:
                 with Image.open(buf) as img:
-                    self._IMG = ImageTk.PhotoImage(img, master=self._master)
+                    self._IMG = ImageTk.PhotoImage(img, master=self)
                     self.configure(image=self._IMG)
         elif ImageData and ImagePath: raise KeyError('Cannot use both ImageData and ImageName')
         elif ImageData:
-            self._IMG = tk.PhotoImage(master=self._master, data=ImageData)
+            self._IMG = tk.PhotoImage(master=self, data=ImageData)
             self.configure(image=self._IMG)
         elif ImagePath:
             self.OpenImage(ImagePath)
@@ -260,7 +259,7 @@ class _ImageMixin:
         assert (os.path.isfile(path))
         with open(path, 'rb') as f:
             with Image.open(f) as img:
-                self._IMG = ImageTk.PhotoImage(img, master=self._master)
+                self._IMG = ImageTk.PhotoImage(img, master=self)
                 self.configure(image=self._IMG)
     def SetPhoto(self, *, Base64Data: str = None, rawData: bytes = None,
                  parent_pi: dict = None, parentRelX: float = None, parentRelY: float = None,
@@ -329,7 +328,6 @@ class _BaseTkinterWidget(object):
     configure: callable
     winfo_width: callable
     winfo_height: callable
-    _master: any
 
     _pi: dict
     _wrap: int
@@ -368,13 +366,10 @@ class _BaseTkinterWidget(object):
 
 class TkinterFrame(_LayoutManagerMixin, tk.Frame, _BaseTkinterWidget):
     def __init__(self, master, **kwargs):
-        self._master = master
-        tk.Frame.__init__(self, master=self._master, **kwargs)
-        self.place_configure()
+        tk.Frame.__init__(self, master=master, **kwargs)
 class TkinterLabelFrame(_LayoutManagerMixin, tk.LabelFrame, _BaseTkinterWidget):
     def __init__(self, master, **kwargs):
-        self._master = master
-        tk.LabelFrame.__init__(self, master=self._master, **kwargs)
+        tk.LabelFrame.__init__(self, master=master, **kwargs)
 
     @property
     def txt(self) -> str: return self._txt.get()
@@ -397,8 +392,7 @@ class TkinterEntry(_LayoutManagerMixin, tk.Entry, _BaseTkinterWidget):
     xscrollcommand.
     """
     def __init__(self, master, Color: dict = None, **kwargs):
-        self._master = master
-        tk.Entry.__init__(self, master=self._master, **kwargs)
+        tk.Entry.__init__(self, master=master, **kwargs)
         if Color:
             self.configure(background=Color['BG'])
             self.configure(disabledforeground='black')
@@ -439,8 +433,7 @@ class TkinterButton(_LayoutManagerMixin, tk.Button, _BaseTkinterWidget, _ImageMi
         overrelief, state, width
     """
     def __init__(self, master, Text: str = '', Override_var: tk.StringVar = None, Color: dict = None, Command: callable = None, **kwargs):
-        self._master = master
-        tk.Button.__init__(self, master=self._master, **kwargs)
+        tk.Button.__init__(self, master=master, **kwargs)
         cmd = kwargs.get('Command', None) or kwargs.get('command', None)
         if cmd: self.SetCommand(cmd)
         if Color:
@@ -514,8 +507,7 @@ class TkinterCheckBox(_LayoutManagerMixin, tk.Checkbutton, _BaseTkinterWidget, _
     """
     _value: tk.BooleanVar
     def __init__(self, master, Text: str = '', Override_var: tk.StringVar = None, **kwargs):
-        self._master = master
-        tk.Checkbutton.__init__(self, master=self._master, **kwargs)
+        tk.Checkbutton.__init__(self, master=master, **kwargs)
         self._value = tk.BooleanVar(master=self, value=False)
         self.configure(variable=self._value)
 
@@ -558,8 +550,7 @@ class TkinterComboBox(_LayoutManagerMixin, ttk.Combobox, _BaseTkinterWidget, _Co
         width
     """
     def __init__(self, master, Text: str = '', Override_var: tk.StringVar = None, **kwargs):
-        self._master = master
-        ttk.Combobox.__init__(self, master=self._master, **kwargs)
+        ttk.Combobox.__init__(self, master=master, **kwargs)
 
         if Override_var is not None:
             self._txt = Override_var
@@ -608,8 +599,7 @@ class TkinterLabel(_LayoutManagerMixin, tk.Label, _BaseTkinterWidget, _ImageMixi
 
     """
     def __init__(self, master, Text: str = '', Override_var: tk.StringVar = None, Color: dict = None, **kwargs):
-        self._master = master
-        tk.Label.__init__(self, master=self._master, **kwargs)
+        tk.Label.__init__(self, master=master, **kwargs)
 
         if Color:
             self.configure(activebackground=Color['ABG'])
@@ -642,11 +632,10 @@ class TkinterListbox(_LayoutManagerMixin, tk.Listbox, _BaseTkinterWidget, _Comma
     """
     _Current_ListBox_Index: int = None
     def __init__(self, master, *, Command: callable = None, z=None, Color: dict = None, selectMode: str = tk.SINGLE, **kwargs):
-        self._master = master
         if 'SelectMode' in kwargs:
             selectMode = kwargs.pop('SelectMode')
         assert (selectMode in (tk.SINGLE, tk.MULTIPLE))
-        tk.Listbox.__init__(self, master=self._master, selectmode=selectMode, **kwargs)
+        tk.Listbox.__init__(self, master=master, selectmode=selectMode, **kwargs)
         if Command is not None: self.SetCommand(Command, z=z)
         if Color:
             self.configure(background=Color['BG'])

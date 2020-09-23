@@ -1,3 +1,5 @@
+@echo off
+
 rmdir /Q /S dist
 mkdir dist
 
