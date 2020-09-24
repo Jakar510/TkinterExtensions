@@ -25,7 +25,7 @@ __all__ = [
         'TkinterEntry', 'TkinterLabel', 'TkinterButton', 'TkinterListbox', 'TkinterEvent', 'tkEvent', 'KeyBindings', 'TkinterTreeView', 'TkinterTreeViewHolder', 'TkinterCheckBox',
         'TkinterFrame', 'TkinterLabelFrame', 'TkinterComboBox', 'tk', 'ttk', 'ButtonGrid', 'ResizePhoto', 'CalculateWrapLength', 'RoundFloat',
 
-        'ActiveStyle', 'AnchorAndSticky', 'Fill', 'Side', 'Relief', 'Orient', 'Wrap', 'BorderMode', 'Tags', 'States', 'MenuItemTypes', 'SelectionMode', 'CanvasStyles', 'ViewArguments'
+        'ActiveStyle', 'AnchorAndSticky', 'Fill', 'Side', 'Relief', 'Orient', 'Wrap', 'BorderMode', 'Tags', 'ViewState', 'MenuItemTypes', 'SelectionMode', 'CanvasStyles', 'ViewArguments'
         ]
 
 
@@ -155,32 +155,20 @@ class Layout(IntEnum):
     pack = 3
 
 
-# noinspection PyUnusedLocal
+
 class _BaseTkinterWidget_:
     configure: callable
     winfo_width: callable
     winfo_height: callable
 
-    _optionalImage: ImageTk.PhotoImage
-    _defaultImage: ImageTk.PhotoImage
+    _state_: ViewState = ViewState.Hidden
+    _optionalImage: ImageTk.PhotoImage = None
+    _defaultImage: ImageTk.PhotoImage = None
     _IMG: ImageTk.PhotoImage = None
     _cmd: callable
     _pi: dict = { }
     _manager_: Layout = None
-    _wrap: int
-    _defaultImage = None
-    _optionalImage = None
-
-    _txt: tk.StringVar
-    _screenWidth: int
-    _screenHeight: int
-
-    def __init__(self, *, Override_var: tk.StringVar = None, Text: str):
-        if Override_var is not None:
-            self._txt = Override_var
-        else:
-            self._txt = tk.StringVar(master=self, value=Text)
-        self.configure(textvariable=self._txt)
+    _wrap: int = None
 
     @property
     def wrap(self) -> int: return self._wrap
@@ -189,13 +177,12 @@ class _BaseTkinterWidget_:
         self._wrap = value
         self.configure(wraplength=self._wrap)
 
-    @property
-    def txt(self) -> str: return self._txt.get()
-    @txt.setter
-    def txt(self, value: str): self._txt.set(value)
 
     @property
     def pi(self) -> dict: return self._pi.copy()
+    @property
+    def State(self) -> ViewState: return self._state_
+
     @property
     def width(self) -> int: return self.winfo_width()
     @property
@@ -210,34 +197,62 @@ class _BaseTkinterWidget_:
         if self._manager_ is None: return False
         if self._manager_ == Layout.pack:
             self.pack(self._pi)
-            return True
+            return self._show()
         elif self._manager_ == Layout.grid:
             self.grid(self._pi)
-            return True
+            return self._show()
         elif self._manager_ == Layout.place:
             self.place(self._pi)
-            return True
+            return self._show()
 
         return False
+    def _show(self) -> bool:
+        self._state_ = ViewState.Normal
+        return True
+
     # noinspection PyUnresolvedReferences
     def hide(self, *args, **kwargs) -> bool:
         """         Hides the current widget or frame. Can be overridden to add additional functionality if need.        """
         if self._manager_ is None: return False
         if self._manager_ == Layout.pack:
             self.pack_forget()
-            return True
+            return self._hide()
         elif self._manager_ == Layout.grid:
             self.grid_forget()
-            return True
+            return self._hide()
         elif self._manager_ == Layout.place:
             self.place_forget()
-            return True
+            return self._hide()
 
         return False
+    def _hide(self) -> bool:
+        self._state_ = ViewState.Hidden
+        return True
+
+    def SetActive(self):
+        self.configure(state=ViewState.Active.value)
+        self._state_ = ViewState.Active
+    def Disable(self):
+        self.configure(state=ViewState.Disabled.value)
+        self._state_ = ViewState.Disabled
 
     def __call__(self, *args, **kwargs):
         if self._cmd:
             self._cmd(*args, **kwargs)
+class _BaseTextTkinterWidget_(_BaseTkinterWidget_):
+    _txt: tk.StringVar
+    def __init__(self, *, Override_var: tk.StringVar = None, Text: str):
+        if Override_var is not None:
+            self._txt = Override_var
+        else:
+            self._txt = tk.StringVar(master=self, value=Text)
+        self.configure(textvariable=self._txt)
+
+    @property
+    def txt(self) -> str: return self._txt.get()
+    @txt.setter
+    def txt(self, value: str): self._txt.set(value)
+
 
 
 class TkinterFrame(tk.Frame, _BaseTkinterWidget_):
@@ -274,7 +289,7 @@ class TkinterFrame(tk.Frame, _BaseTkinterWidget_):
     def grid_columnconfigure(self, index: int, weight: int = 1, **kwargs):
         super().grid_columnconfigure(index, weight=weight, **kwargs)
         return self
-class TkinterLabelFrame(tk.LabelFrame, _BaseTkinterWidget_):
+class TkinterLabelFrame(tk.LabelFrame, _BaseTextTkinterWidget_):
     """Construct a labelframe widget with the parent MASTER.
 
     STANDARD OPTIONS
@@ -294,6 +309,7 @@ class TkinterLabelFrame(tk.LabelFrame, _BaseTkinterWidget_):
         if 'text' in kwargs: Text = kwargs.pop('text') or Text
         if 'Text' in kwargs: Text = kwargs.pop('Text') or Text
         tk.LabelFrame.__init__(self, master=master, text=Text, **kwargs)
+        _BaseTextTkinterWidget_.__init__(self, Override_var=None, Text=Text)
 
     @property
     def txt(self) -> str: return self._txt.get()
@@ -334,7 +350,7 @@ class TkinterLabelFrame(tk.LabelFrame, _BaseTkinterWidget_):
         return self
 
 
-class TkinterEntry(tk.Entry, _BaseTkinterWidget_):
+class TkinterEntry(tk.Entry, _BaseTextTkinterWidget_):
     __doc__ = """Construct an entry widget with the parent MASTER.
 
     Valid resource names: background, bd, bg, borderwidth, cursor,
@@ -348,7 +364,7 @@ class TkinterEntry(tk.Entry, _BaseTkinterWidget_):
     """
     def __init__(self, master, Color: dict = None, Text: str = '', Override_var: tk.StringVar = None, **kwargs):
         tk.Entry.__init__(self, master=master, **kwargs)
-        _BaseTkinterWidget_.__init__(self, Override_var=Override_var, Text=Text)
+        _BaseTextTkinterWidget_.__init__(self, Override_var=Override_var, Text=Text)
         if Color:
             self.configure(background=Color['BG'])
             self.configure(disabledforeground='black')
@@ -401,7 +417,7 @@ class TkinterEntry(tk.Entry, _BaseTkinterWidget_):
         return self
 
 
-class TkinterButton(tk.Button, _BaseTkinterWidget_):
+class TkinterButton(tk.Button, _BaseTextTkinterWidget_):
     """Construct a button widget with the parent MASTER.
 
         STANDARD OPTIONS
@@ -436,7 +452,7 @@ class TkinterButton(tk.Button, _BaseTkinterWidget_):
             self.configure(highlightcolor=Color['HFG'])
 
         if Command: self.SetCommand(Command)
-        _BaseTkinterWidget_.__init__(self, Override_var=Override_var, Text=Text)
+        _BaseTextTkinterWidget_.__init__(self, Override_var=Override_var, Text=Text)
 
 
     def pack(self, *args, **kwargs):
@@ -573,7 +589,7 @@ class TkinterButton(tk.Button, _BaseTkinterWidget_):
                 self.configure(image=self._IMG)
 
 
-class TkinterCheckBox(tk.Checkbutton, _BaseTkinterWidget_):
+class TkinterCheckBox(tk.Checkbutton, _BaseTextTkinterWidget_):
     """Construct a checkbutton widget with the parent MASTER.
 
         Valid resource names:
@@ -626,7 +642,7 @@ class TkinterCheckBox(tk.Checkbutton, _BaseTkinterWidget_):
     _value: tk.BooleanVar
     def __init__(self, master, Text: str = '', Override_var: tk.StringVar = None, **kwargs):
         tk.Checkbutton.__init__(self, master=master, **kwargs)
-        _BaseTkinterWidget_.__init__(self, Override_var=Override_var, Text=Text)
+        _BaseTextTkinterWidget_.__init__(self, Override_var=Override_var, Text=Text)
         self._value = tk.BooleanVar(master=self, value=False)
         self.configure(variable=self._value)
 
@@ -776,7 +792,7 @@ class TkinterCheckBox(tk.Checkbutton, _BaseTkinterWidget_):
                 self.configure(image=self._IMG)
 
 
-class TkinterComboBox(ttk.Combobox, _BaseTkinterWidget_):
+class TkinterComboBox(ttk.Combobox, _BaseTextTkinterWidget_):
     """Construct a Ttk Combobox widget with the parent master.
 
     STANDARD OPTIONS
@@ -799,7 +815,7 @@ class TkinterComboBox(ttk.Combobox, _BaseTkinterWidget_):
     """
     def __init__(self, master, Text: str = '', Override_var: tk.StringVar = None, **kwargs):
         ttk.Combobox.__init__(self, master=master, **kwargs)
-        _BaseTkinterWidget_.__init__(self, Override_var=Override_var, Text=Text)
+        _BaseTextTkinterWidget_.__init__(self, Override_var=Override_var, Text=Text)
 
     @property
     def value(self) -> bool: return self._txt.get()
@@ -856,7 +872,7 @@ class TkinterComboBox(ttk.Combobox, _BaseTkinterWidget_):
         return self
 
 
-class TkinterLabel(tk.Label, _BaseTkinterWidget_):
+class TkinterLabel(tk.Label, _BaseTextTkinterWidget_):
     __doc__ = """Construct a label widget with the parent MASTER.
 
     STANDARD OPTIONS
@@ -876,7 +892,7 @@ class TkinterLabel(tk.Label, _BaseTkinterWidget_):
     """
     def __init__(self, master, Text: str = '', Override_var: tk.StringVar = None, Color: dict = None, **kwargs):
         tk.Label.__init__(self, master=master, **kwargs)
-        _BaseTkinterWidget_.__init__(self, Override_var=Override_var, Text=Text)
+        _BaseTextTkinterWidget_.__init__(self, Override_var=Override_var, Text=Text)
 
         if Color:
             self.configure(activebackground=Color['ABG'])
@@ -1005,7 +1021,7 @@ class TkinterLabel(tk.Label, _BaseTkinterWidget_):
                 self.configure(image=self._IMG)
 
 
-class TkinterListbox(tk.Listbox, _BaseTkinterWidget_):
+class TkinterListbox(tk.Listbox, _BaseTextTkinterWidget_):
     """Construct a listbox widget with the parent MASTER.
 
     Valid resource names: background, bd, bg, borderwidth, cursor,

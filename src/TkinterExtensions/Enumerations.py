@@ -4,7 +4,7 @@ from tkinter.constants import *
 
 
 
-__all__ = ['ActiveStyle', 'AnchorAndSticky', 'Fill', 'Side', 'Relief', 'Orient', 'Wrap', 'BorderMode', 'Tags', 'States', 'MenuItemTypes', 'SelectionMode', 'CanvasStyles', 'ViewArguments']
+__all__ = ['ActiveStyle', 'AnchorAndSticky', 'Fill', 'Side', 'Relief', 'Orient', 'Wrap', 'BorderMode', 'Tags', 'ViewState', 'MenuItemTypes', 'SelectionMode', 'CanvasStyles', 'ViewArguments']
 
 class AnchorAndSticky(Enum):
     North = N
@@ -62,7 +62,7 @@ class Tags(Enum):  # Special tags, marks and insert positions
     Anchor = ANCHOR
     All = ALL  # e.g. Canvas.delete(ALL)
 
-class States(Enum):  # Text widget and button states
+class ViewState(Enum):  # Text widget and button states
     Normal = NORMAL
     Disabled = DISABLED
     Active = ACTIVE
