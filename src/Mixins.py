@@ -1,10 +1,12 @@
+
 # ------------------------------------------------------------------------------
-#  Created by Tyler Stegmaier.
+#  Created by Tyler Stegmaier
 #  Copyright (c) 2020.
 #
 # ------------------------------------------------------------------------------
 
-# major.minor[.maintenance]
-VERSION = (1, 1, 0)
-
-__version__ = version = '.'.join(map(str, VERSION))
+class AutoNameMixin:
+    @property
+    def __name__(self) -> str: return str(self.__class__.__name__)
+class NameMixin:
+    __name__: str = None

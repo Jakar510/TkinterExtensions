@@ -1,10 +1,19 @@
-from enum import Enum
+# ------------------------------------------------------------------------------
+#  Created by Tyler Stegmaier
+#  Copyright (c) 2020.
+#
+# ------------------------------------------------------------------------------
+
+from enum import Enum, IntEnum
 from tkinter.constants import *
 
 
 
 
-__all__ = ['ActiveStyle', 'AnchorAndSticky', 'Fill', 'Side', 'Relief', 'Orient', 'Wrap', 'BorderMode', 'Tags', 'ViewState', 'MenuItemTypes', 'SelectionMode', 'CanvasStyles', 'ViewArguments']
+__all__ = [
+        'ActiveStyle', 'AnchorAndSticky', 'Fill', 'Side', 'Relief', 'Orient', 'Wrap', 'BorderMode', 'Tags', 'ViewState', 'MenuItemTypes', 'SelectionMode', 'CanvasStyles', 'Layout',
+        'ViewArguments'
+        ]
 
 class AnchorAndSticky(Enum):
     North = N
@@ -104,3 +113,8 @@ class ViewArguments(Enum):  # Arguments to xview/yview
     Scroll = SCROLL
     Units = UNITS
     Pages = PAGES
+
+class Layout(IntEnum):
+    place = 1
+    grid = 2
+    pack = 3

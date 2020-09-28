@@ -1,3 +1,9 @@
+# ------------------------------------------------------------------------------
+#  Created by Tyler Stegmaier
+#  Copyright (c) 2020.
+#
+# ------------------------------------------------------------------------------
+
 from setuptools import setup
 
 from src.TkinterExtensions.__version__ import version
