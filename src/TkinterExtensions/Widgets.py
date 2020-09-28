@@ -112,12 +112,12 @@ class _BaseTkinterWidget_:
         if callable(self._cmd): self._cmd(*args, **kwargs)
 class _BaseTextTkinterWidget_(_BaseTkinterWidget_):
     _txt: tk.StringVar
-    def __init__(self, *, Override_var: tk.StringVar = None, Text: str):
+    def __init__(self, *, Override_var: tk.StringVar or None, Text: str, configure: bool = True):
         if Override_var is not None:
             self._txt = Override_var
         else:
             self._txt = tk.StringVar(master=self, value=Text)
-        self.configure(textvariable=self._txt)
+        if configure: self.configure(textvariable=self._txt)
 
     @property
     def txt(self) -> str: return self._txt.get()
@@ -180,7 +180,7 @@ class TkinterLabelFrame(tk.LabelFrame, _BaseTextTkinterWidget_):
         if 'text' in kwargs: Text = kwargs.pop('text') or Text
         if 'Text' in kwargs: Text = kwargs.pop('Text') or Text
         tk.LabelFrame.__init__(self, master=master, text=Text, **kwargs)
-        _BaseTextTkinterWidget_.__init__(self, Override_var=None, Text=Text)
+        _BaseTextTkinterWidget_.__init__(self, Override_var=None, Text=Text, configure=False)
 
     @property
     def txt(self) -> str: return self._txt.get()

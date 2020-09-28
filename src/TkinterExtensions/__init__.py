@@ -5,9 +5,9 @@
 # ------------------------------------------------------------------------------
 
 
-from .Events import *
-from .debug import *
-from .Enumerations import *
-from .Widgets import *
-from .Helpers import *
 from .Bindings import *
+from .Enumerations import *
+from .Events import *
+from .Helpers import *
+from .Widgets import *
+from .debug import *
