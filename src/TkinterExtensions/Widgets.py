@@ -113,7 +113,7 @@ class _BaseTkinterWidget_(tk.Widget):
         self._pi = self.place_info()
         self._manager_ = Layout.place
         return self
-
+    def PlaceFull(self): return self.Place(relx=0.0, rely=0.0, relwidth=1.0, relheight=1.0)
 
     def Grid(self, cnf={ }, sticky: str or AnchorAndSticky = tk.NSEW, rowspan: int = 1, columnspan: int = 1, **kwargs):
         if isinstance(sticky, AnchorAndSticky): sticky = sticky.value
