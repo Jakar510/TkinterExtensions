@@ -15,6 +15,17 @@ __all__ = [
         'ViewArguments'
         ]
 
+class Layout(IntEnum):
+    place = 1
+    grid = 2
+    pack = 3
+
+class ViewState(Enum):  # v _widget and button states
+    Normal = NORMAL
+    Disabled = DISABLED
+    Active = ACTIVE
+    Hidden = HIDDEN  # Canvas state
+
 class AnchorAndSticky(Enum):
     North = N
     South = S
@@ -71,11 +82,6 @@ class Tags(Enum):  # Special tags, marks and insert positions
     Anchor = ANCHOR
     All = ALL  # e.g. Canvas.delete(ALL)
 
-class ViewState(Enum):  # Text widget and button states
-    Normal = NORMAL
-    Disabled = DISABLED
-    Active = ACTIVE
-    Hidden = HIDDEN  # Canvas state
 
 class MenuItemTypes(Enum):  # Menu item types
     Cascade = CASCADE
@@ -113,8 +119,3 @@ class ViewArguments(Enum):  # Arguments to xview/yview
     Scroll = SCROLL
     Units = UNITS
     Pages = PAGES
-
-class Layout(IntEnum):
-    place = 1
-    grid = 2
-    pack = 3

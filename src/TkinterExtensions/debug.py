@@ -17,20 +17,21 @@ def _rootLevelDataRecurive(w) -> dict:
 def _WidgetDataRecurive(w) -> dict:
     assert (isinstance(w, _BaseTkinterWidget_) and isinstance(w, tk.BaseWidget))
     return {
-            'Type':                       w.__class__,
-            'str(w)':                     str(w),
-            'repr(w)':                    repr(w),
-            'PI (position info)':         w.pi,
-            'master.children':            w.master.children,
-            'children':                   w.children,
-            'winfo_id()':                 w.winfo_id(),
-            'winfo_name()':               w.winfo_name(),
-            'winfo_parent()':             w.winfo_parent(),
-            'winfo_manager()':            w.winfo_manager(),
-            'winfo_ismapped()':           w.winfo_ismapped(),
-            'winfo_pathname(winfo_id())': w.winfo_pathname(w.winfo_id()),
-            'winfo_children()':           _childData(w.winfo_children()),
+            'Type':                     w.__class__,
+            'str(w)':                   str(w),
+            'repr(w)':                  repr(w),
+            'PI (position info)':       w.pi,
+            # 'master.children':            w.master.children,
+            'children':                 w.children,
+            'winfo_id':                 w.winfo_id(),
+            'winfo_name':               w.winfo_name(),
+            'winfo_parent':             w.winfo_parent(),
+            'winfo_manager':            w.winfo_manager(),
+            'winfo_ismapped':           w.winfo_ismapped(),
+            'winfo_pathname(winfo_id)': w.winfo_pathname(w.winfo_id()),
+            'winfo_children':           _childData(w.winfo_children()),
             }
+
 def _childData(obj):
     if isinstance(obj, dict):
         r = { }
@@ -44,8 +45,8 @@ def _childData(obj):
         r = []
         for w in obj:
             print('type(w)', type(w))
-            r.append(_WidgetDataRecurive(w))
-        return r
+            r.append((w.winfo_id(), _WidgetDataRecurive(w)))
+        return dict(r)
 
     return obj
 def DebugWidgetRecursively(w, *, Message: str):
@@ -68,19 +69,19 @@ def _rootLevelData(w, root: tk.Tk or tk.Toplevel) -> dict:
 def _WidgetData(w) -> dict:
     assert (isinstance(w, _BaseTkinterWidget_) and isinstance(w, tk.BaseWidget))
     return {
-            'Type':                       w.__class__,
-            'str(w)':                     str(w),
-            'repr(w)':                    repr(w),
-            'PI (position info)':         w.pi,
-            'master.children':            w.master.children,
-            'children':                   w.children,
-            'winfo_id()':                 w.winfo_id(),
-            'winfo_name()':               w.winfo_name(),
-            'winfo_parent()':             w.winfo_parent(),
-            'winfo_manager()':            w.winfo_manager(),
-            'winfo_ismapped()':           w.winfo_ismapped(),
-            'winfo_pathname(winfo_id())': w.winfo_pathname(w.winfo_id()),
-            'winfo_children()':           w.winfo_children(),
+            'Type':                     w.__class__,
+            'str(w)':                   str(w),
+            'repr(w)':                  repr(w),
+            'PI (position info)':       w.pi,
+            'master.children':          w.master.children,
+            'children':                 w.children,
+            'winfo_id':                 w.winfo_id(),
+            'winfo_name':               w.winfo_name(),
+            'winfo_parent':             w.winfo_parent(),
+            'winfo_manager':            w.winfo_manager(),
+            'winfo_ismapped':           w.winfo_ismapped(),
+            'winfo_pathname(winfo_id)': w.winfo_pathname(w.winfo_id()),
+            'winfo_children':           w.winfo_children(),
             }
 def DebugWidget(w, *, root: tk.Tk or tk.Toplevel, Message: str):
     assert (isinstance(w, _BaseTkinterWidget_) and isinstance(w, tk.BaseWidget))

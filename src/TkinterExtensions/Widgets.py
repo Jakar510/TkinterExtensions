@@ -8,9 +8,8 @@ import base64
 import io
 import os
 import tkinter as tk
-from abc import ABC
 from tkinter import Event as tkEvent, ttk
-from typing import Dict
+from typing import Union
 from urllib.request import urlopen
 
 from PIL import Image, ImageTk
@@ -24,111 +23,84 @@ from .Helpers import *
 
 
 __all__ = [
-        'TkinterEntry', 'TkinterLabel', 'TkinterButton', 'TkinterListbox', 'tkEvent', 'TkinterTreeView', 'TkinterTreeViewHolder', 'TkinterCheckBox',
-        'TkinterFrame', 'TkinterLabelFrame', 'TkinterComboBox', 'tk', 'ttk', 'ButtonGrid',
+        'tk', 'ttk', 'CurrentValue', 'tkEvent',
 
-        'ActiveStyle', 'AnchorAndSticky', 'Fill', 'Side', 'Relief', 'Orient', 'Wrap', 'BorderMode', 'Tags', 'ViewState', 'MenuItemTypes', 'SelectionMode', 'CanvasStyles', 'ViewArguments'
+        'TkinterEntry', 'TkinterLabel', 'TkinterButton', 'TkinterListbox', 'TkinterTreeView', 'TkinterTreeViewHolder',
+        'TkinterCheckBox', 'TkinterFrame', 'TkinterLabelFrame', 'TkinterComboBox',
         ]
 
-class _BaseTkinterWidget_:
+
+class _BaseTkinterWidget_(tk.Widget):
     configure: callable
     winfo_width: callable
     winfo_height: callable
+    focus_set: callable
     children: dict
 
     _state_: ViewState = ViewState.Hidden
-    _optionalImage: ImageTk.PhotoImage = None
-    _defaultImage: ImageTk.PhotoImage = None
-    _IMG: ImageTk.PhotoImage = None
     _cmd: callable
     _pi: dict = { }
     _manager_: Layout = None
     _wrap: int = None
 
     @property
-    def wrap(self) -> int: return self._wrap
-    @wrap.setter
-    def wrap(self, value: int):
-        self._wrap = value
-        self.configure(wraplength=self._wrap)
-
-
-    @property
     def pi(self) -> dict: return self._pi.copy()
+
     @property
     def State(self) -> ViewState: return self._state_
 
     @property
     def width(self) -> int: return self.winfo_width()
+
     @property
     def height(self) -> int: return self.winfo_height()
 
     # noinspection PyUnresolvedReferences
-    def show(self, *args, **kwargs) -> bool:
-        """         Shows the current widget or frame. Can be overridden to add additional functionality if need.        """
+    def show(self, **kwargs) -> bool:
+        """         Shows the current _widget or frame. Can be overridden to add additional functionality if need.        """
         if self._manager_ is None: return False
+
+        state = kwargs.get('state', None) or kwargs.get('State', ViewState.Normal)
+        assert (isinstance(state, ViewState))
+
         if self._manager_ == Layout.pack:
             self.pack(self._pi)
-            return self._show()
+            return self._show(state)
+
         elif self._manager_ == Layout.grid:
             self.grid(self._pi)
-            return self._show()
+            return self._show(state)
+
         elif self._manager_ == Layout.place:
             self.place(self._pi)
-            return self._show()
+            return self._show(state)
 
         return False
-    def _show(self) -> bool:
-        self._state_ = ViewState.Normal
+    def _show(self, state: ViewState = ViewState.Normal) -> bool:
+        self._SetState(state)
         return True
 
     # noinspection PyUnresolvedReferences
-    def hide(self, *args, **kwargs) -> bool:
-        """         Hides the current widget or frame. Can be overridden to add additional functionality if need.        """
+    def hide(self) -> bool:
+        """         Hides the current _widget or frame. Can be overridden to add additional functionality if need.        """
         if self._manager_ is None: return False
         if self._manager_ == Layout.pack:
             self.pack_forget()
             return self._hide()
+
         elif self._manager_ == Layout.grid:
             self.grid_forget()
             return self._hide()
+
         elif self._manager_ == Layout.place:
             self.place_forget()
             return self._hide()
 
         return False
     def _hide(self) -> bool:
-        self._state_ = ViewState.Hidden
+        self._SetState(state=ViewState.Hidden)
         return True
 
-    def SetActive(self):
-        self.configure(state=ViewState.Active.value)
-        self._state_ = ViewState.Active
-    def Disable(self):
-        self.configure(state=ViewState.Disabled.value)
-        self._state_ = ViewState.Disabled
-
-    def __call__(self, *args, **kwargs):
-        if callable(self._cmd): self._cmd(*args, **kwargs)
-class _BaseTextTkinterWidget_(_BaseTkinterWidget_):
-    _txt: tk.StringVar
-    def __init__(self, *, Override_var: tk.StringVar or None, Text: str, configure: bool = True):
-        if Override_var is not None:
-            self._txt = Override_var
-        else:
-            self._txt = tk.StringVar(master=self, value=Text)
-        if configure: self.configure(textvariable=self._txt)
-
-    @property
-    def txt(self) -> str: return self._txt.get()
-    @txt.setter
-    def txt(self, value: str): self._txt.set(value)
-
-
-
-class TkinterFrame(tk.Frame, _BaseTkinterWidget_):
-    def __init__(self, master, **kwargs):
-        tk.Frame.__init__(self, master=master, **kwargs)
 
     def Pack(self, cnf={ }, **kwargs):
         self.pack(cnf, **kwargs)
@@ -150,18 +122,218 @@ class TkinterFrame(tk.Frame, _BaseTkinterWidget_):
         self._manager_ = Layout.grid
         return self
     # noinspection PyMethodOverriding
-    def grid_anchor(self, anchor: str or AnchorAndSticky):
+    def Grid_Anchor(self, anchor: str or AnchorAndSticky):
         if isinstance(anchor, AnchorAndSticky): anchor = anchor.value
-        super().grid_anchor(anchor)
+        self.grid_anchor(anchor)
         return self
-    def grid_rowconfigure(self, index: int, weight: int = 1, **kwargs):
-        super().grid_rowconfigure(index, weight=weight, **kwargs)
+    def Grid_RowConfigure(self, index: int, weight: int = 1, **kwargs):
+        self.grid_rowconfigure(index, weight=weight, **kwargs)
         return self
-    def grid_columnconfigure(self, index: int, weight: int = 1, **kwargs):
-        super().grid_columnconfigure(index, weight=weight, **kwargs)
+    def Grid_ColumnConfigure(self, index: int, weight: int = 1, **kwargs):
+        self.grid_columnconfigure(index, weight=weight, **kwargs)
         return self
+
+
+    def SetActive(self, takeFocus: bool = True):
+        if takeFocus: self.focus_set()
+        return self._SetState(state=ViewState.Active)
+    def Disable(self): return self._SetState(state=ViewState.Disabled)
+    def _SetState(self, state: ViewState):
+        assert (isinstance(state, ViewState))
+        try: self.configure(state=state.value)
+        except tk.TclError: pass
+
+        self._state_ = state
+        return self
+
+
+    def __call__(self, *args, **kwargs):
+        if callable(self._cmd): self._cmd(*args, **kwargs)
+class _BaseTextTkinterWidget_(_BaseTkinterWidget_):
+    _txt: tk.StringVar
+    # noinspection PyMissingConstructor
+    def __init__(self, *, Override_var: tk.StringVar or None, Text: str, configure: bool = True):
+        if Override_var is not None:
+            self._txt = Override_var
+        else:
+            self._txt = tk.StringVar(master=self, value=Text)
+        if configure: self.configure(textvariable=self._txt)
+
+    @property
+    def txt(self) -> str: return self._txt.get()
+    @txt.setter
+    def txt(self, value: str): self._txt.set(value)
+
+    @property
+    def wrap(self) -> int: return self._wrap
+    @wrap.setter
+    def wrap(self, value: int):
+        self._wrap = value
+        self.configure(wraplength=self._wrap)
+
+class CallWrapper(object):
+    """Internal class. Stores function to call when some user
+    defined Tcl function is called e.g. after an event occurred."""
+
+    _func: callable
+    _widget: Union[_BaseTextTkinterWidget_, _BaseTkinterWidget_] = None
+    def __init__(self, func: callable, widget: Union[_BaseTextTkinterWidget_, _BaseTkinterWidget_] = None):
+        """Store FUNC, SUBST and WIDGET as members."""
+        self._func: callable = func
+        self._widget = widget
+
+    def __call__(self, *args, **kwargs):
+        """Apply first function SUBST to arguments, than FUNC."""
+        try:
+            return self._func(*args, **kwargs)
+        except SystemExit: raise
+        except Exception:
+            if hasattr(self._widget, '_report_exception'):
+                # noinspection PyProtectedMember
+                self._widget._report_exception()
+            else: raise
+
+    def __repr__(self) -> str: return f'{super().__repr__().replace(">", "")} [ {dict(func=self._func, widget=self._widget)} ]>'
+    def __str__(self) -> str: return repr(self)
+
+
+
+    def SetWidget(self, w):
+        """ Internal Method """
+        assert (isinstance(w, _BaseTkinterWidget_))
+        self._widget = w
+        return self
+
+    @classmethod
+    def Create(cls, func: callable, z: int or str = None, widget: Union[_BaseTextTkinterWidget_, tk.Widget] = None, **kwargs):
+        if kwargs and func:
+            return cls(lambda x=kwargs: func(**x), widget=widget)
+        elif z is not None and func:
+            return cls(lambda x=z: func(x), widget=widget)
+        elif func:
+            return cls(func, widget=widget)
+
+        return None
+class CurrentValue(CallWrapper):
+    def __call__(self, *args, **kwargs): return self._func(self._widget.txt, *args, **kwargs)
+    def SetWidget(self, w):
+        """ Internal Method """
+        assert (isinstance(w, _BaseTextTkinterWidget_) and isinstance(w, tk.Widget))
+        self._widget = w
+        return self
+
+
+class CommandMixin:
+    _cmd: CallWrapper
+    configure: callable
+    def __call__(self, *args, **kwargs): return self._cmd(*args, **kwargs)
+    def SetCommand(self, func: Union[callable, CurrentValue], z: int or str = None, **kwargs):
+        try:
+            assert (callable(func) or isinstance(func, CurrentValue))
+        except AssertionError:
+            raise ValueError(f'_func is not callable. got {type(func)}')
+
+        if isinstance(func, CurrentValue): self._cmd = func.SetWidget(self)
+        else: self._cmd = CallWrapper.Create(func, z, **kwargs)
+
+        return self._setCommand()
+    def _setCommand(self):
+        self.configure(command=self._cmd)
+        return self
+
+
+class ImageMixin:
+    _pi: dict
+    configure: callable
+    _IMG: Union[ImageTk.PhotoImage, tk.PhotoImage] = None
+    def SetImage(self, ImagePath: str = None, ImageData: str = None, url: str = None):
+        if url: self.DownloadImage(url)
+        elif ImageData and ImagePath: raise KeyError('Cannot use both ImageData and ImageName')
+        elif ImageData:
+            self._IMG = tk.PhotoImage(master=self, data=ImageData)
+            self.configure(image=self._IMG)
+        elif ImagePath:
+            self.OpenImage(ImagePath)
+        return self
+    def DownloadImage(self, url: str):
+        raw_data = urlopen(url).read()
+        with io.BytesIO(raw_data) as buf:
+            with Image.open(buf) as img:
+                self._IMG = ImageTk.PhotoImage(img, master=self)
+                self.configure(image=self._IMG)
+    def OpenImage(self, path: str):
+        assert (os.path.isfile(path))
+        with open(path, 'rb') as f:
+            with Image.open(f) as img:
+                self._IMG = ImageTk.PhotoImage(img, master=self)
+                self.configure(image=self._IMG)
+    def SetPhoto(self, *, Base64Data: str = None, rawData: bytes = None,
+                 parent_pi: dict = None, parentRelX: float = None, parentRelY: float = None,
+                 maxWidth: int = None, maxHeight: int = None,
+                 offset_factor: float = 0.95, screenWidth: int, screenHeight: int):
+        if parent_pi is not None:
+            parentRelX = float(parent_pi['relwidth'])
+            parentRelY = float(parent_pi['relheight'])
+
+        assert (isinstance(parentRelX, float))
+        assert (isinstance(parentRelY, float))
+
+        if maxWidth is None:
+            # if hasattr(widget, 'width'): maxHeight = widget.width
+            if 'width' in self._pi and self._pi['width'] != '':
+                maxWidth = (float(self._pi['width']) / screenWidth) * offset_factor * parentRelX
+            else:
+                maxWidth = CalculateWrapLength(screenWidth, float(self._pi['relwidth']), offset_factor, parentRelX)
+            maxWidth = int(maxWidth)
+        if maxHeight is None:
+            # if hasattr(widget, 'height'): maxHeight = widget.height
+            if 'height' in self._pi and self._pi['height'] != '':
+                maxHeight = (float(self._pi['height']) / screenHeight) * offset_factor * parentRelY
+            else:
+                maxHeight = CalculateWrapLength(screenHeight, float(self._pi['relheight']), offset_factor, parentRelY)
+            maxHeight = int(maxHeight)
+
+        if Base64Data:
+            assert (Base64Data is not None)
+            rawData = base64.b64decode(Base64Data)
+
+        assert (rawData is not None)
+        with io.BytesIO(rawData) as buf:
+            with Image.open(buf) as tempImg:
+                self._IMG = ImageTk.PhotoImage(master=self, image=ResizePhoto(tempImg, MaxWidth=maxWidth, MaxHeight=maxHeight))
+                self.configure(image=self._IMG)
+
+    # # noinspection DuplicatedCode
+    # def SetDefaultImage(self, ImagePath: str = None, ImageData: str = None, display=True):
+    #     if ImageData and ImagePath: raise KeyError('Cannot use both ImageData and ImageName')
+    #     elif ImageData:
+    #         self._defaultImage = tk.PhotoImage(master=self, data=ImageData)
+    #         if display: self.configure(image=self._defaultImage)
+    #     elif ImagePath:
+    #         self.OpenImage(ImagePath)
+    #         if display: self.configure(image=self._defaultImage)
+    #     return self
+    # # noinspection DuplicatedCode
+    # def SetOptionalImage(self, ImagePath: str = None, ImageData: str = None, display=True):
+    #     if ImageData and ImagePath: raise KeyError('Cannot use both ImageData and ImageName')
+    #     elif ImageData:
+    #         self._optionalImage = tk.PhotoImage(master=self, data=ImageData)
+    #         if display: self.configure(image=self._optionalImage)
+    #     elif ImagePath:
+    #         self.OpenImage(ImagePath)
+    #         if display: self.configure(image=self._optionalImage)
+    #     return self
+
+
+
+
+
+class TkinterFrame(tk.Frame, _BaseTkinterWidget_):
+    def __init__(self, master, **kwargs):
+        tk.Frame.__init__(self, master=master, **kwargs)
+
 class TkinterLabelFrame(tk.LabelFrame, _BaseTextTkinterWidget_):
-    """Construct a labelframe widget with the parent MASTER.
+    """Construct a labelframe _widget with the parent MASTER.
 
     STANDARD OPTIONS
 
@@ -178,7 +350,7 @@ class TkinterLabelFrame(tk.LabelFrame, _BaseTextTkinterWidget_):
     """
     def __init__(self, master, Text: str = '', **kwargs):
         if 'text' in kwargs: Text = kwargs.pop('text') or Text
-        if 'Text' in kwargs: Text = kwargs.pop('Text') or Text
+        if 'v' in kwargs: Text = kwargs.pop('v') or Text
         tk.LabelFrame.__init__(self, master=master, text=Text, **kwargs)
         _BaseTextTkinterWidget_.__init__(self, Override_var=None, Text=Text, configure=False)
 
@@ -189,40 +361,10 @@ class TkinterLabelFrame(tk.LabelFrame, _BaseTextTkinterWidget_):
         self._txt.set(value)
         self.configure(text=value)
 
-    def Pack(self, cnf={ }, **kwargs):
-        self.pack(cnf, **kwargs)
-        self._pi = self.pack_info()
-        self._manager_ = Layout.pack
-        return self
-
-    def Place(self, cnf={ }, **kwargs):
-        self.place(cnf, **kwargs)
-        self._pi = self.place_info()
-        self._manager_ = Layout.place
-        return self
-
-
-    def Grid(self, cnf={ }, sticky: str or AnchorAndSticky = tk.NSEW, rowspan: int = 1, columnspan: int = 1, **kwargs):
-        if isinstance(sticky, AnchorAndSticky): sticky = sticky.value
-        self.grid(cnf, sticky=sticky, rowspan=rowspan, columnspan=columnspan, **kwargs)
-        self._pi = self.grid_info()
-        self._manager_ = Layout.grid
-        return self
-    # noinspection PyMethodOverriding
-    def grid_anchor(self, anchor: str or AnchorAndSticky):
-        if isinstance(anchor, AnchorAndSticky): anchor = anchor.value
-        super().grid_anchor(anchor)
-        return self
-    def grid_rowconfigure(self, index: int, weight: int = 1, **kwargs):
-        super().grid_rowconfigure(index, weight=weight, **kwargs)
-        return self
-    def grid_columnconfigure(self, index: int, weight: int = 1, **kwargs):
-        super().grid_columnconfigure(index, weight=weight, **kwargs)
-        return self
 
 
 class TkinterEntry(tk.Entry, _BaseTextTkinterWidget_):
-    __doc__ = """Construct an entry widget with the parent MASTER.
+    __doc__ = """Construct an entry _widget with the parent MASTER.
 
     Valid resource names: background, bd, bg, borderwidth, cursor,
     exportselection, fg, font, foreground, highlightbackground,
@@ -256,40 +398,10 @@ class TkinterEntry(tk.Entry, _BaseTextTkinterWidget_):
         self.insert(tk.END, value)
 
 
-    def Pack(self, cnf={ }, **kwargs):
-        self.pack(cnf, **kwargs)
-        self._pi = self.pack_info()
-        self._manager_ = Layout.pack
-        return self
-
-    def Place(self, cnf={ }, **kwargs):
-        self.place(cnf, **kwargs)
-        self._pi = self.place_info()
-        self._manager_ = Layout.place
-        return self
 
 
-    def Grid(self, cnf={ }, sticky: str or AnchorAndSticky = tk.NSEW, rowspan: int = 1, columnspan: int = 1, **kwargs):
-        if isinstance(sticky, AnchorAndSticky): sticky = sticky.value
-        self.grid(cnf, sticky=sticky, rowspan=rowspan, columnspan=columnspan, **kwargs)
-        self._pi = self.grid_info()
-        self._manager_ = Layout.grid
-        return self
-    # noinspection PyMethodOverriding
-    def grid_anchor(self, anchor: str or AnchorAndSticky):
-        if isinstance(anchor, AnchorAndSticky): anchor = anchor.value
-        super().grid_anchor(anchor)
-        return self
-    def grid_rowconfigure(self, index: int, weight: int = 1, **kwargs):
-        super().grid_rowconfigure(index, weight=weight, **kwargs)
-        return self
-    def grid_columnconfigure(self, index: int, weight: int = 1, **kwargs):
-        super().grid_columnconfigure(index, weight=weight, **kwargs)
-        return self
-
-
-class TkinterButton(tk.Button, _BaseTextTkinterWidget_):
-    """Construct a button widget with the parent MASTER.
+class TkinterButton(tk.Button, _BaseTextTkinterWidget_, ImageMixin, CommandMixin):
+    """Construct a button _widget with the parent MASTER.
 
         STANDARD OPTIONS
 
@@ -309,7 +421,7 @@ class TkinterButton(tk.Button, _BaseTextTkinterWidget_):
     """
     def __init__(self, master, Text: str = '', Override_var: tk.StringVar = None, Color: dict = None, Command: callable = None, **kwargs):
         tk.Button.__init__(self, master=master, **kwargs)
-        cmd = kwargs.get('Command', None) or kwargs.get('command', None)
+        cmd = kwargs.pop('command', None)
         if cmd: self.SetCommand(cmd)
         if Color:
             self.configure(activebackground=Color['ABG'])
@@ -326,142 +438,10 @@ class TkinterButton(tk.Button, _BaseTextTkinterWidget_):
         _BaseTextTkinterWidget_.__init__(self, Override_var=Override_var, Text=Text)
 
 
-    def Pack(self, cnf={ }, **kwargs):
-        self.pack(cnf, **kwargs)
-        self._pi = self.pack_info()
-        self._manager_ = Layout.pack
-        return self
-
-    def Place(self, cnf={ }, **kwargs):
-        self.place(cnf, **kwargs)
-        self._pi = self.place_info()
-        self._manager_ = Layout.place
-        return self
 
 
-    def Grid(self, cnf={ }, sticky: str or AnchorAndSticky = tk.NSEW, rowspan: int = 1, columnspan: int = 1, **kwargs):
-        if isinstance(sticky, AnchorAndSticky): sticky = sticky.value
-        self.grid(cnf, sticky=sticky, rowspan=rowspan, columnspan=columnspan, **kwargs)
-        self._pi = self.grid_info()
-        self._manager_ = Layout.grid
-        return self
-    # noinspection PyMethodOverriding
-    def grid_anchor(self, anchor: str or AnchorAndSticky):
-        if isinstance(anchor, AnchorAndSticky): anchor = anchor.value
-        super().grid_anchor(anchor)
-        return self
-    def grid_rowconfigure(self, index: int, weight: int = 1, **kwargs):
-        super().grid_rowconfigure(index, weight=weight, **kwargs)
-        return self
-    def grid_columnconfigure(self, index: int, weight: int = 1, **kwargs):
-        super().grid_columnconfigure(index, weight=weight, **kwargs)
-        return self
-
-    # noinspection DuplicatedCode
-    def SetCommand(self, func: callable, z: int or str = None, **kwargs):
-        try:
-            assert (callable(func))
-        except AssertionError:
-            raise ValueError(f'func is not callable. got {type(func)}')
-        if kwargs and func:
-            self._cmd = lambda x=kwargs: func(**x)
-            self.configure(command=self._cmd)
-        elif z is not None and func:
-            self._cmd = lambda x=z: func(x)
-            self.configure(command=self._cmd)
-        elif func:
-            self._cmd = func
-            self.configure(command=func)
-        return self
-
-    # noinspection DuplicatedCode
-    def SetDefaultImage(self, ImagePath: str = None, ImageData: str = None, display=True):
-        if ImageData and ImagePath: raise KeyError('Cannot use both ImageData and ImageName')
-        elif ImageData:
-            self._defaultImage = tk.PhotoImage(master=self, data=ImageData)
-            if display: self.configure(image=self._defaultImage)
-        elif ImagePath:
-            self.OpenImage(ImagePath)
-            if display: self.configure(image=self._defaultImage)
-        return self
-    # noinspection DuplicatedCode
-    def SetOptionalImage(self, ImagePath: str = None, ImageData: str = None, display=True):
-        if ImageData and ImagePath: raise KeyError('Cannot use both ImageData and ImageName')
-        elif ImageData:
-            self._optionalImage = tk.PhotoImage(master=self, data=ImageData)
-            if display: self.configure(image=self._optionalImage)
-        elif ImagePath:
-            self.OpenImage(ImagePath)
-            if display: self.configure(image=self._optionalImage)
-        return self
-    # noinspection DuplicatedCode
-    def SetImage(self, ImagePath: str = None, ImageData: str = None, default: bool = False, optional: bool = False, url: str = None):
-        if optional:
-            self.configure(image=self._optionalImage)
-        elif default:
-            self.configure(image=self._defaultImage)
-        elif url:
-            raw_data = urlopen(url).read()
-            with io.BytesIO(raw_data) as buf:
-                with Image.open(buf) as img:
-                    self._IMG = ImageTk.PhotoImage(img, master=self)
-                    self.configure(image=self._IMG)
-        elif ImageData and ImagePath: raise KeyError('Cannot use both ImageData and ImageName')
-        elif ImageData:
-            self._IMG = tk.PhotoImage(master=self, data=ImageData)
-            self.configure(image=self._IMG)
-        elif ImagePath:
-            self.OpenImage(ImagePath)
-        return self
-    # noinspection DuplicatedCode
-    def OpenImage(self, path: str):
-        assert (os.path.isfile(path))
-        with open(path, 'rb') as f:
-            with Image.open(f) as img:
-                self._IMG = ImageTk.PhotoImage(img, master=self)
-                self.configure(image=self._IMG)
-    # noinspection DuplicatedCode
-    def SetPhoto(self, *, Base64Data: str = None, rawData: bytes = None,
-                 parent_pi: dict = None, parentRelX: float = None, parentRelY: float = None,
-                 maxWidth: int = None, maxHeight: int = None,
-                 offset_factor: float = 0.95, screenWidth: int, screenHeight: int):
-        if parent_pi is not None:
-            parentRelX = float(parent_pi['relwidth'])
-            parentRelY = float(parent_pi['relheight'])
-
-        assert (isinstance(parentRelX, float))
-        assert (isinstance(parentRelY, float))
-
-        if maxWidth is None:
-            # if hasattr(widget, 'width'): maxHeight = widget.width
-            if 'width' in self._pi and self._pi['width'] != '':
-                maxWidth = (float(self._pi['width']) / screenWidth) * offset_factor * parentRelX
-            else:
-                maxWidth = CalculateWrapLength(screenWidth, float(self._pi['relwidth']), offset_factor, parentRelX)
-            maxWidth = int(maxWidth)
-        if maxHeight is None:
-            # if hasattr(widget, 'height'): maxHeight = widget.height
-            if 'height' in self._pi and self._pi['height'] != '':
-                maxHeight = (float(self._pi['height']) / screenHeight) * offset_factor * parentRelY
-            else:
-                maxHeight = CalculateWrapLength(screenHeight, float(self._pi['relheight']), offset_factor, parentRelY)
-            maxHeight = int(maxHeight)
-
-        if Base64Data:
-            assert (Base64Data is not None)
-            msg = base64.b64decode(Base64Data)
-        else:
-            assert (rawData is not None)
-            msg = rawData
-
-        with io.BytesIO(msg) as buf:
-            with Image.open(buf) as tempImg:
-                self._IMG = ImageTk.PhotoImage(master=self, image=ResizePhoto(tempImg, MaxWidth=maxWidth, MaxHeight=maxHeight))
-                self.configure(image=self._IMG)
-
-
-class TkinterCheckBox(tk.Checkbutton, _BaseTextTkinterWidget_):
-    """Construct a checkbutton widget with the parent MASTER.
+class TkinterCheckBox(tk.Checkbutton, _BaseTextTkinterWidget_, ImageMixin, CommandMixin):
+    """Construct a checkbutton _widget with the parent MASTER.
 
         Valid resource names:
 
@@ -529,142 +509,10 @@ class TkinterCheckBox(tk.Checkbutton, _BaseTextTkinterWidget_):
             self.deselect()
 
 
-    def Pack(self, cnf={ }, **kwargs):
-        self.pack(cnf, **kwargs)
-        self._pi = self.pack_info()
-        self._manager_ = Layout.pack
-        return self
-
-    def Place(self, cnf={ }, **kwargs):
-        self.place(cnf, **kwargs)
-        self._pi = self.place_info()
-        self._manager_ = Layout.place
-        return self
 
 
-    def Grid(self, cnf={ }, sticky: str or AnchorAndSticky = tk.NSEW, rowspan: int = 1, columnspan: int = 1, **kwargs):
-        if isinstance(sticky, AnchorAndSticky): sticky = sticky.value
-        self.grid(cnf, sticky=sticky, rowspan=rowspan, columnspan=columnspan, **kwargs)
-        self._pi = self.grid_info()
-        self._manager_ = Layout.grid
-        return self
-    # noinspection PyMethodOverriding
-    def grid_anchor(self, anchor: str or AnchorAndSticky):
-        if isinstance(anchor, AnchorAndSticky): anchor = anchor.value
-        super().grid_anchor(anchor)
-        return self
-    def grid_rowconfigure(self, index: int, weight: int = 1, **kwargs):
-        super().grid_rowconfigure(index, weight=weight, **kwargs)
-        return self
-    def grid_columnconfigure(self, index: int, weight: int = 1, **kwargs):
-        super().grid_columnconfigure(index, weight=weight, **kwargs)
-        return self
-
-    # noinspection DuplicatedCode
-    def SetCommand(self, func: callable, z: int or str = None, **kwargs):
-        try:
-            assert (callable(func))
-        except AssertionError:
-            raise ValueError(f'func is not callable. got {type(func)}')
-        if kwargs and func:
-            self._cmd = lambda x=kwargs: func(**x)
-            self.configure(command=self._cmd)
-        elif z is not None and func:
-            self._cmd = lambda x=z: func(x)
-            self.configure(command=self._cmd)
-        elif func:
-            self._cmd = func
-            self.configure(command=func)
-        return self
-
-    # noinspection DuplicatedCode
-    def SetDefaultImage(self, ImagePath: str = None, ImageData: str = None, display=True):
-        if ImageData and ImagePath: raise KeyError('Cannot use both ImageData and ImageName')
-        elif ImageData:
-            self._defaultImage = tk.PhotoImage(master=self, data=ImageData)
-            if display: self.configure(image=self._defaultImage)
-        elif ImagePath:
-            self.OpenImage(ImagePath)
-            if display: self.configure(image=self._defaultImage)
-        return self
-    # noinspection DuplicatedCode
-    def SetOptionalImage(self, ImagePath: str = None, ImageData: str = None, display=True):
-        if ImageData and ImagePath: raise KeyError('Cannot use both ImageData and ImageName')
-        elif ImageData:
-            self._optionalImage = tk.PhotoImage(master=self, data=ImageData)
-            if display: self.configure(image=self._optionalImage)
-        elif ImagePath:
-            self.OpenImage(ImagePath)
-            if display: self.configure(image=self._optionalImage)
-        return self
-    # noinspection DuplicatedCode
-    def SetImage(self, ImagePath: str = None, ImageData: str = None, default: bool = False, optional: bool = False, url: str = None):
-        if optional:
-            self.configure(image=self._optionalImage)
-        elif default:
-            self.configure(image=self._defaultImage)
-        elif url:
-            raw_data = urlopen(url).read()
-            with io.BytesIO(raw_data) as buf:
-                with Image.open(buf) as img:
-                    self._IMG = ImageTk.PhotoImage(img, master=self)
-                    self.configure(image=self._IMG)
-        elif ImageData and ImagePath: raise KeyError('Cannot use both ImageData and ImageName')
-        elif ImageData:
-            self._IMG = tk.PhotoImage(master=self, data=ImageData)
-            self.configure(image=self._IMG)
-        elif ImagePath:
-            self.OpenImage(ImagePath)
-        return self
-    # noinspection DuplicatedCode
-    def OpenImage(self, path: str):
-        assert (os.path.isfile(path))
-        with open(path, 'rb') as f:
-            with Image.open(f) as img:
-                self._IMG = ImageTk.PhotoImage(img, master=self)
-                self.configure(image=self._IMG)
-    # noinspection DuplicatedCode
-    def SetPhoto(self, *, Base64Data: str = None, rawData: bytes = None,
-                 parent_pi: dict = None, parentRelX: float = None, parentRelY: float = None,
-                 maxWidth: int = None, maxHeight: int = None,
-                 offset_factor: float = 0.95, screenWidth: int, screenHeight: int):
-        if parent_pi is not None:
-            parentRelX = float(parent_pi['relwidth'])
-            parentRelY = float(parent_pi['relheight'])
-
-        assert (isinstance(parentRelX, float))
-        assert (isinstance(parentRelY, float))
-
-        if maxWidth is None:
-            # if hasattr(widget, 'width'): maxHeight = widget.width
-            if 'width' in self._pi and self._pi['width'] != '':
-                maxWidth = (float(self._pi['width']) / screenWidth) * offset_factor * parentRelX
-            else:
-                maxWidth = CalculateWrapLength(screenWidth, float(self._pi['relwidth']), offset_factor, parentRelX)
-            maxWidth = int(maxWidth)
-        if maxHeight is None:
-            # if hasattr(widget, 'height'): maxHeight = widget.height
-            if 'height' in self._pi and self._pi['height'] != '':
-                maxHeight = (float(self._pi['height']) / screenHeight) * offset_factor * parentRelY
-            else:
-                maxHeight = CalculateWrapLength(screenHeight, float(self._pi['relheight']), offset_factor, parentRelY)
-            maxHeight = int(maxHeight)
-
-        if Base64Data:
-            assert (Base64Data is not None)
-            msg = base64.b64decode(Base64Data)
-        else:
-            assert (rawData is not None)
-            msg = rawData
-
-        with io.BytesIO(msg) as buf:
-            with Image.open(buf) as tempImg:
-                self._IMG = ImageTk.PhotoImage(master=self, image=ResizePhoto(tempImg, MaxWidth=maxWidth, MaxHeight=maxHeight))
-                self.configure(image=self._IMG)
-
-
-class TkinterComboBox(ttk.Combobox, _BaseTextTkinterWidget_):
-    """Construct a Ttk Combobox widget with the parent master.
+class TkinterComboBox(ttk.Combobox, _BaseTextTkinterWidget_, CommandMixin):
+    """Construct a Ttk Combobox _widget with the parent master.
 
     STANDARD OPTIONS
 
@@ -693,58 +541,17 @@ class TkinterComboBox(ttk.Combobox, _BaseTextTkinterWidget_):
     @value.setter
     def value(self, v: str): self._txt.set(v)
 
-    # noinspection DuplicatedCode
-    def SetCommand(self, func: callable, z: int or str = None, **kwargs):
-        assert (callable(func))
-        if kwargs and func:
-            self._cmd = lambda x=kwargs: func(**x)
-            self.bind(KeyBindings.ComboboxSelected, self._cmd)
-        elif z is not None and func:
-            self._cmd = lambda x=z: func(x)
-            self.bind(KeyBindings.ComboboxSelected, self._cmd)
-        elif func:
-            self._cmd = func
-            self.bind(KeyBindings.ComboboxSelected, self._cmd)
+    def _setCommand(self):
+        self.bind(KeyBindings.ComboboxSelected, self._cmd)
         return self
 
     def SetValues(self, values: list or tuple):
         self.configure(values=values)
 
 
-    def Pack(self, cnf={ }, **kwargs):
-        self.pack(cnf, **kwargs)
-        self._pi = self.pack_info()
-        self._manager_ = Layout.pack
-        return self
 
-    def Place(self, cnf={ }, **kwargs):
-        self.place(cnf, **kwargs)
-        self._pi = self.place_info()
-        self._manager_ = Layout.place
-        return self
-
-
-    def Grid(self, cnf={ }, sticky: str or AnchorAndSticky = tk.NSEW, rowspan: int = 1, columnspan: int = 1, **kwargs):
-        if isinstance(sticky, AnchorAndSticky): sticky = sticky.value
-        self.grid(cnf, sticky=sticky, rowspan=rowspan, columnspan=columnspan, **kwargs)
-        self._pi = self.grid_info()
-        self._manager_ = Layout.grid
-        return self
-    # noinspection PyMethodOverriding
-    def grid_anchor(self, anchor: str or AnchorAndSticky):
-        if isinstance(anchor, AnchorAndSticky): anchor = anchor.value
-        super().grid_anchor(anchor)
-        return self
-    def grid_rowconfigure(self, index: int, weight: int = 1, **kwargs):
-        super().grid_rowconfigure(index, weight=weight, **kwargs)
-        return self
-    def grid_columnconfigure(self, index: int, weight: int = 1, **kwargs):
-        super().grid_columnconfigure(index, weight=weight, **kwargs)
-        return self
-
-
-class TkinterLabel(tk.Label, _BaseTextTkinterWidget_):
-    __doc__ = """Construct a label widget with the parent MASTER.
+class TkinterLabel(tk.Label, _BaseTextTkinterWidget_, ImageMixin):
+    __doc__ = """Construct a label _widget with the parent MASTER.
 
     STANDARD OPTIONS
 
@@ -776,124 +583,10 @@ class TkinterLabel(tk.Label, _BaseTextTkinterWidget_):
             self.configure(highlightbackground=Color['HBG'])
             self.configure(highlightcolor=Color['HFG'])
 
-    def Pack(self, cnf={ }, **kwargs):
-        self.pack(cnf, **kwargs)
-        self._pi = self.pack_info()
-        self._manager_ = Layout.pack
-        return self
-
-    def Place(self, cnf={ }, **kwargs):
-        self.place(cnf, **kwargs)
-        self._pi = self.place_info()
-        self._manager_ = Layout.place
-        return self
-
-    def Grid(self, cnf={ }, sticky: str or AnchorAndSticky = tk.NSEW, rowspan: int = 1, columnspan: int = 1, **kwargs):
-        if isinstance(sticky, AnchorAndSticky): sticky = sticky.value
-        self.grid(cnf, sticky=sticky, rowspan=rowspan, columnspan=columnspan, **kwargs)
-        self._pi = self.grid_info()
-        self._manager_ = Layout.grid
-        return self
-    # noinspection PyMethodOverriding
-    def grid_anchor(self, anchor: str or AnchorAndSticky):
-        if isinstance(anchor, AnchorAndSticky): anchor = anchor.value
-        super().grid_anchor(anchor)
-        return self
-    def grid_rowconfigure(self, index: int, weight: int = 1, **kwargs):
-        super().grid_rowconfigure(index, weight=weight, **kwargs)
-        return self
-    def grid_columnconfigure(self, index: int, weight: int = 1, **kwargs):
-        super().grid_columnconfigure(index, weight=weight, **kwargs)
-        return self
-
-    # noinspection DuplicatedCode
-    def SetDefaultImage(self, ImagePath: str = None, ImageData: str = None, display=True):
-        if ImageData and ImagePath: raise KeyError('Cannot use both ImageData and ImageName')
-        elif ImageData:
-            self._defaultImage = tk.PhotoImage(master=self, data=ImageData)
-            if display: self.configure(image=self._defaultImage)
-        elif ImagePath:
-            self.OpenImage(ImagePath)
-            if display: self.configure(image=self._defaultImage)
-        return self
-    # noinspection DuplicatedCode
-    def SetOptionalImage(self, ImagePath: str = None, ImageData: str = None, display=True):
-        if ImageData and ImagePath: raise KeyError('Cannot use both ImageData and ImageName')
-        elif ImageData:
-            self._optionalImage = tk.PhotoImage(master=self, data=ImageData)
-            if display: self.configure(image=self._optionalImage)
-        elif ImagePath:
-            self.OpenImage(ImagePath)
-            if display: self.configure(image=self._optionalImage)
-        return self
-    # noinspection DuplicatedCode
-    def SetImage(self, ImagePath: str = None, ImageData: str = None, default: bool = False, optional: bool = False, url: str = None):
-        if optional:
-            self.configure(image=self._optionalImage)
-        elif default:
-            self.configure(image=self._defaultImage)
-        elif url:
-            raw_data = urlopen(url).read()
-            with io.BytesIO(raw_data) as buf:
-                with Image.open(buf) as img:
-                    self._IMG = ImageTk.PhotoImage(img, master=self)
-                    self.configure(image=self._IMG)
-        elif ImageData and ImagePath: raise KeyError('Cannot use both ImageData and ImageName')
-        elif ImageData:
-            self._IMG = tk.PhotoImage(master=self, data=ImageData)
-            self.configure(image=self._IMG)
-        elif ImagePath:
-            self.OpenImage(ImagePath)
-        return self
-    # noinspection DuplicatedCode
-    def OpenImage(self, path: str):
-        assert (os.path.isfile(path))
-        with open(path, 'rb') as f:
-            with Image.open(f) as img:
-                self._IMG = ImageTk.PhotoImage(img, master=self)
-                self.configure(image=self._IMG)
-    # noinspection DuplicatedCode
-    def SetPhoto(self, *, Base64Data: str = None, rawData: bytes = None,
-                 parent_pi: dict = None, parentRelX: float = None, parentRelY: float = None,
-                 maxWidth: int = None, maxHeight: int = None,
-                 offset_factor: float = 0.95, screenWidth: int, screenHeight: int):
-        if parent_pi is not None:
-            parentRelX = float(parent_pi['relwidth'])
-            parentRelY = float(parent_pi['relheight'])
-
-        assert (isinstance(parentRelX, float))
-        assert (isinstance(parentRelY, float))
-
-        if maxWidth is None:
-            # if hasattr(widget, 'width'): maxHeight = widget.width
-            if 'width' in self._pi and self._pi['width'] != '':
-                maxWidth = (float(self._pi['width']) / screenWidth) * offset_factor * parentRelX
-            else:
-                maxWidth = CalculateWrapLength(screenWidth, float(self._pi['relwidth']), offset_factor, parentRelX)
-            maxWidth = int(maxWidth)
-        if maxHeight is None:
-            # if hasattr(widget, 'height'): maxHeight = widget.height
-            if 'height' in self._pi and self._pi['height'] != '':
-                maxHeight = (float(self._pi['height']) / screenHeight) * offset_factor * parentRelY
-            else:
-                maxHeight = CalculateWrapLength(screenHeight, float(self._pi['relheight']), offset_factor, parentRelY)
-            maxHeight = int(maxHeight)
-
-        if Base64Data:
-            assert (Base64Data is not None)
-            msg = base64.b64decode(Base64Data)
-        else:
-            assert (rawData is not None)
-            msg = rawData
-
-        with io.BytesIO(msg) as buf:
-            with Image.open(buf) as tempImg:
-                self._IMG = ImageTk.PhotoImage(master=self, image=ResizePhoto(tempImg, MaxWidth=maxWidth, MaxHeight=maxHeight))
-                self.configure(image=self._IMG)
 
 
-class TkinterListbox(tk.Listbox, _BaseTextTkinterWidget_):
-    """Construct a listbox widget with the parent MASTER.
+class TkinterListbox(tk.Listbox, _BaseTextTkinterWidget_, CommandMixin):
+    """Construct a listbox _widget with the parent MASTER.
 
     Valid resource names: background, bd, bg, borderwidth, cursor,
     exportselection, fg, font, foreground, height, highlightbackground,
@@ -988,20 +681,9 @@ class TkinterListbox(tk.Listbox, _BaseTextTkinterWidget_):
         for item in temp_list:
             self.insert(tk.END, item)
 
-    # noinspection DuplicatedCode
-    def SetCommand(self, func: callable, z: int or str = None, **kwargs):
-        assert (callable(func))
-        if kwargs and func:
-            self._cmd = lambda x=kwargs: func(**x)
-            self.bind(KeyBindings.ListboxSelect, self._cmd)
-        elif z is not None and func:
-            self._cmd = lambda x=z: func(x)
-            self.bind(KeyBindings.ListboxSelect, self._cmd)
-        elif func:
-            self._cmd = func
-            self.bind(KeyBindings.ListboxSelect, self._cmd)
+    def _setCommand(self):
+        self.bind(KeyBindings.ListboxSelect, self._cmd)
         return self
-
     def ResetColors(self, color: str):
         for i in range(self.size()):
             self.itemconfig(i, background=color)
@@ -1027,39 +709,9 @@ class TkinterListbox(tk.Listbox, _BaseTextTkinterWidget_):
         pass
 
 
-    def Pack(self, cnf={ }, **kwargs):
-        self.pack(cnf, **kwargs)
-        self._pi = self.pack_info()
-        self._manager_ = Layout.pack
-        return self
-
-    def Place(self, cnf={ }, **kwargs):
-        self.place(cnf, **kwargs)
-        self._pi = self.place_info()
-        self._manager_ = Layout.place
-        return self
 
 
-    def Grid(self, cnf={ }, sticky: str or AnchorAndSticky = tk.NSEW, rowspan: int = 1, columnspan: int = 1, **kwargs):
-        if isinstance(sticky, AnchorAndSticky): sticky = sticky.value
-        self.grid(cnf, sticky=sticky, rowspan=rowspan, columnspan=columnspan, **kwargs)
-        self._pi = self.grid_info()
-        self._manager_ = Layout.grid
-        return self
-    # noinspection PyMethodOverriding
-    def grid_anchor(self, anchor: str or AnchorAndSticky):
-        if isinstance(anchor, AnchorAndSticky): anchor = anchor.value
-        super().grid_anchor(anchor)
-        return self
-    def grid_rowconfigure(self, index: int, weight: int = 1, **kwargs):
-        super().grid_rowconfigure(index, weight=weight, **kwargs)
-        return self
-    def grid_columnconfigure(self, index: int, weight: int = 1, **kwargs):
-        super().grid_columnconfigure(index, weight=weight, **kwargs)
-        return self
-
-
-class TkinterTreeView(ttk.Treeview, _BaseTkinterWidget_):
+class TkinterTreeView(ttk.Treeview, _BaseTkinterWidget_, CommandMixin):
     def __init__(self, master: tk.Frame, Color: dict = None, **kwargs):
         ttk.Treeview.__init__(self, master=master, **kwargs)
         if Color:
@@ -1071,19 +723,10 @@ class TkinterTreeView(ttk.Treeview, _BaseTkinterWidget_):
             self.configure(highlightbackground=Color['HBG'])
             self.configure(highlightcolor=Color['HFG'])
 
-    # noinspection DuplicatedCode
-    def SetCommand(self, func: callable, z: int or str = None, **kwargs):
-        assert (callable(func))
-        if kwargs and func:
-            self._cmd = lambda x=kwargs: func(**x)
-            self.bind(KeyBindings.TreeViewSelect, self._cmd)
-        elif z is not None and func:
-            self._cmd = lambda x=z: func(x)
-            self.bind(KeyBindings.TreeViewSelect, self._cmd)
-        elif func:
-            self._cmd = func
-            self.bind(KeyBindings.TreeViewSelect, self._cmd)
+    def _setCommand(self):
+        self.bind(KeyBindings.TreeViewSelect, self._cmd)
         return self
+
     def SetTags(self, tags: dict):
         if tags:
             for tag, kwargs in tags.items():
@@ -1118,36 +761,6 @@ class TkinterTreeView(ttk.Treeview, _BaseTkinterWidget_):
                     value = 'None'
                 tree.insert(parent, 'end', uid, text=value)  # text=key, value=value)
 
-    def Pack(self, cnf={ }, **kwargs):
-        self.pack(cnf, **kwargs)
-        self._pi = self.pack_info()
-        self._manager_ = Layout.pack
-        return self
-
-    def Place(self, cnf={ }, **kwargs):
-        self.place(cnf, **kwargs)
-        self._pi = self.place_info()
-        self._manager_ = Layout.place
-        return self
-
-
-    def Grid(self, cnf={ }, sticky: str or AnchorAndSticky = tk.NSEW, rowspan: int = 1, columnspan: int = 1, **kwargs):
-        if isinstance(sticky, AnchorAndSticky): sticky = sticky.value
-        self.grid(cnf, sticky=sticky, rowspan=rowspan, columnspan=columnspan, **kwargs)
-        self._pi = self.grid_info()
-        self._manager_ = Layout.grid
-        return self
-    # noinspection PyMethodOverriding
-    def grid_anchor(self, anchor: str or AnchorAndSticky):
-        if isinstance(anchor, AnchorAndSticky): anchor = anchor.value
-        super().grid_anchor(anchor)
-        return self
-    def grid_rowconfigure(self, index: int, weight: int = 1, **kwargs):
-        super().grid_rowconfigure(index, weight=weight, **kwargs)
-        return self
-    def grid_columnconfigure(self, index: int, weight: int = 1, **kwargs):
-        super().grid_columnconfigure(index, weight=weight, **kwargs)
-        return self
 class TkinterTreeViewHolder(TkinterFrame):
     """Construct a Ttk Treeview with parent scale.
 
@@ -1181,101 +794,3 @@ class TkinterTreeViewHolder(TkinterFrame):
         self.vsb.pi = self.vsb.place_info()
         self.TreeView.configure(yscrollcommand=self.vsb.set)
 
-
-    def Pack(self, cnf={ }, **kwargs):
-        self.pack(cnf, **kwargs)
-        self._pi = self.pack_info()
-        self._manager_ = Layout.pack
-        return self
-
-    def Place(self, cnf={ }, **kwargs):
-        self.place(cnf, **kwargs)
-        self._pi = self.place_info()
-        self._manager_ = Layout.place
-        return self
-
-
-    def Grid(self, cnf={ }, sticky: str or AnchorAndSticky = tk.NSEW, rowspan: int = 1, columnspan: int = 1, **kwargs):
-        if isinstance(sticky, AnchorAndSticky): sticky = sticky.value
-        self.grid(cnf, sticky=sticky, rowspan=rowspan, columnspan=columnspan, **kwargs)
-        self._pi = self.grid_info()
-        self._manager_ = Layout.grid
-        return self
-    # noinspection PyMethodOverriding
-    def grid_anchor(self, anchor: str or AnchorAndSticky):
-        if isinstance(anchor, AnchorAndSticky): anchor = anchor.value
-        super().grid_anchor(anchor)
-        return self
-    def grid_rowconfigure(self, index: int, weight: int = 1, **kwargs):
-        super().grid_rowconfigure(index, weight=weight, **kwargs)
-        return self
-    def grid_columnconfigure(self, index: int, weight: int = 1, **kwargs):
-        super().grid_columnconfigure(index, weight=weight, **kwargs)
-        return self
-
-
-class ButtonGrid(TkinterFrame, ABC):
-    __buttons: Dict[int, TkinterButton] = { }
-    def __init__(self, *, master: TkinterFrame, rows: int = None, cols: int = None, NumberOfButtons: int = None, **kwargs):
-        """
-            :param kwargs: TkinterButton kwargs
-        """
-        assert (isinstance(master, TkinterFrame))
-        TkinterFrame.__init__(self, master=master)
-        self._rows = rows or len(self.ButtonTitles)
-        self._cols = cols or 1
-        self._NumberOfButtons = NumberOfButtons or self._rows * self._cols
-
-        if len(self.ButtonCommands) != self._NumberOfButtons:
-            raise ValueError(f"len(self.ButtonCommands) [ {len(self.ButtonCommands)} ]  does not Match self._NumberOfButtons [ {self._NumberOfButtons} ]")
-        if len(self.ButtonTitles) != self._NumberOfButtons:
-            raise ValueError(f"len(self.ButtonTitles) [ {len(self.ButtonTitles)} ]  does not Match self._NumberOfButtons [ {self._NumberOfButtons} ]")
-
-        self._MakeGrid(kwargs)
-    def _MakeGrid(self, kwargs: dict):
-        for r in range(self._rows): self.grid_rowconfigure(r, weight=1)
-        for c in range(self._cols): self.grid_columnconfigure(c, weight=1)
-
-        r = 0
-        c = 0
-        for i in range(self._NumberOfButtons):
-            if c >= self._cols:
-                r += 1
-                c = 0
-            self.__buttons[i] = TkinterButton(self, Text=self.ButtonTitles[i], **kwargs)
-            self.__buttons[i].grid(row=r, column=c)
-            self.__buttons[i].SetCommand(self.ButtonCommands[i])
-            c += 1
-
-    def HideAll(self):
-        for w in self.__buttons.values():
-            w.hide()
-    def ShowAll(self):
-        for w in self.__buttons.values():
-            w.show()
-
-    @property
-    def ButtonTitles(self) -> dict: raise NotImplementedError()
-    @property
-    def ButtonCommands(self) -> dict: raise NotImplementedError()
-
-
-    def UpdateText(self, Titles: dict = None):
-        if Titles is None: Titles = self.ButtonTitles
-        if len(Titles) != self._NumberOfButtons: raise ValueError("len(Titles) Doesn't Match NumberOfButtons")
-
-        for i in range(self._NumberOfButtons):
-            self.__buttons[i].txt = Titles[i]
-    def UpdateCommands(self, commands: dict = { }, kwz: dict = { }, z: dict = { }):
-        if len(commands) != self._NumberOfButtons: raise ValueError("len(commands) Doesn't Match NumberOfButtons")
-
-        for i, Command in commands.items():
-            widget = self.__buttons[i]
-            if i in kwz and kwz[i] is not None and Command:
-                widget.cmd = lambda x=kwz[i]: Command(**x)
-                widget.configure(command=widget.cmd)
-            elif i in z and z[i] is not None and Command:
-                widget.cmd = lambda x=z[i]: Command(x)
-                widget.configure(command=widget.cmd)
-            elif Command:
-                widget.configure(command=Command)
