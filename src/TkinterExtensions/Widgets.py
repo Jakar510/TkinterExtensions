@@ -716,6 +716,7 @@ class TkinterListbox(tk.Listbox, _BaseTextTkinterWidget_, CommandMixin):
             self.insert(index, value)
     def GetAtIndex(self, index: int) -> str: return self.get(index)
 
+
     def SetList(self, temp_list: list or tuple):
         """        clear the listbox and set the new items.        """
         self.Clear()
@@ -724,7 +725,7 @@ class TkinterListbox(tk.Listbox, _BaseTextTkinterWidget_, CommandMixin):
     def AddList(self, temp_list: list or tuple):
         """        Append items from the list into the listbox.        """
         for item in temp_list:
-            self.insert(tk.END, item)
+            self.Append(item)
     def SortList(self, key: callable = str.lower):
         """        function to sort listbox items case insensitive by default.        """
         temp_list = self.Items
@@ -734,6 +735,8 @@ class TkinterListbox(tk.Listbox, _BaseTextTkinterWidget_, CommandMixin):
         # load listbox with sorted data
         for item in temp_list:
             self.insert(tk.END, item)
+    def Append(self, value: str): self.insert(tk.END, value)
+
 
     def _setCommand(self):
         self.bind(KeyBindings.ListboxSelect, self._cmd)
@@ -748,19 +751,16 @@ class TkinterListbox(tk.Listbox, _BaseTextTkinterWidget_, CommandMixin):
         return list(self.get(0, tk.END))
 
     @property
-    def Index(self) -> int or None:
-        return self._Current_ListBox_Index
+    def Index(self) -> int or None: return self._Current_ListBox_Index
     @Index.setter
     def Index(self, value: int or None):
         self._Current_ListBox_Index = value
         if value is not None: self.SelectRow(value)
 
     @property
-    def txt(self) -> str:
-        return self.get('1.0', tk.END)
+    def txt(self) -> str: return self.GetAtIndex(self._Current_ListBox_Index)
     @txt.setter
-    def txt(self, value: str):
-        pass
+    def txt(self, value: str): self.ReplaceAtIndex(self._Current_ListBox_Index, value)
 
 
 
