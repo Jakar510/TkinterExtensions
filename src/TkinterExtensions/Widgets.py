@@ -338,40 +338,15 @@ class ImageMixin:
             with Image.open(f) as img:
                 self._IMG = ImageTk.PhotoImage(img, master=self)
                 self.configure(image=self._IMG)
-    def SetPhoto(self, *, Base64Data: str = None, rawData: bytes = None,
-                 parent_pi: dict = None, parentRelX: float = None, parentRelY: float = None,
-                 maxWidth: int = None, maxHeight: int = None,
-                 offset_factor: float = 0.95, screenWidth: int, screenHeight: int):
-        if parent_pi is not None:
-            parentRelX = float(parent_pi['relwidth'])
-            parentRelY = float(parent_pi['relheight'])
-
-        assert (isinstance(parentRelX, float))
-        assert (isinstance(parentRelY, float))
-
-        if maxWidth is None:
-            # if hasattr(widget, 'width'): maxHeight = widget.width
-            if 'width' in self._pi and self._pi['width'] != '':
-                maxWidth = (float(self._pi['width']) / screenWidth) * offset_factor * parentRelX
-            else:
-                maxWidth = CalculateWrapLength(screenWidth, float(self._pi['relwidth']), offset_factor, parentRelX)
-            maxWidth = int(maxWidth)
-        if maxHeight is None:
-            # if hasattr(widget, 'height'): maxHeight = widget.height
-            if 'height' in self._pi and self._pi['height'] != '':
-                maxHeight = (float(self._pi['height']) / screenHeight) * offset_factor * parentRelY
-            else:
-                maxHeight = CalculateWrapLength(screenHeight, float(self._pi['relheight']), offset_factor, parentRelY)
-            maxHeight = int(maxHeight)
-
+    def SetPhoto(self, *, Base64Data: str = None, rawData: bytes = None, MaxWidth: int, MaxHeight: int):
         if Base64Data:
-            assert (Base64Data is not None)
+            assert (isinstance(Base64Data, str))
             rawData = base64.b64decode(Base64Data)
 
-        assert (rawData is not None)
+        assert (isinstance(rawData, bytes))
         with io.BytesIO(rawData) as buf:
             with Image.open(buf) as tempImg:
-                self._IMG = ImageTk.PhotoImage(master=self, image=ResizePhoto(tempImg, MaxWidth=maxWidth, MaxHeight=maxHeight))
+                self._IMG = ImageTk.PhotoImage(master=self, image=ResizePhoto(tempImg, MaxWidth=int(MaxWidth), MaxHeight=int(MaxHeight)))
                 self.configure(image=self._IMG)
 
     # # noinspection DuplicatedCode
