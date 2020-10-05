@@ -206,6 +206,9 @@ class _BaseTkinterWidget_(tk.Widget):
     def Disable(self):
         """ Disable the widget """
         return self._SetState(state=ViewState.Disabled)
+    def Enable(self, state: ViewState = ViewState.Normal):
+        """ Enable the widget, and optinally change its state from normal. """
+        return self._SetState(state=state)
     def _SetState(self, state: ViewState):
         assert (isinstance(state, ViewState))
         try: self.configure(state=state.value)
@@ -435,7 +438,7 @@ class TkinterLabelFrame(tk.LabelFrame, _BaseTextTkinterWidget_):
 
 
 
-class TkinterEntry(tk.Entry, _BaseTextTkinterWidget_):
+class TkinterEntry(tk.Entry, _BaseTextTkinterWidget_, CommandMixin):
     __doc__ = """Construct an entry _widget with the parent MASTER.
 
     Valid resource names: background, bd, bg, borderwidth, cursor,
@@ -461,6 +464,10 @@ class TkinterEntry(tk.Entry, _BaseTextTkinterWidget_):
 
     def Clear(self):
         self.delete(tk.FIRST, tk.END)
+
+    def _setCommand(self):
+        self.bind(KeyBindings.bindButton, self._cmd)
+        return self
 
     @property
     def txt(self) -> str:
@@ -865,4 +872,3 @@ class TkinterTreeViewHolder(TkinterFrame):
         self.vsb.pack(side='right', fill='y')
         self.vsb.pi = self.vsb.place_info()
         self.TreeView.configure(yscrollcommand=self.vsb.set)
-
