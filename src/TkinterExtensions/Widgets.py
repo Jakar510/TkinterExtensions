@@ -750,6 +750,15 @@ class TkinterListbox(tk.Listbox, _BaseTextTkinterWidget_, CommandMixin):
         """ returns the current listbox contents """
         return list(self.get(0, tk.END))
 
+
+    def IsAllValidItems(self) -> bool: return all(self.Items)
+    def ValidCount(self) -> int:
+        count = 0
+        for item in self.Items:
+            if item: count += 1
+
+        return count
+
     @property
     def Index(self) -> int or None: return self._Current_ListBox_Index
     @Index.setter
