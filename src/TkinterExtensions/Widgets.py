@@ -8,6 +8,7 @@ import base64
 import io
 import os
 import tkinter as tk
+from enum import Enum
 from tkinter import Event as tkEvent, ttk
 from typing import Union
 from urllib.request import urlopen
@@ -29,16 +30,8 @@ __all__ = [
         'TkinterCheckBox', 'TkinterFrame', 'TkinterLabelFrame', 'TkinterComboBox',
         ]
 
-
 class _BaseTkinterWidget_(tk.Widget):
-    configure: callable
-    winfo_width: callable
-    winfo_height: callable
-    focus_set: callable
-    children: dict
-
     _state_: ViewState = ViewState.Hidden
-    _cmd: callable
     _pi: dict = { }
     _manager_: Layout = None
     _wrap: int = None
@@ -57,7 +50,10 @@ class _BaseTkinterWidget_(tk.Widget):
 
     # noinspection PyUnresolvedReferences
     def show(self, **kwargs) -> bool:
-        """         Shows the current _widget or frame. Can be overridden to add additional functionality if need.        """
+        """
+        Shows the current widget or frame, based on the current geometry manager.
+        Can be overridden to add additional functionality if needed.
+        """
         if self._manager_ is None: return False
 
         state = kwargs.get('state', None) or kwargs.get('State', ViewState.Normal)
@@ -82,7 +78,10 @@ class _BaseTkinterWidget_(tk.Widget):
 
     # noinspection PyUnresolvedReferences
     def hide(self) -> bool:
-        """         Hides the current _widget or frame. Can be overridden to add additional functionality if need.        """
+        """
+        Hides the current widget or frame, based on the current geometry manager.
+        Can be overridden to add additional functionality if needed.
+        """
         if self._manager_ is None: return False
         if self._manager_ == Layout.pack:
             self.pack_forget()
@@ -103,19 +102,71 @@ class _BaseTkinterWidget_(tk.Widget):
 
 
     def Pack(self, cnf={ }, **kwargs):
+        """Pack a widget in the parent widget. Use as options:
+        after=widget - pack it after you have packed widget
+        anchor=NSEW (or subset) - position widget according to
+                                  given direction
+        before=widget - pack it before you will pack widget
+        expand=bool - expand widget if parent size grows
+        fill=NONE or X or Y or BOTH - fill widget if widget grows
+        in=master - use master to contain this widget
+        in_=master - see 'in' option description
+        ipadx=amount - add internal padding in x direction
+        ipady=amount - add internal padding in y direction
+        padx=amount - add padding in x direction
+        pady=amount - add padding in y direction
+        side=TOP or BOTTOM or LEFT or RIGHT -  where to add this widget.
+        """
         self.pack(cnf, **kwargs)
         self._pi = self.pack_info()
         self._manager_ = Layout.pack
         return self
 
     def Place(self, cnf={ }, **kwargs):
+        """Place a widget in the parent widget. Use as options:
+        in=master - master relative to which the widget is placed
+        in_=master - see 'in' option description
+        x=amount - locate anchor of this widget at position x of master
+        y=amount - locate anchor of this widget at position y of master
+        relx=amount - locate anchor of this widget between 0.0 and 1.0
+                      relative to width of master (1.0 is right edge)
+        rely=amount - locate anchor of this widget between 0.0 and 1.0
+                      relative to height of master (1.0 is bottom edge)
+        anchor=NSEW (or subset) - position anchor according to given direction
+        width=amount - width of this widget in pixel
+        height=amount - height of this widget in pixel
+        relwidth=amount - width of this widget between 0.0 and 1.0
+                          relative to width of master (1.0 is the same width
+                          as the master)
+        relheight=amount - height of this widget between 0.0 and 1.0
+                           relative to height of master (1.0 is the same
+                           height as the master)
+        bordermode="inside" or "outside" - whether to take border width of
+                                           master widget into account
+        """
         self.place(cnf, **kwargs)
         self._pi = self.place_info()
         self._manager_ = Layout.place
         return self
-    def PlaceFull(self): return self.Place(relx=0.0, rely=0.0, relwidth=1.0, relheight=1.0)
+    def PlaceFull(self):
+        """ Default placement in frame occupying the full screen and/or space available in master. """
+        return self.Place(relx=0.0, rely=0.0, relwidth=1.0, relheight=1.0)
 
     def Grid(self, cnf={ }, sticky: str or AnchorAndSticky = tk.NSEW, rowspan: int = 1, columnspan: int = 1, **kwargs):
+        """Position a widget in the parent widget in a grid. Use as options:
+        column=number - use cell identified with given column (starting with 0)
+        columnspan=number - this widget will span several columns
+        in=master - use master to contain this widget
+        in_=master - see 'in' option description
+        ipadx=amount - add internal padding in x direction
+        ipady=amount - add internal padding in y direction
+        padx=amount - add padding in x direction
+        pady=amount - add padding in y direction
+        row=number - use cell identified with given row (starting with 0)
+        rowspan=number - this widget will span several rows
+        sticky=NSEW - if cell is larger on which sides will this
+                      widget stick to the cell boundary
+        """
         if isinstance(sticky, AnchorAndSticky): sticky = sticky.value
         self.grid(cnf, sticky=sticky, rowspan=rowspan, columnspan=columnspan, **kwargs)
         self._pi = self.grid_info()
@@ -123,21 +174,38 @@ class _BaseTkinterWidget_(tk.Widget):
         return self
     # noinspection PyMethodOverriding
     def Grid_Anchor(self, anchor: str or AnchorAndSticky):
+        """The anchor value controls how to place the grid within the
+        master when no row/column has any weight.
+
+        The default anchor is nw."""
         if isinstance(anchor, AnchorAndSticky): anchor = anchor.value
         self.grid_anchor(anchor)
         return self
     def Grid_RowConfigure(self, index: int, weight: int = 1, **kwargs):
+        """Configure row INDEX of a grid.
+
+        Valid resources are minsize (minimum size of the row),
+        weight (how much does additional space propagate to this row)
+        and pad (how much space to let additionally)."""
         self.grid_rowconfigure(index, weight=weight, **kwargs)
         return self
     def Grid_ColumnConfigure(self, index: int, weight: int = 1, **kwargs):
+        """Configure column INDEX of a grid.
+
+        Valid resources are minsize (minimum size of the column),
+        weight (how much does additional space propagate to this column)
+        and pad (how much space to let additionally)."""
         self.grid_columnconfigure(index, weight=weight, **kwargs)
         return self
 
 
     def SetActive(self, takeFocus: bool = True):
+        """ Set the widget to Active Status """
         if takeFocus: self.focus_set()
         return self._SetState(state=ViewState.Active)
-    def Disable(self): return self._SetState(state=ViewState.Disabled)
+    def Disable(self):
+        """ Disable the widget """
+        return self._SetState(state=ViewState.Disabled)
     def _SetState(self, state: ViewState):
         assert (isinstance(state, ViewState))
         try: self.configure(state=state.value)
@@ -145,10 +213,6 @@ class _BaseTkinterWidget_(tk.Widget):
 
         self._state_ = state
         return self
-
-
-    def __call__(self, *args, **kwargs):
-        if callable(self._cmd): self._cmd(*args, **kwargs)
 class _BaseTextTkinterWidget_(_BaseTkinterWidget_):
     _txt: tk.StringVar
     # noinspection PyMissingConstructor
@@ -170,6 +234,8 @@ class _BaseTextTkinterWidget_(_BaseTkinterWidget_):
     def wrap(self, value: int):
         self._wrap = value
         self.configure(wraplength=self._wrap)
+
+
 
 class CallWrapper(object):
     """Internal class. Stores function to call when some user
@@ -226,7 +292,9 @@ class CurrentValue(CallWrapper):
 class CommandMixin:
     _cmd: CallWrapper
     configure: callable
-    def __call__(self, *args, **kwargs): return self._cmd(*args, **kwargs)
+    def __call__(self, *args, **kwargs):
+        """ Execute the Command """
+        if callable(self._cmd): self._cmd(*args, **kwargs)
     def SetCommand(self, func: Union[callable, CurrentValue], z: int or str = None, **kwargs):
         try:
             assert (callable(func) or isinstance(func, CurrentValue))
@@ -332,6 +400,10 @@ class TkinterFrame(tk.Frame, _BaseTkinterWidget_):
     def __init__(self, master, **kwargs):
         tk.Frame.__init__(self, master=master, **kwargs)
 
+    def __name__(self, InstanceID: Union[str, int, Enum]):
+        if isinstance(InstanceID, Enum): InstanceID = InstanceID.value
+
+        return f'{self.__class__.__name__}_{InstanceID}'.lower()
 class TkinterLabelFrame(tk.LabelFrame, _BaseTextTkinterWidget_):
     """Construct a labelframe _widget with the parent MASTER.
 
