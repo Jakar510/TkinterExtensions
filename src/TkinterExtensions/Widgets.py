@@ -438,7 +438,7 @@ class TkinterEntry(tk.Entry, _BaseTextTkinterWidget_, CommandMixin):
             self.configure(highlightcolor=Color['HFG'])
 
     def Clear(self):
-        self.delete(tk.FIRST, tk.END)
+        self.delete(0, Tags.End.value)
 
     def _setCommand(self):
         self.bind(KeyBindings.bindButton, self._cmd)
@@ -449,10 +449,10 @@ class TkinterEntry(tk.Entry, _BaseTextTkinterWidget_, CommandMixin):
     @txt.setter
     def txt(self, value: str):
         self.Clear()
-        self.insert(tk.FIRST, value)
+        self.insert(Tags.End.value, value)
 
     def Append(self, value: str):
-        self.insert(tk.END, value)
+        self.insert(Tags.End.value, value)
 
 
 
@@ -679,13 +679,13 @@ class TkinterListbox(tk.Listbox, _BaseTextTkinterWidget_, CommandMixin):
         if index is None: index = self._Current_ListBox_Index
         if index is None: return
         self.activate(index)
-        self.selection_clear(0, tk.END)
+        self.selection_clear(0, Tags.End.value)
         self.selection_set(index)
         self.focus_set()
         self._Current_ListBox_Index = index
     def SelectRows(self, *args):
         if args:
-            self.selection_clear(0, tk.END)
+            self.selection_clear(0, Tags.End.value)
             self.focus_set()
             for index in args:
                 if isinstance(index, int):
@@ -707,7 +707,7 @@ class TkinterListbox(tk.Listbox, _BaseTextTkinterWidget_, CommandMixin):
 
     def Clear(self):
         """ delete all lines from the listbox. """
-        self.delete(0, tk.END)
+        self.delete(0, Tags.End.value)
     def DeleteAtIndex(self, index: int = None):
         """        delete a selected line from the listbox.        """
         if index is None: index = self.Current_Index()  # get selected line index
@@ -724,7 +724,7 @@ class TkinterListbox(tk.Listbox, _BaseTextTkinterWidget_, CommandMixin):
         """        clear the listbox and set the new items.        """
         self.Clear()
         for item in temp_list:
-            self.insert(tk.END, item)
+            self.insert(Tags.End.value, item)
     def AddList(self, temp_list: list or tuple):
         """        Append items from the list into the listbox.        """
         for item in temp_list:
@@ -734,11 +734,11 @@ class TkinterListbox(tk.Listbox, _BaseTextTkinterWidget_, CommandMixin):
         temp_list = self.Items
         temp_list.sort(key=key)
         # delete contents of present listbox
-        self.delete(0, tk.END)
+        self.delete(0, Tags.End.value)
         # load listbox with sorted data
         for item in temp_list:
-            self.insert(tk.END, item)
-    def Append(self, value: str): self.insert(tk.END, value)
+            self.insert(Tags.End.value, item)
+    def Append(self, value: str): self.insert(Tags.End.value, value)
 
 
     def _setCommand(self):
@@ -751,7 +751,7 @@ class TkinterListbox(tk.Listbox, _BaseTextTkinterWidget_, CommandMixin):
     @property
     def Items(self) -> list:
         """ returns the current listbox contents """
-        return list(self.get(0, tk.END))
+        return list(self.get(0, Tags.End.value))
 
 
     def IsAllValidItems(self) -> bool: return all(self.Items)

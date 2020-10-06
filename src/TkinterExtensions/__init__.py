@@ -13,3 +13,4 @@ from .HID import *
 from .Helpers import *
 from .Widgets import *
 from .debug import *
+from .AnimatedGIF import *

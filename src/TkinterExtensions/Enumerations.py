@@ -80,6 +80,7 @@ class Tags(Enum):  # Special tags, marks and insert positions
     Insert = INSERT
     Current = CURRENT
     Anchor = ANCHOR
+    First = FIRST
     All = ALL  # e.g. Canvas.delete(ALL)
 
 
