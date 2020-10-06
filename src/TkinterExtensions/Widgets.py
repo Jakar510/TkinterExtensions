@@ -445,10 +445,13 @@ class TkinterEntry(tk.Entry, _BaseTextTkinterWidget_, CommandMixin):
         return self
 
     @property
-    def txt(self) -> str:
-        return self.get()
+    def txt(self) -> str: return self.get()
     @txt.setter
     def txt(self, value: str):
+        self.Clear()
+        self.insert(tk.FIRST, value)
+
+    def Append(self, value: str):
         self.insert(tk.END, value)
 
 
