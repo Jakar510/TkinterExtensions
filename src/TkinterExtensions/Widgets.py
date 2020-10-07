@@ -718,7 +718,30 @@ class TkinterListbox(tk.Listbox, _BaseTextTkinterWidget_, CommandMixin):
             self.DeleteAtIndex(index)
             self.insert(index, value)
     def GetAtIndex(self, index: int) -> str: return self.get(index)
+    def Advance(self, *, forward: bool = True, amount: int = 1, extend: bool = False):
+        """
+            Advance the row either up or down.
 
+        :param forward: direction to change: True moves down, False moves up.
+        :type forward: bool
+        :param amount: offset to change the line focus index
+        :type amount: int
+        :param extend: if forward is True, and extend is True, append new row on advance
+        :type extend: bool
+        :return:
+        :rtype:
+        """
+        i = self.Index
+        if forward: i += amount
+        else: i -= amount
+
+        if i > self.Count:
+            if extend:
+                for _ in range(amount): self.Append('')
+            else: i = self.Count
+        elif i < 0: i = 0
+
+        self.Index = i
 
     def SetList(self, temp_list: list or tuple):
         """        clear the listbox and set the new items.        """
@@ -761,6 +784,9 @@ class TkinterListbox(tk.Listbox, _BaseTextTkinterWidget_, CommandMixin):
             if item: count += 1
 
         return count
+
+    @property
+    def Count(self) -> int: return self.size()
 
     @property
     def Index(self) -> int or None: return self._Current_ListBox_Index
