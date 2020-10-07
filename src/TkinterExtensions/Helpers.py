@@ -63,10 +63,13 @@ def sizeof(obj):
 
 
 class AutoStartThread(threading.Thread):
-    def __init__(self, Target: callable, *args, Name: str = None, AutoStart: bool = True, Daemon: bool = True, **kwargs):
-        assert (callable(Target))
-        if Name == '' or Name is None: Name = Target.__name__
-        threading.Thread.__init__(self, name=Name, target=Target, args=args, kwargs=kwargs, daemon=Daemon)
+    def __init__(self, target: callable, *args, Name: str = None, AutoStart: bool = True, Daemon: bool = True, **kwargs):
+        assert (callable(target))
+        if not Name:
+            try: Name = target.__qualname__
+            except AttributeError: Name = target.__name__
+
+        super().__init__(name=Name, target=target, args=args, kwargs=kwargs, daemon=Daemon)
         if AutoStart: self.start()
 
 
