@@ -50,3 +50,9 @@ class TkinterEvent(tkEvent):
         :return:
         """
         return self.__dict__
+
+    @staticmethod
+    def IsValid(o: str):
+        if isinstance(o, str): return o != '??'
+
+        raise TypeError(f'expected str, got {type(o)}')
