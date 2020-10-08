@@ -246,7 +246,7 @@ class CallWrapper(object):
 
     _func: callable
     _widget: Union[_BaseTextTkinterWidget_, _BaseTkinterWidget_] = None
-    def __init__(self, func: callable, widget: Union[_BaseTextTkinterWidget_, _BaseTkinterWidget_] = None):
+    def __init__(self, func: callable, widget: _BaseTkinterWidget_ = None):
         """Store FUNC, SUBST and WIDGET as members."""
         self._func: callable = func
         self._widget = widget
@@ -265,16 +265,14 @@ class CallWrapper(object):
     def __repr__(self) -> str: return f'{super().__repr__().replace(">", "")} [ {dict(func=self._func, widget=self._widget)} ]>'
     def __str__(self) -> str: return repr(self)
 
-
-
-    def SetWidget(self, w):
+    def SetWidget(self, w: _BaseTkinterWidget_):
         """ Internal Method """
         assert (isinstance(w, _BaseTkinterWidget_))
         self._widget = w
         return self
 
     @classmethod
-    def Create(cls, func: callable, z: int or str = None, widget: Union[_BaseTextTkinterWidget_, tk.Widget] = None, **kwargs):
+    def Create(cls, func: callable, z: int or str = None, widget: _BaseTkinterWidget_ = None, **kwargs):
         if kwargs and func:
             return cls(lambda x=kwargs: func(**x), widget=widget)
         elif z is not None and func:
@@ -287,7 +285,7 @@ class CurrentValue(CallWrapper):
     def __call__(self, *args, **kwargs): return self._func(self._widget.txt, *args, **kwargs)
     def SetWidget(self, w):
         """ Internal Method """
-        assert (isinstance(w, _BaseTextTkinterWidget_) and isinstance(w, tk.Widget))
+        assert (isinstance(w, _BaseTextTkinterWidget_))
         self._widget = w
         return self
 
