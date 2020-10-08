@@ -7,6 +7,7 @@ import itertools
 import os
 import sys
 import threading
+from abc import ABC
 from typing import Union
 
 from PIL import Image
@@ -15,7 +16,7 @@ from PIL import Image
 
 
 __all__ = [
-        'ResizePhoto', 'CalculateWrapLength', 'RoundFloat', 'AutoCounter', 'AutoStartThread', 'lazy_property', 'sizeof', 'IsImage',
+        'ResizePhoto', 'CalculateWrapLength', 'RoundFloat', 'AutoCounter', 'AutoStartThread', 'lazy_property', 'sizeof', 'IsImage', 'AutoStartTargetedThread'
         ]
 
 def RoundFloat(Float: float, Precision: int) -> str:
@@ -62,7 +63,17 @@ def sizeof(obj):
     return size
 
 
-class AutoStartThread(threading.Thread):
+class AutoStartThread(threading.Thread, ABC):
+    def __init__(self, *args, Name: str = None, AutoStart: bool = True, Daemon: bool = True, **kwargs):
+        if not Name:
+            try: Name = self.__class__.__qualname__
+            except AttributeError: Name = self.__class__.__name__
+
+        super().__init__(name=Name, args=args, kwargs=kwargs, daemon=Daemon)
+        if AutoStart: self.start()
+    def run(self): raise NotImplementedError()
+
+class AutoStartTargetedThread(threading.Thread):
     def __init__(self, target: callable, *args, Name: str = None, AutoStart: bool = True, Daemon: bool = True, **kwargs):
         assert (callable(target))
         if not Name:
