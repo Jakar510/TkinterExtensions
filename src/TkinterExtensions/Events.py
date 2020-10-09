@@ -26,7 +26,7 @@ class TkinterEvent(tkEvent):
     def __str__(self) -> str: return self.ToString()
     def __repr__(self) -> str: return self.ToString()
 
-    def ToString(self) -> str: return f'<{self.__class__.__name__} Object. SavedFileSettings: \n{pprint.pformat(self.ToDict(), indent=4)} >'
+    def ToString(self) -> str: return f'<{self.__class__.__name__} Object. State: \n{pprint.pformat(self.ToDict(), indent=4)} >'
     def ToDict(self) -> dict:
         """
             {

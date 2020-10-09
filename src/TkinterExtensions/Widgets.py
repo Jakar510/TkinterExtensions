@@ -40,6 +40,9 @@ class _BaseTkinterWidget_(tk.Widget):
     def pi(self) -> dict: return self._pi.copy()
 
     @property
+    def IsVisible(self) -> bool: return self._state_ != ViewState.Hidden
+
+    @property
     def State(self) -> ViewState: return self._state_
 
     @property
