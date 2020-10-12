@@ -4,8 +4,8 @@
 #
 # ------------------------------------------------------------------------------
 
-from .Sytle import *
-from .base import *
+from TkinterExtensions.Widgets.Style import *
+from TkinterExtensions.Widgets.base import *
 
 
 

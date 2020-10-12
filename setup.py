@@ -25,7 +25,9 @@ setup(
         author='Tyler Stegmaier',
         author_email='tyler.stegmaier.510@gmail.com',
         description='Strongly typed widgets and event with multiple helper functions build in to speed up development.',
-        install_requires=['pillow'],
+        install_requires=[
+                'pillow', 'tk_html_widgets',
+                ],
         classifiers=[
                 # How mature is this project? Common values are
                 #   3 - Alpha

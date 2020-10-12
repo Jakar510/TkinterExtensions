@@ -8,14 +8,14 @@ from typing import List, Union
 
 from PIL import Image, ImageTk
 
-from .Widgets import TkinterLabel, tk
+from TkinterExtensions.Widgets.Widgets import Label, tk
 
 
 
 
 __all__ = ['AnimatedGIF']
 
-class AnimatedGIF(TkinterLabel, object):
+class AnimatedGIF(Label, object):
     """
     Creates an Animated loading screen with a GIF whose animation is started by AnimatedGIF.Pack/Place/Grid/show and stopped by AnimatedGIF.hide.
 

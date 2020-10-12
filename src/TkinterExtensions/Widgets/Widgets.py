@@ -3,23 +3,25 @@
 #  Copyright (c) 2020.
 #
 # ------------------------------------------------------------------------------
+
 import base64
 import io
 import os
 from typing import Tuple
 from urllib.request import urlopen
 
+from TkinterExtensions.Bindings import *
+from TkinterExtensions.Events import *
+from TkinterExtensions.Misc.Enumerations import *
+from TkinterExtensions.Widgets.base import *
 from .BaseWidgets import *
-from .Bindings import *
-from .Enumerations import *
-from .Events import *
-from .base import *
+from .Frames import TkinterFrame
 
 
 
 
 __all__ = [
-        'TkinterEntry', 'TkinterLabel', 'TkinterButton', 'TkinterListbox', 'TkinterCheckBox', 'TkinterCanvas', 'TkinterText', 'TkinterCheckButton'
+        'Entry', 'Label', 'Button', 'Listbox', 'CheckBox', 'Canvas', 'Text', 'CheckButton', 'ScrolledText', 'Scrollbar',
         ]
 
 """
@@ -40,7 +42,8 @@ Text
 """
 
 
-class TkinterButton(tk.Button, BaseTextTkinterWidget, ImageMixin, CommandMixin):
+# noinspection DuplicatedCode
+class Button(tk.Button, BaseTextTkinterWidget, ImageMixin, CommandMixin):
     """Construct a button _widget with the parent MASTER.
 
         STANDARD OPTIONS
@@ -77,7 +80,9 @@ class TkinterButton(tk.Button, BaseTextTkinterWidget, ImageMixin, CommandMixin):
         if Command: self.SetCommand(Command)
         BaseTextTkinterWidget.__init__(self, Override_var=Override_var, Text=Text)
 
-class TkinterLabel(tk.Label, BaseTextTkinterWidget, ImageMixin):
+
+# noinspection DuplicatedCode
+class Label(tk.Label, BaseTextTkinterWidget, ImageMixin):
     __doc__ = """Construct a label _widget with the parent MASTER.
 
     STANDARD OPTIONS
@@ -110,7 +115,9 @@ class TkinterLabel(tk.Label, BaseTextTkinterWidget, ImageMixin):
             self.configure(highlightbackground=Color['HBG'])
             self.configure(highlightcolor=Color['HFG'])
 
-class TkinterEntry(tk.Entry, BaseTextTkinterWidget, CommandMixin):
+
+# noinspection DuplicatedCode
+class Entry(tk.Entry, BaseTextTkinterWidget, CommandMixin):
     __doc__ = """Construct an entry _widget with the parent MASTER.
 
     Valid resource names: background, bd, bg, borderwidth, cursor,
@@ -152,7 +159,7 @@ class TkinterEntry(tk.Entry, BaseTextTkinterWidget, CommandMixin):
         self.insert(Tags.End.value, value)
 
 
-class TkinterCheckBox(tk.Checkbutton, BaseTextTkinterWidget, ImageMixin, CommandMixin):
+class CheckBox(tk.Checkbutton, BaseTextTkinterWidget, ImageMixin, CommandMixin):
     """Construct a checkbutton _widget with the parent MASTER.
 
         Valid resource names:
@@ -220,7 +227,8 @@ class TkinterCheckBox(tk.Checkbutton, BaseTextTkinterWidget, ImageMixin, Command
         else:
             self.deselect()
 
-class TkinterListbox(tk.Listbox, BaseTextTkinterWidget, CommandMixin):
+
+class Listbox(tk.Listbox, BaseTextTkinterWidget, CommandMixin):
     """Construct a listbox _widget with the parent MASTER.
 
     Valid resource names: background, bd, bg, borderwidth, cursor,
@@ -379,7 +387,7 @@ class TkinterListbox(tk.Listbox, BaseTextTkinterWidget, CommandMixin):
     def txt(self, value: str): self.ReplaceAtIndex(self._Current_ListBox_Index, value)
 
 
-class TkinterCanvas(tk.Canvas, BaseTkinterWidget, CommandMixin):
+class Canvas(tk.Canvas, BaseTkinterWidget, CommandMixin):
     def SetImage(self, X: int, Y: int, ImagePath: str = None, ImageData: str = None, url: str = None) -> Tuple[ImageTk.PhotoImage, Tuple[int, int], int]:
         if url: return self.DownloadImage(url, X, Y)
         elif ImageData and ImagePath: raise KeyError('Cannot use both ImageData and ImageName')
@@ -401,7 +409,51 @@ class TkinterCanvas(tk.Canvas, BaseTkinterWidget, CommandMixin):
         return img_tk, image.size, self.create_image(X, Y, anchor=anchor, image=img_tk)
 
 
-class TkinterCheckButton(tk.Checkbutton, BaseTextTkinterWidget, CommandMixin): pass
+class CheckButton(tk.Checkbutton, BaseTextTkinterWidget, CommandMixin): pass
 
 
-class TkinterText(tk.Text, BaseTextTkinterWidget, CommandMixin): pass
+class Scrollbar(tk.Scrollbar, BaseTkinterWidget, CommandMixin):
+    pass
+
+
+class Text(tk.Text, BaseTextTkinterWidget, CommandMixin):
+    def Clear(self): self.delete(self.GetIndex(1, 0), tk.END)
+
+    @staticmethod
+    def GetIndex(line: int, char: int): return f'{line}.{char}'
+
+    @property
+    def txt(self) -> str: return self.get(self.GetIndex(1, 0), tk.END)
+    @txt.setter
+    def txt(self, value: str): self.insert(self.GetIndex(1, 0), value)
+
+# class ScrolledText(Text, BaseTextTkinterWidget):
+#     def __init__(self, master, **kw):
+#         self.frame = TkinterFrame(master)
+#
+#         self.vbar = Scrollbar(self.frame)
+#         kw.update(yscrollcommand=self.vbar.set)
+#         self.vbar.Pack(side=tk.RIGHT, fill=tk.Y)
+#         self.vbar.SetCommand(self.yview)
+#
+#         tk.Text.__init__(self, self.frame, **kw)
+#         self.Pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+#
+#     def __str__(self): return str(self.frame)
+
+class ScrolledText(TkinterFrame, BaseTextTkinterWidget):
+    def __init__(self, master, **kw):
+        self.text = Text(master=self)
+
+        self.vbar = Scrollbar(self)
+        self.vbar.Pack(side=tk.RIGHT, fill=tk.Y)
+        self.vbar.SetCommand(self.text.yview)
+        self.text.configure(yscrollcommand=self.vbar.set)
+
+        TkinterFrame.__init__(self, master=master, **kw)
+        self.Pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+    @property
+    def txt(self) -> str: return self.text.txt
+    @txt.setter
+    def txt(self, value: str): self.text.txt = value

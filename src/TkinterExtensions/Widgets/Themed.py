@@ -3,17 +3,18 @@
 #  Copyright (c) 2020.
 #
 # ------------------------------------------------------------------------------
-from .Enumerations import *
-from .Bindings import KeyBindings
-from .Frames import *
-from .base import *
+
+from TkinterExtensions.Bindings import KeyBindings
+from TkinterExtensions.Misc.Enumerations import *
+from TkinterExtensions.Widgets.Frames import *
+from TkinterExtensions.Widgets.base import *
 from .BaseWidgets import *
 
 
 
 
 __all__ = [
-        'TkinterTreeView', 'TkinterTreeViewHolder', 'TkinterComboBox', 'ThemedTkinterButton', 'ThemedTkinterEntry', 'ThemedTkinterLabel',
+        'TreeView', 'TreeViewHolder', 'ComboBox', 'Button', 'Entry', 'Label',
         ]
 
 """
@@ -34,7 +35,7 @@ SizeGrip
 --TreeView
 """
 
-class TkinterComboBox(ttk.Combobox, BaseTextTkinterWidget, CommandMixin):
+class ComboBox(ttk.Combobox, BaseTextTkinterWidget, CommandMixin):
     """Construct a Ttk Combobox _widget with the parent master.
 
     STANDARD OPTIONS
@@ -72,7 +73,7 @@ class TkinterComboBox(ttk.Combobox, BaseTextTkinterWidget, CommandMixin):
         self.configure(values=values)
 
 
-class TkinterTreeView(ttk.Treeview, BaseTkinterWidget, CommandMixin):
+class TreeView(ttk.Treeview, BaseTkinterWidget, CommandMixin):
     def __init__(self, master: tk.Frame, Color: dict = None, **kwargs):
         ttk.Treeview.__init__(self, master=master, **kwargs)
         if Color:
@@ -121,7 +122,7 @@ class TkinterTreeView(ttk.Treeview, BaseTkinterWidget, CommandMixin):
                 if value is None:
                     value = 'None'
                 tree.insert(parent, 'end', uid, text=value)  # text=key, value=value)
-class TkinterTreeViewHolder(TkinterFrame):
+class TreeViewHolder(TkinterFrame):
     """Construct a Ttk Treeview with parent scale.
 
     STANDARD OPTIONS
@@ -141,12 +142,12 @@ class TkinterTreeViewHolder(TkinterFrame):
     Also creates ttk.scrollbar and the frame that conatins
     both TreeView and ScrollBar objects
     """
-    TreeView: TkinterTreeView
+    TreeView: TreeView
     vsb: ttk.Scrollbar
     def __init__(self, master, backgroundColor: str, **kwargs):
         TkinterFrame.__init__(self, master=master, bg=backgroundColor, **kwargs)
 
-        self.TreeView = TkinterTreeView(master=self, **kwargs)
+        self.TreeView = TreeView(master=self, **kwargs)
         self.TreeView.pack(side='left', fill=tk.BOTH, expand=1)
 
         self.vsb = ttk.Scrollbar(master=self, orient="vertical", command=self)
@@ -155,7 +156,8 @@ class TkinterTreeViewHolder(TkinterFrame):
         self.TreeView.configure(yscrollcommand=self.vsb.set)
 
 
-class ThemedTkinterButton(ttk.Button, BaseTextTkinterWidget, ImageMixin, CommandMixin):
+# noinspection DuplicatedCode
+class Button(ttk.Button, BaseTextTkinterWidget, ImageMixin, CommandMixin):
     """Construct a button _widget with the parent MASTER.
 
         STANDARD OPTIONS
@@ -193,7 +195,8 @@ class ThemedTkinterButton(ttk.Button, BaseTextTkinterWidget, ImageMixin, Command
         BaseTextTkinterWidget.__init__(self, Override_var=Override_var, Text=Text)
 
 
-class ThemedTkinterLabel(ttk.Label, BaseTextTkinterWidget, ImageMixin):
+# noinspection DuplicatedCode
+class Label(ttk.Label, BaseTextTkinterWidget, ImageMixin):
     __doc__ = """Construct a label _widget with the parent MASTER.
 
     STANDARD OPTIONS
@@ -227,7 +230,8 @@ class ThemedTkinterLabel(ttk.Label, BaseTextTkinterWidget, ImageMixin):
             self.configure(highlightcolor=Color['HFG'])
 
 
-class ThemedTkinterEntry(ttk.Entry, BaseTextTkinterWidget, CommandMixin):
+# noinspection DuplicatedCode
+class Entry(ttk.Entry, BaseTextTkinterWidget, CommandMixin):
     __doc__ = """Construct an entry _widget with the parent MASTER.
 
     Valid resource names: background, bd, bg, borderwidth, cursor,

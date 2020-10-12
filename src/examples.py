@@ -4,10 +4,10 @@
 #
 # ------------------------------------------------------------------------------
 
-import time
 import queue
-import threading
 import random
+import threading
+import time
 from typing import List, Union
 
 from TkinterExtensions import *
@@ -34,11 +34,10 @@ PhotoData = _GetPhotoByteData()
 
 q = queue.Queue()
 
-class Root(tk.Tk):
+class Root(TkinterRoot):
     # sets up Tkinter and creates the other windows and places them accordingly.
     def __init__(self):
-        super().__init__()
-        self.geometry('800x480+100+100')
+        super().__init__(Screen_Width=800, Screen_Height=480, x=100, y=100)
 
         self.w: List[tk.Widget] = []
         self.home = HomeWindow(master=self).PlaceFull()
@@ -60,12 +59,12 @@ class HomeWindow(TkinterFrame):
     def __init__(self, master: Root):
         self.root = master
         super().__init__(master)
-        self.w: List[TkinterButton] = []
+        self.w: List[Widgets.Button] = []
 
     def Add(self, cls: Union[TkinterFrame, TkinterLabelFrame]):
         assert (callable(cls))
         w = cls(master=self.root).PlaceFull()
-        b = TkinterButton(master=self, Text=w.__class__.__name__)
+        b = Widgets.Button(master=self, Text=f'{w.__class__.__name__} [ {len(self.root.w)} ]')
         b.SetCommand(lambda: self.closeWindow(w))
         i = len(self.root.w)
         self.Grid_RowConfigure(i)
@@ -81,7 +80,7 @@ class HomeWindow(TkinterFrame):
 
 
 class BaseWindow(TkinterFrame):
-    button: TkinterButton
+    button: Widgets.Button
     CreateWidgets: callable
     def __init__(self, master: Root):
         self.master = master
@@ -95,28 +94,28 @@ class BaseWindow(TkinterFrame):
 
 class Window1(BaseWindow):
     def CreateWidgets(self):
-        self.button = TkinterButton(master=self, Text="button 1").SetCommand(self.exit).Place(relx=0.0, rely=0.0, relheight=1.0, relwidth=1.0).SetImage(ImageData=PhotoData['Abort_70x70'])
+        self.button = Widgets.Button(master=self, Text="button 1").SetCommand(self.exit).Place(relx=0.0, rely=0.0, relheight=1.0, relwidth=1.0).SetImage(ImageData=PhotoData['Abort_70x70'])
 
 
 class Window2(BaseWindow):
     def CreateWidgets(self):
-        self.button = TkinterButton(master=self, Text="button 2").SetCommand(self.exit).Place(relx=0.0, rely=0.0, relheight=1.0, relwidth=1.0).SetImage(ImageData=PhotoData['Abort_70x70'])
+        self.button = Widgets.Button(master=self, Text="button 2").SetCommand(self.exit).Place(relx=0.0, rely=0.0, relheight=1.0, relwidth=1.0).SetImage(ImageData=PhotoData['Abort_70x70'])
 
 
 class Window3(BaseWindow):
     nested: Window2
     def CreateWidgets(self):
-        self.button = TkinterButton(master=self, Text="button 3").SetCommand(self.exit).Place(relx=0.0, rely=0.0, relheight=1.0, relwidth=0.5).SetImage(ImageData=PhotoData['Abort_70x70'])
+        self.button = Widgets.Button(master=self, Text="button 3").SetCommand(self.exit).Place(relx=0.0, rely=0.0, relheight=1.0, relwidth=0.5).SetImage(ImageData=PhotoData['Abort_70x70'])
         self.nested = LabelWindow(master=self).Place(relx=0.5, rely=0.0, relheight=1.0, relwidth=0.5)
 
 
 class LabelWindow(TkinterLabelFrame):
-    button: TkinterButton
+    button: Widgets.Button
     CreateWidgets: callable
     def __init__(self, master: Root or BaseWindow):
         self.master = master
         super().__init__(master, Text=self.__class__.__name__)
-        self.button = TkinterButton(master=self, Text="button 4").SetCommand(self.exit).Place(relx=0.0, rely=0.0, relheight=1.0, relwidth=0.5)
+        self.button = Widgets.Button(master=self, Text="button 4").SetCommand(self.exit).Place(relx=0.0, rely=0.0, relheight=1.0, relwidth=0.5)
 
     def exit(self):
         self.hide()

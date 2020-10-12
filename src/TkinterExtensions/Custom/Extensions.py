@@ -6,8 +6,8 @@
 from abc import ABC
 from typing import Dict
 
-from .Frames import *
-from .Widgets import *
+from TkinterExtensions.Widgets.Frames import *
+from TkinterExtensions.Widgets.Widgets import *
 
 
 
@@ -17,10 +17,10 @@ __all__ = [
         ]
 
 class ButtonGrid(TkinterFrame, ABC):
-    __buttons: Dict[int, TkinterButton] = { }
+    __buttons: Dict[int, Button] = { }
     def __init__(self, *, master: TkinterFrame, rows: int = None, cols: int = None, NumberOfButtons: int = None, **kwargs):
         """
-            :param kwargs: TkinterButton kwargs
+            :param kwargs: Button kwargs
         """
         assert (isinstance(master, TkinterFrame))
         TkinterFrame.__init__(self, master=master)
@@ -44,7 +44,7 @@ class ButtonGrid(TkinterFrame, ABC):
             if c >= self._cols:
                 r += 1
                 c = 0
-            self.__buttons[i] = TkinterButton(self, Text=self.ButtonTitles[i], **kwargs)
+            self.__buttons[i] = Button(self, Text=self.ButtonTitles[i], **kwargs)
             self.__buttons[i].grid(row=r, column=c)
             self.__buttons[i].SetCommand(self.ButtonCommands[i])
             c += 1

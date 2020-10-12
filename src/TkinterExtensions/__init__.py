@@ -5,18 +5,10 @@
 # ------------------------------------------------------------------------------
 
 
-from .AnimatedGIF import *
+from TkinterExtensions.Custom import *
+from TkinterExtensions.Events import *
+from TkinterExtensions.Misc import *
+from TkinterExtensions.Widgets import *
 from .Bindings import *
-from .Constants import *
-from .Enumerations import *
 from .Events import *
-from .Extensions import *
-from .Frames import *
 from .HID import *
-from .Helpers import *
-from .Root import *
-from .Sytle import *
-from .ThemedWidgets import *
-from .Widgets import *
-from .base import *
-from .debug import *

@@ -7,8 +7,8 @@
 from enum import Enum
 from typing import Union
 
-from .base import *
-from .BaseWidgets import *
+from TkinterExtensions.Widgets.BaseWidgets import *
+from TkinterExtensions.Widgets.base import *
 
 
 
@@ -23,6 +23,9 @@ class TkinterFrame(tk.Frame, BaseTkinterWidget):
         if isinstance(InstanceID, Enum): InstanceID = InstanceID.value
 
         return f'{self.__class__.__name__}_{InstanceID}'.lower()
+
+
+
 class TkinterLabelFrame(tk.LabelFrame, BaseTextTkinterWidget):
     """Construct a labelframe _widget with the parent MASTER.
 

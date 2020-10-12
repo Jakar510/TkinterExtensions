@@ -13,9 +13,9 @@ from urllib.request import urlopen
 
 from PIL import Image, ImageTk
 
-from .Enumerations import *
-from .Helpers import *
-from .base import *
+from TkinterExtensions.Misc.Enumerations import *
+from TkinterExtensions.Misc.Helpers import *
+from TkinterExtensions.Widgets.base import *
 
 
 

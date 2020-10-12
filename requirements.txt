@@ -1,2 +1,2 @@
 pillow
-
+tk_html_widgets
