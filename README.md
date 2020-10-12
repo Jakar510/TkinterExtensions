@@ -4,7 +4,7 @@ Strongly typed widgets and event with multiple helper functions build in to spee
 
 ## Tktiner Bindings
 
-This project only uses the most common bindings. For the full list, see [All Tkinter bindings](https://github.com/Jakar510/PythonTkinterBindings/blob/master/src/object_struture.json).
+This project only uses the most common bindings. For the full list, see [All Tkinter bindings](src/TkinterExtensions/Bindings/Enumerations.py).
 
 ## Contributing
 
@@ -13,6 +13,8 @@ Please read [CONTRIBUTING.md](.github/CONTRIBUTING.md) for details on our code o
 ## Authors
 
 * **Tyler Stegmaier** - *Initial work* - [Jakar510](https://github.com/Jakar510)
+* **Paolo Gurisatti** - *tk_html_widgets* - [paolo-gurisatti](https://github.com/paolo-gurisatti)
+* **Ole Jakob Skjelten** - *AnimatedGIF* - [olesk75](https://github.com/olesk75)
 
 ## License
 
@@ -21,6 +23,6 @@ This project is licensed under the GNU GENERAL PUBLIC LICENSE Version 3 License 
 ## Acknowledgments
 
 * Tkinter library authors
-* [olesk75/AnimatedGIF](https://github.com/olesk75/AnimatedGIF)
-* [paolo-gurisatti/tk_html_widgets](https://github.com/paolo-gurisatti/tk_html_widgets)
+* [olesk75/AnimatedGIF](https://github.com/olesk75/AnimatedGIF) for [AnimatedGIF](src/TkinterExtensions/Widgets/Custom.py)
+* [paolo-gurisatti/tk_html_widgets](https://github.com/paolo-gurisatti/tk_html_widgets) for [Html Widgets](src/TkinterExtensions/Widgets/HTML.py)
 
