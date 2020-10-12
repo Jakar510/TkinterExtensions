@@ -4,7 +4,7 @@ tkinter HTML text widgets
 
 import sys
 
-from tk_html_widgets import html_parser
+import tk_html_widgets as tk_html
 
 from TkinterExtensions.Widgets.Widgets import ScrolledText
 
@@ -16,11 +16,11 @@ __all__ = [
         ]
 
 class HTMLScrolledText(ScrolledText):
-    """ HTML scrolled text widget """
+    __doc__ = tk_html.HTMLScrolledText.__doc__
     def __init__(self, *args, html=None, **kwargs):
         super().__init__(*args, **kwargs)
         self._w_init(kwargs)
-        self.html_parser = html_parser.HTMLTextParser()
+        self.html_parser = tk_html.html_parser.HTMLTextParser()
         if isinstance(html, str):
             self.set_html(html)
     def _w_init(self, kwargs):
@@ -32,10 +32,7 @@ class HTMLScrolledText(ScrolledText):
             else:
                 self.config(background='white')
     def fit_height(self):
-        # ------------------------------------------------------------------------------------------
-        """
-        Fit widget height to wrapped lines
-        """
+        """ Fit widget height to wrapped lines """
         for h in range(1, 4):
             self.config(height=h)
             self.master.update()
@@ -43,6 +40,8 @@ class HTMLScrolledText(ScrolledText):
                 break
         else:
             self.config(height=0.5 + 3 / self.text.yview()[1])
+
+        return self
     def set_html(self, html, strip=True):
         # ------------------------------------------------------------------------------------------
         """
@@ -54,7 +53,7 @@ class HTMLScrolledText(ScrolledText):
         self.text.Clear()
         self.text.tag_delete(self.text.tag_names)
         self.html_parser.w_set_html(self.text, html, strip=strip)
-        self.Enable(state=prev_state)
+        return self.Enable(state=prev_state)
 
 
     @property
@@ -63,8 +62,8 @@ class HTMLScrolledText(ScrolledText):
     def txt(self, value: str): self.set_html(value)
 
 
-
 class HTMLText(HTMLScrolledText):
+    __doc__ = tk_html.HTMLText.__doc__
     """ HTML text widget """
     def _w_init(self, kwargs):
         # ------------------------------------------------------------------------------------------
@@ -79,7 +78,7 @@ class HTMLText(HTMLScrolledText):
 
 
 class HTMLLabel(HTMLText):
-    """ HTML label widget """
+    __doc__ = tk_html.HTMLLabel.__doc__
     def _w_init(self, kwargs):
         # ------------------------------------------------------------------------------------------
         super()._w_init(kwargs)
@@ -95,7 +94,4 @@ class HTMLLabel(HTMLText):
         if not 'padx' in kwargs.keys():
             self.config(padx=3)
 
-    def set_html(self, *args, **kwargs):
-        # ------------------------------------------------------------------------------------------
-        super().set_html(*args, **kwargs)
-        self.Disable()
+    def set_html(self, *args, **kwargs): return super().set_html(*args, **kwargs).Disable()

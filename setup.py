@@ -3,6 +3,7 @@
 #  Copyright (c) 2020.
 #
 # ------------------------------------------------------------------------------
+import os
 
 from setuptools import setup
 
@@ -10,6 +11,9 @@ from src.TkinterExtensions.__version__ import version
 
 
 
+
+with open(os.path.abspath("README.md"), "r") as f:
+    long_description = f.read()
 
 data_files = [
         'TkinterExtensions/*.py'
@@ -20,11 +24,13 @@ setup(
         version=version,
         packages=['TkinterExtensions'],
         url='https://github.com/Jakar510/TkinterExtensions',
-        download_url=f'https://github.com/Jakar510/PyDebug/TkinterExtensions/releases/tag/{version}',
+        # download_url=f'https://github.com/Jakar510/PyDebug/TkinterExtensions/releases/tag/{version}',
         license='GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007',
         author='Tyler Stegmaier',
         author_email='tyler.stegmaier.510@gmail.com',
         description='Strongly typed widgets and event with multiple helper functions build in to speed up development.',
+        long_description=long_description,
+        long_description_content_type="text/markdown",
         install_requires=[
                 'pillow', 'tk_html_widgets',
                 ],

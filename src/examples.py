@@ -7,7 +7,7 @@
 import queue
 import random
 import threading
-import time
+from time import sleep
 from typing import List, Union
 
 from TkinterExtensions import *
@@ -49,9 +49,9 @@ class Root(TkinterRoot):
         while True:
             cls = random.choice([Window1, Window2, Window3, LabelWindow])
             self.home.Add(cls)
-            DebugWidget(self.home, root=self, Message='__run__')
+            # DebugWidget(self.home, root=self, Message='__run__')
 
-            time.sleep(2)
+            sleep(2)
             # self.after(1000, self.__run__)
 
 

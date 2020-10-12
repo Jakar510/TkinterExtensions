@@ -4,11 +4,6 @@
 #
 # ------------------------------------------------------------------------------
 
-
-from TkinterExtensions.Custom import *
-from TkinterExtensions.Events import *
+from TkinterExtensions.Bindings import *
 from TkinterExtensions.Misc import *
 from TkinterExtensions.Widgets import *
-from .Bindings import *
-from .Events import *
-from .HID import *

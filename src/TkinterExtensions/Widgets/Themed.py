@@ -4,7 +4,7 @@
 #
 # ------------------------------------------------------------------------------
 
-from TkinterExtensions.Bindings import KeyBindings
+from TkinterExtensions.Bindings import Bindings
 from TkinterExtensions.Misc.Enumerations import *
 from TkinterExtensions.Widgets.Frames import *
 from TkinterExtensions.Widgets.base import *
@@ -66,7 +66,7 @@ class ComboBox(ttk.Combobox, BaseTextTkinterWidget, CommandMixin):
     def value(self, v: str): self._txt.set(v)
 
     def _setCommand(self):
-        self.bind(KeyBindings.ComboboxSelected, self._cmd)
+        self.bind(Bindings.ComboBox.ComboboxSelected.value, self._cmd)
         return self
 
     def SetValues(self, values: list or tuple):
@@ -86,7 +86,7 @@ class TreeView(ttk.Treeview, BaseTkinterWidget, CommandMixin):
             self.configure(highlightcolor=Color['HFG'])
 
     def _setCommand(self):
-        self.bind(KeyBindings.TreeViewSelect, self._cmd)
+        self.bind(Bindings.TreeView.TreeViewSelect.value, self._cmd)
         return self
 
     def SetTags(self, tags: dict):
@@ -258,7 +258,7 @@ class Entry(ttk.Entry, BaseTextTkinterWidget, CommandMixin):
     def Clear(self): self.delete(0, Tags.End.value)
 
     def _setCommand(self):
-        self.bind(KeyBindings.bindButton, self._cmd)
+        self.bind(Bindings.Mouse.Button.value, self._cmd)
         return self
 
     @property

@@ -54,3 +54,4 @@ class TkinterLabelFrame(tk.LabelFrame, BaseTextTkinterWidget):
     def txt(self, value: str):
         self._txt.set(value)
         self.configure(text=value)
+

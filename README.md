@@ -22,4 +22,5 @@ This project is licensed under the GNU GENERAL PUBLIC LICENSE Version 3 License 
 
 * Tkinter library authors
 * [olesk75/AnimatedGIF](https://github.com/olesk75/AnimatedGIF)
+* [paolo-gurisatti/tk_html_widgets](https://github.com/paolo-gurisatti/tk_html_widgets)
 

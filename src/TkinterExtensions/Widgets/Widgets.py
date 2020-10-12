@@ -10,8 +10,8 @@ import os
 from typing import Tuple
 from urllib.request import urlopen
 
-from TkinterExtensions.Bindings import *
-from TkinterExtensions.Events import *
+from TkinterExtensions.Bindings import Bindings
+from TkinterExtensions.Bindings.Events import *
 from TkinterExtensions.Misc.Enumerations import *
 from TkinterExtensions.Widgets.base import *
 from .BaseWidgets import *
@@ -145,7 +145,7 @@ class Entry(tk.Entry, BaseTextTkinterWidget, CommandMixin):
         self.delete(0, Tags.End.value)
 
     def _setCommand(self):
-        self.bind(KeyBindings.bindButton, self._cmd)
+        self.bind(Bindings.Mouse.Button.value, self._cmd)
         return self
 
     @property
@@ -351,7 +351,7 @@ class Listbox(tk.Listbox, BaseTextTkinterWidget, CommandMixin):
 
 
     def _setCommand(self):
-        self.bind(KeyBindings.ListboxSelect, self._cmd)
+        self.bind(Bindings.ListBox.ListboxSelect.value, self._cmd)
         return self
     def ResetColors(self, color: str):
         for i in range(self.size()):

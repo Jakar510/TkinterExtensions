@@ -8,6 +8,8 @@
 import pprint
 from tkinter import Event as tkEvent
 
+from .Enumerations import *
+
 
 
 
@@ -49,6 +51,10 @@ class TkinterEvent(tkEvent):
         :return:
         """
         return self.__dict__
+
+
+    def isEnter(self) -> bool: return self.keysym == Core.Enter.value or self.keysym == Core.KP_Enter.value or self.keysym == Core.Return.value
+
 
     @staticmethod
     def IsValid(o: str):
