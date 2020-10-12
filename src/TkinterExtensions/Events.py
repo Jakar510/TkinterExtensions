@@ -16,10 +16,9 @@ __all__ = ['TkinterEvent']
 class TkinterEvent(tkEvent):
     __slots__ = ['serial', 'num', 'height', 'keycode', 'state', 'time', 'width', 'x', 'y', 'char', 'keysym', 'keysym_num', 'type', 'widget', 'x_root', 'y_root', 'delta']
     def __init__(self, source: tkEvent = None):
-        tkEvent.__init__(self)
+        super().__init__()
         if source is not None:
             assert (isinstance(source, tkEvent))
-            self.__dict__ = source.__dict__
             for name, value in source.__dict__.items():
                 setattr(self, name, value)
 

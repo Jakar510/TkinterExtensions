@@ -1,10 +1,14 @@
 # ------------------------------------------------------------------------------
-#  Created by Tyler Stegmaier.
+#  Created by Tyler Stegmaier
 #  Copyright (c) 2020.
 #
 # ------------------------------------------------------------------------------
 
-# major.minor[.maintenance]
-VERSION = (1, 4, 0)
 
-__version__ = version = '.'.join(map(str, VERSION))
+import tkinter as tk
+from tkinter import Event as tkEvent, ttk
+
+
+
+
+__all__ = ['tk', 'ttk', 'tkEvent']

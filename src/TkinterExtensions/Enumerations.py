@@ -83,7 +83,6 @@ class Tags(Enum):  # Special tags, marks and insert positions
     First = FIRST
     All = ALL  # e.g. Canvas.delete(ALL)
 
-
 class MenuItemTypes(Enum):  # Menu item types
     Cascade = CASCADE
     CheckButton = CHECKBUTTON

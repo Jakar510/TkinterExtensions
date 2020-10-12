@@ -4,7 +4,8 @@
 #
 # ------------------------------------------------------------------------------
 
-from .Widgets import _BaseTkinterWidget_, tk
+from .base import tk
+from .BaseWidgets import BaseTkinterWidget
 
 
 
@@ -12,10 +13,10 @@ from .Widgets import _BaseTkinterWidget_, tk
 __all__ = ['DebugWidget', 'DebugWidgetRecursively']
 
 def _rootLevelDataRecurive(w) -> dict:
-    assert (isinstance(w, _BaseTkinterWidget_) and isinstance(w, tk.BaseWidget))
+    assert (isinstance(w, BaseTkinterWidget) and isinstance(w, tk.BaseWidget))
     return _WidgetDataRecurive(w)
 def _WidgetDataRecurive(w) -> dict:
-    assert (isinstance(w, _BaseTkinterWidget_) and isinstance(w, tk.BaseWidget))
+    assert (isinstance(w, BaseTkinterWidget) and isinstance(w, tk.BaseWidget))
     return {
             'Type':                     w.__class__,
             'str(w)':                   str(w),
@@ -50,7 +51,7 @@ def _childData(obj):
 
     return obj
 def DebugWidgetRecursively(w, *, Message: str):
-    assert (isinstance(w, _BaseTkinterWidget_) and isinstance(w, tk.BaseWidget))
+    assert (isinstance(w, BaseTkinterWidget) and isinstance(w, tk.BaseWidget))
     from pprint import PrettyPrinter
     pp = PrettyPrinter(indent=4)
     print(f'---------------- {Message} < {w.__class__.__name__} > ----------------')
@@ -60,14 +61,14 @@ def DebugWidgetRecursively(w, *, Message: str):
 
 
 def _rootLevelData(w, root: tk.Tk or tk.Toplevel) -> dict:
-    assert (isinstance(w, _BaseTkinterWidget_) and isinstance(w, tk.BaseWidget))
+    assert (isinstance(w, BaseTkinterWidget) and isinstance(w, tk.BaseWidget))
     return {
             'root.children': root.children,
             # f'Widget: {w.__class__.__name__}':        _WidgetData(w)
             'Widget':        _WidgetData(w)
             }
 def _WidgetData(w) -> dict:
-    assert (isinstance(w, _BaseTkinterWidget_) and isinstance(w, tk.BaseWidget))
+    assert (isinstance(w, BaseTkinterWidget) and isinstance(w, tk.BaseWidget))
     return {
             'Type':                     w.__class__,
             'str(w)':                   str(w),
@@ -84,7 +85,7 @@ def _WidgetData(w) -> dict:
             'winfo_children':           w.winfo_children(),
             }
 def DebugWidget(w, *, root: tk.Tk or tk.Toplevel, Message: str):
-    assert (isinstance(w, _BaseTkinterWidget_) and isinstance(w, tk.BaseWidget))
+    assert (isinstance(w, BaseTkinterWidget) and isinstance(w, tk.BaseWidget))
     from pprint import PrettyPrinter
     pp = PrettyPrinter(indent=4)
     print(f'---------------- {Message} < {w.__class__.__name__} > ----------------')
