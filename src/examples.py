@@ -34,7 +34,7 @@ PhotoData = _GetPhotoByteData()
 
 q = queue.Queue()
 
-class Root(TkinterRoot):
+class Root(Root):
     # sets up Tkinter and creates the other windows and places them accordingly.
     def __init__(self):
         super().__init__(Screen_Width=800, Screen_Height=480, x=100, y=100)
@@ -53,15 +53,15 @@ class Root(TkinterRoot):
 
             sleep(2)
             # self.after(1000, self.__run__)
+    Root
 
-
-class HomeWindow(TkinterFrame):
+class HomeWindow(Frame):
     def __init__(self, master: Root):
         self.root = master
         super().__init__(master)
         self.w: List[Widgets.Button] = []
 
-    def Add(self, cls: Union[TkinterFrame, TkinterLabelFrame]):
+    def Add(self, cls: Union[Frame, LabelFrame]):
         assert (callable(cls))
         w = cls(master=self.root).PlaceFull()
         b = Widgets.Button(master=self, Text=f'{w.__class__.__name__} [ {len(self.root.w)} ]')
@@ -73,13 +73,13 @@ class HomeWindow(TkinterFrame):
         w.hide()
         self.root.w.append(w)
 
-    def closeWindow(self, w: Union[TkinterFrame, TkinterLabelFrame]):
+    def closeWindow(self, w: Union[Frame, LabelFrame]):
         w.show()
         self.root.home.hide()
 
 
 
-class BaseWindow(TkinterFrame):
+class BaseWindow(Frame):
     button: Widgets.Button
     CreateWidgets: callable
     def __init__(self, master: Root):
@@ -109,7 +109,7 @@ class Window3(BaseWindow):
         self.nested = LabelWindow(master=self).Place(relx=0.5, rely=0.0, relheight=1.0, relwidth=0.5)
 
 
-class LabelWindow(TkinterLabelFrame):
+class LabelWindow(LabelFrame):
     button: Widgets.Button
     CreateWidgets: callable
     def __init__(self, master: Root or BaseWindow):

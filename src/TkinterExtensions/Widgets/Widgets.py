@@ -15,7 +15,7 @@ from TkinterExtensions.Bindings.Events import *
 from TkinterExtensions.Misc.Enumerations import *
 from TkinterExtensions.Widgets.base import *
 from .BaseWidgets import *
-from .Frames import TkinterFrame
+from .Frames import Frame
 
 
 
@@ -429,7 +429,7 @@ class Text(tk.Text, BaseTextTkinterWidget, CommandMixin):
 
 # class ScrolledText(Text, BaseTextTkinterWidget):
 #     def __init__(self, master, **kw):
-#         self.frame = TkinterFrame(master)
+#         self.frame = Frame(master)
 #
 #         self.vbar = Scrollbar(self.frame)
 #         kw.update(yscrollcommand=self.vbar.set)
@@ -441,7 +441,7 @@ class Text(tk.Text, BaseTextTkinterWidget, CommandMixin):
 #
 #     def __str__(self): return str(self.frame)
 
-class ScrolledText(TkinterFrame, BaseTextTkinterWidget):
+class ScrolledText(Frame, BaseTextTkinterWidget):
     def __init__(self, master, **kw):
         self.text = Text(master=self)
 
@@ -450,7 +450,7 @@ class ScrolledText(TkinterFrame, BaseTextTkinterWidget):
         self.vbar.SetCommand(self.text.yview)
         self.text.configure(yscrollcommand=self.vbar.set)
 
-        TkinterFrame.__init__(self, master=master, **kw)
+        Frame.__init__(self, master=master, **kw)
         self.Pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
     @property

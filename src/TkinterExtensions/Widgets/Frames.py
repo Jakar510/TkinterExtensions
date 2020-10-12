@@ -13,9 +13,9 @@ from TkinterExtensions.Widgets.base import *
 
 
 
-__all__ = ['TkinterFrame', 'TkinterLabelFrame']
+__all__ = ['Frame', 'LabelFrame']
 
-class TkinterFrame(tk.Frame, BaseTkinterWidget):
+class Frame(tk.Frame, BaseTkinterWidget):
     def __init__(self, master, **kwargs):
         tk.Frame.__init__(self, master=master, **kwargs)
 
@@ -26,7 +26,7 @@ class TkinterFrame(tk.Frame, BaseTkinterWidget):
 
 
 
-class TkinterLabelFrame(tk.LabelFrame, BaseTextTkinterWidget):
+class LabelFrame(tk.LabelFrame, BaseTextTkinterWidget):
     """Construct a labelframe _widget with the parent MASTER.
 
     STANDARD OPTIONS

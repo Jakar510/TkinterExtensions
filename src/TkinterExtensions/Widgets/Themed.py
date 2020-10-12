@@ -3,8 +3,9 @@
 #  Copyright (c) 2020.
 #
 # ------------------------------------------------------------------------------
+from typing import List
 
-from TkinterExtensions.Bindings import Bindings
+from TkinterExtensions.Bindings import Bindings, TkinterEvent
 from TkinterExtensions.Misc.Enumerations import *
 from TkinterExtensions.Widgets.Frames import *
 from TkinterExtensions.Widgets.base import *
@@ -74,6 +75,8 @@ class ComboBox(ttk.Combobox, BaseTextTkinterWidget, CommandMixin):
 
 
 class TreeView(ttk.Treeview, BaseTkinterWidget, CommandMixin):
+    last_focus: int or str
+    focus_tags: List[str] = []
     def __init__(self, master: tk.Frame, Color: dict = None, **kwargs):
         ttk.Treeview.__init__(self, master=master, **kwargs)
         if Color:
@@ -122,7 +125,20 @@ class TreeView(ttk.Treeview, BaseTkinterWidget, CommandMixin):
                 if value is None:
                     value = 'None'
                 tree.insert(parent, 'end', uid, text=value)  # text=key, value=value)
-class TreeViewHolder(TkinterFrame):
+
+
+    def OnSelectRow(self, event: tkEvent):
+        if not isinstance(event, TkinterEvent): event = TkinterEvent(event)
+
+        _iid = self.identify_row(event.y)
+
+        if _iid != self.last_focus:
+            if self.last_focus:
+                self.item(self.last_focus, tags=[])
+            self.item(_iid, tags=self.focus_tags)
+            self.last_focus = _iid
+            print(event, _iid)
+class TreeViewHolder(Frame):
     """Construct a Ttk Treeview with parent scale.
 
     STANDARD OPTIONS
@@ -145,7 +161,7 @@ class TreeViewHolder(TkinterFrame):
     TreeView: TreeView
     vsb: ttk.Scrollbar
     def __init__(self, master, backgroundColor: str, **kwargs):
-        TkinterFrame.__init__(self, master=master, bg=backgroundColor, **kwargs)
+        Frame.__init__(self, master=master, bg=backgroundColor, **kwargs)
 
         self.TreeView = TreeView(master=self, **kwargs)
         self.TreeView.pack(side='left', fill=tk.BOTH, expand=1)

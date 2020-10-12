@@ -21,14 +21,14 @@ __all__ = [
         'AnimatedGIF', 'ButtonGrid'
         ]
 
-class ButtonGrid(TkinterFrame, ABC):
+class ButtonGrid(Frame, ABC):
     __buttons: Dict[int, Button] = { }
-    def __init__(self, *, master: TkinterFrame, rows: int = None, cols: int = None, NumberOfButtons: int = None, **kwargs):
+    def __init__(self, *, master: Frame, rows: int = None, cols: int = None, NumberOfButtons: int = None, **kwargs):
         """
             :param kwargs: Button kwargs
         """
-        assert (isinstance(master, TkinterFrame))
-        TkinterFrame.__init__(self, master=master)
+        assert (isinstance(master, Frame))
+        Frame.__init__(self, master=master)
         self._rows = rows or len(self.ButtonTitles)
         self._cols = cols or 1
         self._NumberOfButtons = NumberOfButtons or self._rows * self._cols

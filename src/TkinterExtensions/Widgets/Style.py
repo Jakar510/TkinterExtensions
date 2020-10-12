@@ -11,9 +11,9 @@ from TkinterExtensions.Widgets.base import *
 
 
 
-__all__ = ['TkinterStyle']
+__all__ = ['Style']
 
-class TkinterStyle(ttk.Style):
+class Style(ttk.Style):
     def Configure_Root(self, background: str, foreground: str, selected: str, active: str, font: str):
         self.configure('.', background=background, foreground=foreground, font=font)
         self.map('.', background=[('selected', selected), ('active', active)])
