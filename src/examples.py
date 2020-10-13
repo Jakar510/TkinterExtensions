@@ -11,6 +11,7 @@ from time import sleep
 from typing import List, Union
 
 from TkinterExtensions import *
+from TkinterExtensions.Widgets.KeyBoard import *
 
 
 
@@ -53,7 +54,6 @@ class Root(Root):
 
             sleep(2)
             # self.after(1000, self.__run__)
-    Root
 
 class HomeWindow(Frame):
     def __init__(self, master: Root):
@@ -124,4 +124,5 @@ class LabelWindow(LabelFrame):
 
 
 if __name__ == '__main__':
-    Root().Run()
+    # Root().Run()
+    test()

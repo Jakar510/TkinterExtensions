@@ -7,6 +7,7 @@
 import base64
 import io
 import os
+from enum import Enum
 from typing import Tuple
 from urllib.request import urlopen
 
@@ -44,7 +45,7 @@ Text
 
 # noinspection DuplicatedCode
 class Button(tk.Button, BaseTextTkinterWidget, ImageMixin, CommandMixin):
-    """Construct a button _widget with the parent MASTER.
+    """Construct a button _widget with the master MASTER.
 
         STANDARD OPTIONS
 
@@ -80,10 +81,18 @@ class Button(tk.Button, BaseTextTkinterWidget, ImageMixin, CommandMixin):
         if Command: self.SetCommand(Command)
         BaseTextTkinterWidget.__init__(self, Override_var=Override_var, Text=Text)
 
+    def _options(self, cnf, kwargs=None) -> dict:
+        kw = { }
+        if isinstance(kwargs, dict):
+            for k, v in kwargs.items():
+                if isinstance(v, Enum): v = v.value
+                kw[k] = v
+
+        return super()._options(cnf, kw)
 
 # noinspection DuplicatedCode
 class Label(tk.Label, BaseTextTkinterWidget, ImageMixin):
-    __doc__ = """Construct a label _widget with the parent MASTER.
+    __doc__ = """Construct a label _widget with the master MASTER.
 
     STANDARD OPTIONS
 
@@ -115,10 +124,18 @@ class Label(tk.Label, BaseTextTkinterWidget, ImageMixin):
             self.configure(highlightbackground=Color['HBG'])
             self.configure(highlightcolor=Color['HFG'])
 
+    def _options(self, cnf, kwargs=None) -> dict:
+        kw = { }
+        if isinstance(kwargs, dict):
+            for k, v in kwargs.items():
+                if isinstance(v, Enum): v = v.value
+                kw[k] = v
+
+        return super()._options(cnf, kw)
 
 # noinspection DuplicatedCode
 class Entry(tk.Entry, BaseTextTkinterWidget, CommandMixin):
-    __doc__ = """Construct an entry _widget with the parent MASTER.
+    __doc__ = """Construct an entry _widget with the master MASTER.
 
     Valid resource names: background, bd, bg, borderwidth, cursor,
     exportselection, fg, font, foreground, highlightbackground,
@@ -158,9 +175,17 @@ class Entry(tk.Entry, BaseTextTkinterWidget, CommandMixin):
     def Append(self, value: str):
         self.insert(Tags.End.value, value)
 
+    def _options(self, cnf, kwargs=None) -> dict:
+        kw = { }
+        if isinstance(kwargs, dict):
+            for k, v in kwargs.items():
+                if isinstance(v, Enum): v = v.value
+                kw[k] = v
+
+        return super()._options(cnf, kw)
 
 class CheckBox(tk.Checkbutton, BaseTextTkinterWidget, ImageMixin, CommandMixin):
-    """Construct a checkbutton _widget with the parent MASTER.
+    """Construct a checkbutton _widget with the master MASTER.
 
         Valid resource names:
 
@@ -227,9 +252,17 @@ class CheckBox(tk.Checkbutton, BaseTextTkinterWidget, ImageMixin, CommandMixin):
         else:
             self.deselect()
 
+    def _options(self, cnf, kwargs=None) -> dict:
+        kw = { }
+        if isinstance(kwargs, dict):
+            for k, v in kwargs.items():
+                if isinstance(v, Enum): v = v.value
+                kw[k] = v
+
+        return super()._options(cnf, kw)
 
 class Listbox(tk.Listbox, BaseTextTkinterWidget, CommandMixin):
-    """Construct a listbox _widget with the parent MASTER.
+    """Construct a listbox _widget with the master MASTER.
 
     Valid resource names: background, bd, bg, borderwidth, cursor,
     exportselection, fg, font, foreground, height, highlightbackground,
@@ -386,6 +419,14 @@ class Listbox(tk.Listbox, BaseTextTkinterWidget, CommandMixin):
     @txt.setter
     def txt(self, value: str): self.ReplaceAtIndex(self._Current_ListBox_Index, value)
 
+    def _options(self, cnf, kwargs=None) -> dict:
+        kw = { }
+        if isinstance(kwargs, dict):
+            for k, v in kwargs.items():
+                if isinstance(v, Enum): v = v.value
+                kw[k] = v
+
+        return super()._options(cnf, kw)
 
 class Canvas(tk.Canvas, BaseTkinterWidget, CommandMixin):
     def SetImage(self, X: int, Y: int, ImagePath: str = None, ImageData: str = None, url: str = None) -> Tuple[ImageTk.PhotoImage, Tuple[int, int], int]:
@@ -408,13 +449,36 @@ class Canvas(tk.Canvas, BaseTkinterWidget, CommandMixin):
         img_tk = ImageTk.PhotoImage(image)
         return img_tk, image.size, self.create_image(X, Y, anchor=anchor, image=img_tk)
 
+    def _options(self, cnf, kwargs=None) -> dict:
+        kw = { }
+        if isinstance(kwargs, dict):
+            for k, v in kwargs.items():
+                if isinstance(v, Enum): v = v.value
+                kw[k] = v
 
-class CheckButton(tk.Checkbutton, BaseTextTkinterWidget, CommandMixin): pass
+        return super()._options(cnf, kw)
 
+class CheckButton(tk.Checkbutton, BaseTextTkinterWidget, CommandMixin):
+
+    def _options(self, cnf, kwargs=None) -> dict:
+        kw = { }
+        if isinstance(kwargs, dict):
+            for k, v in kwargs.items():
+                if isinstance(v, Enum): v = v.value
+                kw[k] = v
+
+        return super()._options(cnf, kw)
 
 class Scrollbar(tk.Scrollbar, BaseTkinterWidget, CommandMixin):
-    pass
 
+    def _options(self, cnf, kwargs=None) -> dict:
+        kw = { }
+        if isinstance(kwargs, dict):
+            for k, v in kwargs.items():
+                if isinstance(v, Enum): v = v.value
+                kw[k] = v
+
+        return super()._options(cnf, kw)
 
 class Text(tk.Text, BaseTextTkinterWidget, CommandMixin):
     def Clear(self): self.delete(self.GetIndex(1, 0), tk.END)
@@ -427,6 +491,14 @@ class Text(tk.Text, BaseTextTkinterWidget, CommandMixin):
     @txt.setter
     def txt(self, value: str): self.insert(self.GetIndex(1, 0), value)
 
+    def _options(self, cnf, kwargs=None) -> dict:
+        kw = { }
+        if isinstance(kwargs, dict):
+            for k, v in kwargs.items():
+                if isinstance(v, Enum): v = v.value
+                kw[k] = v
+
+        return super()._options(cnf, kw)
 # class ScrolledText(Text, BaseTextTkinterWidget):
 #     def __init__(self, master, **kw):
 #         self.frame = Frame(master)
@@ -457,3 +529,12 @@ class ScrolledText(Frame, BaseTextTkinterWidget):
     def txt(self) -> str: return self.text.txt
     @txt.setter
     def txt(self, value: str): self.text.txt = value
+
+    def _options(self, cnf, kwargs=None) -> dict:
+        kw = { }
+        if isinstance(kwargs, dict):
+            for k, v in kwargs.items():
+                if isinstance(v, Enum): v = v.value
+                kw[k] = v
+
+        return super()._options(cnf, kw)

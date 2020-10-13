@@ -3,6 +3,7 @@
 #  Copyright (c) 2020.
 #
 # ------------------------------------------------------------------------------
+from enum import Enum
 from typing import List
 
 from TkinterExtensions.Bindings import Bindings, TkinterEvent
@@ -37,7 +38,7 @@ SizeGrip
 """
 
 class ComboBox(ttk.Combobox, BaseTextTkinterWidget, CommandMixin):
-    """Construct a Ttk Combobox _widget with the parent master.
+    """Construct a Ttk Combobox _widget with the master master.
 
     STANDARD OPTIONS
 
@@ -73,6 +74,14 @@ class ComboBox(ttk.Combobox, BaseTextTkinterWidget, CommandMixin):
     def SetValues(self, values: list or tuple):
         self.configure(values=values)
 
+    def _options(self, cnf, kwargs=None) -> dict:
+        kw = { }
+        if isinstance(kwargs, dict):
+            for k, v in kwargs.items():
+                if isinstance(v, Enum): v = v.value
+                kw[k] = v
+
+        return super()._options(cnf, kw)
 
 class TreeView(ttk.Treeview, BaseTkinterWidget, CommandMixin):
     last_focus: int or str
@@ -138,8 +147,17 @@ class TreeView(ttk.Treeview, BaseTkinterWidget, CommandMixin):
             self.item(_iid, tags=self.focus_tags)
             self.last_focus = _iid
             print(event, _iid)
+
+    def _options(self, cnf, kwargs=None) -> dict:
+        kw = { }
+        if isinstance(kwargs, dict):
+            for k, v in kwargs.items():
+                if isinstance(v, Enum): v = v.value
+                kw[k] = v
+
+        return super()._options(cnf, kw)
 class TreeViewHolder(Frame):
-    """Construct a Ttk Treeview with parent scale.
+    """Construct a Ttk Treeview with master scale.
 
     STANDARD OPTIONS
         class, cursor, style, takefocus, xscrollcommand,
@@ -171,10 +189,18 @@ class TreeViewHolder(Frame):
         self.vsb.pi = self.vsb.place_info()
         self.TreeView.configure(yscrollcommand=self.vsb.set)
 
+    def _options(self, cnf, kwargs=None) -> dict:
+        kw = { }
+        if isinstance(kwargs, dict):
+            for k, v in kwargs.items():
+                if isinstance(v, Enum): v = v.value
+                kw[k] = v
+
+        return super()._options(cnf, kw)
 
 # noinspection DuplicatedCode
 class Button(ttk.Button, BaseTextTkinterWidget, ImageMixin, CommandMixin):
-    """Construct a button _widget with the parent MASTER.
+    """Construct a button _widget with the master MASTER.
 
         STANDARD OPTIONS
 
@@ -210,10 +236,18 @@ class Button(ttk.Button, BaseTextTkinterWidget, ImageMixin, CommandMixin):
         if Command: self.SetCommand(Command)
         BaseTextTkinterWidget.__init__(self, Override_var=Override_var, Text=Text)
 
+    def _options(self, cnf, kwargs=None) -> dict:
+        kw = { }
+        if isinstance(kwargs, dict):
+            for k, v in kwargs.items():
+                if isinstance(v, Enum): v = v.value
+                kw[k] = v
+
+        return super()._options(cnf, kw)
 
 # noinspection DuplicatedCode
 class Label(ttk.Label, BaseTextTkinterWidget, ImageMixin):
-    __doc__ = """Construct a label _widget with the parent MASTER.
+    __doc__ = """Construct a label _widget with the master MASTER.
 
     STANDARD OPTIONS
 
@@ -245,10 +279,18 @@ class Label(ttk.Label, BaseTextTkinterWidget, ImageMixin):
             self.configure(highlightbackground=Color['HBG'])
             self.configure(highlightcolor=Color['HFG'])
 
+    def _options(self, cnf, kwargs=None) -> dict:
+        kw = { }
+        if isinstance(kwargs, dict):
+            for k, v in kwargs.items():
+                if isinstance(v, Enum): v = v.value
+                kw[k] = v
+
+        return super()._options(cnf, kw)
 
 # noinspection DuplicatedCode
 class Entry(ttk.Entry, BaseTextTkinterWidget, CommandMixin):
-    __doc__ = """Construct an entry _widget with the parent MASTER.
+    __doc__ = """Construct an entry _widget with the master MASTER.
 
     Valid resource names: background, bd, bg, borderwidth, cursor,
     exportselection, fg, font, foreground, highlightbackground,
@@ -286,3 +328,12 @@ class Entry(ttk.Entry, BaseTextTkinterWidget, CommandMixin):
 
     def Append(self, value: str):
         self.insert(Tags.End.value, value)
+
+    def _options(self, cnf, kwargs=None) -> dict:
+        kw = { }
+        if isinstance(kwargs, dict):
+            for k, v in kwargs.items():
+                if isinstance(v, Enum): v = v.value
+                kw[k] = v
+
+        return super()._options(cnf, kw)

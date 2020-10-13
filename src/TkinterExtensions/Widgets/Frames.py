@@ -24,10 +24,18 @@ class Frame(tk.Frame, BaseTkinterWidget):
 
         return f'{self.__class__.__name__}_{InstanceID}'.lower()
 
+    def _options(self, cnf, kwargs=None) -> dict:
+        kw = { }
+        if isinstance(kwargs, dict):
+            for k, v in kwargs.items():
+                if isinstance(v, Enum): v = v.value
+                kw[k] = v
+
+        return super()._options(cnf, kw)
 
 
 class LabelFrame(tk.LabelFrame, BaseTextTkinterWidget):
-    """Construct a labelframe _widget with the parent MASTER.
+    """Construct a labelframe _widget with the master MASTER.
 
     STANDARD OPTIONS
 
@@ -55,3 +63,12 @@ class LabelFrame(tk.LabelFrame, BaseTextTkinterWidget):
         self._txt.set(value)
         self.configure(text=value)
 
+
+    def _options(self, cnf, kwargs=None) -> dict:
+        kw = { }
+        if isinstance(kwargs, dict):
+            for k, v in kwargs.items():
+                if isinstance(v, Enum): v = v.value
+                kw[k] = v
+
+        return super()._options(cnf, kw)

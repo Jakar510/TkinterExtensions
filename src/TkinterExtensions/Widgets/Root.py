@@ -3,6 +3,7 @@
 #  Copyright (c) 2020.
 #
 # ------------------------------------------------------------------------------
+from enum import Enum
 
 from TkinterExtensions.Widgets.Style import *
 from TkinterExtensions.Widgets.base import *
@@ -13,7 +14,7 @@ from TkinterExtensions.Widgets.base import *
 __all__ = ['Root', 'TopLevel']
 
 # noinspection PyUnresolvedReferences
-class _roorMixin:
+class _rootMixin:
     Style: Style
     Screen_Width: int
     Screen_Height: int
@@ -37,8 +38,12 @@ class _roorMixin:
         self.resizable(width=resizable, height=resizable)
         return self
 
+    @property
+    def width(self) -> int: return self.winfo_width()
+    @property
+    def height(self) -> int: return self.winfo_height()
 # noinspection DuplicatedCode
-class Root(tk.Tk, _roorMixin):
+class Root(tk.Tk, _rootMixin):
     def __init__(self, Screen_Width: int = None, Screen_Height: int = None, x: int = 0, y: int = 0, fullscreen: bool = None, **kwargs):
         super().__init__(**kwargs)
         self.SetDimmensions(Screen_Width, Screen_Height, x, y)
@@ -46,10 +51,18 @@ class Root(tk.Tk, _roorMixin):
 
         self.Style = Style(master=self)
 
+    def _options(self, cnf, kwargs=None) -> dict:
+        kw = { }
+        if isinstance(kwargs, dict):
+            for k, v in kwargs.items():
+                if isinstance(v, Enum): v = v.value
+                kw[k] = v
+
+        return super()._options(cnf, kw)
 
 
 # noinspection DuplicatedCode
-class TopLevel(tk.Toplevel, _roorMixin):
+class TopLevel(tk.Toplevel, _rootMixin):
     def __init__(self, master: Root, Screen_Width: int = None, Screen_Height: int = None, x: int = 0, y: int = 0, fullscreen: bool = None, **kwargs):
         assert (isinstance(master, Root))
         super().__init__(master=master, **kwargs)
@@ -57,3 +70,12 @@ class TopLevel(tk.Toplevel, _roorMixin):
         if fullscreen is not None: self.SetFullScreen(fullscreen)
 
         self.Style = master.Style
+
+    def _options(self, cnf, kwargs=None) -> dict:
+        kw = { }
+        if isinstance(kwargs, dict):
+            for k, v in kwargs.items():
+                if isinstance(v, Enum): v = v.value
+                kw[k] = v
+
+        return super()._options(cnf, kw)
