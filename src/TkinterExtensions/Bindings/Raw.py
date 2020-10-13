@@ -85,8 +85,8 @@ t = "t"
 u = "u"
 v = "v"
 w = "w"
-x = "x"
-y = "y"
+x = "_x"
+y = "_y"
 z = "z"
 
 # class Custom(Enum):

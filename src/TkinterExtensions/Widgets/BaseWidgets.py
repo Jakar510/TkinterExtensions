@@ -8,7 +8,6 @@
 import base64
 import io
 import os
-from enum import Enum
 from typing import Union
 from urllib.request import urlopen
 
@@ -47,7 +46,7 @@ class BaseTkinterWidget(tk.Widget):
     # noinspection PyUnresolvedReferences
     def show(self, **kwargs) -> bool:
         """
-        Shows the current widget or frame, based on the current geometry manager.
+        Shows the current widget or _root_frame, based on the current geometry manager.
         Can be overridden to add additional functionality if needed.
         """
         if self._manager_ is None: return False
@@ -76,7 +75,7 @@ class BaseTkinterWidget(tk.Widget):
     # noinspection PyUnresolvedReferences
     def hide(self) -> bool:
         """
-        Hides the current widget or frame, based on the current geometry manager.
+        Hides the current widget or _root_frame, based on the current geometry manager.
         Can be overridden to add additional functionality if needed.
         """
         if self._manager_ is None: return False
@@ -99,7 +98,7 @@ class BaseTkinterWidget(tk.Widget):
 
 
 
-    def Pack(self, cnf: dict = None, **kwargs):
+    def Pack(self, cnf: dict = { }, **kwargs):
         self.pack(cnf, **kwargs)
         self._pi = self.pack_info()
         self._manager_ = Layout.pack
@@ -114,10 +113,10 @@ class BaseTkinterWidget(tk.Widget):
         fill=NONE or X or Y or BOTH - fill widget if widget grows
         in=master - use master to contain this widget
         in_=master - see 'in' option description
-        ipadx=amount - add internal padding in x direction
-        ipady=amount - add internal padding in y direction
-        padx=amount - add padding in x direction
-        pady=amount - add padding in y direction
+        ipadx=amount - add internal padding in _x direction
+        ipady=amount - add internal padding in _y direction
+        padx=amount - add padding in _x direction
+        pady=amount - add padding in _y direction
         side=TOP or BOTTOM or LEFT or RIGHT -  where to add this widget.
         """
         if 'after' in kwargs: assert (isinstance(kwargs['after'], tk.Widget))
@@ -125,7 +124,7 @@ class BaseTkinterWidget(tk.Widget):
 
         return self.Pack(side=side, anchor=anchor, expand=expand, fill=fill, padx=padx, pady=pady, **kwargs)
     def PackFull(self):
-        """ Default placement in frame occupying the full screen and/or space available in master. """
+        """ Default placement in _root_frame occupying the full screen and/or space available in master. """
         return self.Pack(expand=True, fill=Fill.both, side=Side.top)
 
 
@@ -133,8 +132,8 @@ class BaseTkinterWidget(tk.Widget):
         """Place a widget in the master widget. Use as options:
         in=master - master relative to which the widget is placed
         in_=master - see 'in' option description
-        x=amount - locate anchor of this widget at position x of master
-        y=amount - locate anchor of this widget at position y of master
+        _x=amount - locate anchor of this widget at position _x of master
+        _y=amount - locate anchor of this widget at position _y of master
         relx=amount - locate anchor of this widget between 0.0 and 1.0
                       relative to width of master (1.0 is right edge)
         rely=amount - locate anchor of this widget between 0.0 and 1.0
@@ -160,26 +159,26 @@ class BaseTkinterWidget(tk.Widget):
     def PlaceRelative(self, relx: float, rely: float, relwidth: float, relheight: float, anchor: str or AnchorAndSticky = AnchorAndSticky.NorthEast):
         return self.Place(relx=relx, rely=rely, relwidth=relwidth, relheight=relheight, anchor=anchor)
     def PlaceFull(self):
-        """ Default placement in frame occupying the full screen and/or space available in master. """
+        """ Default placement in _root_frame occupying the full screen and/or space available in master. """
         return self.PlaceRelative(relx=0.0, rely=0.0, relwidth=1.0, relheight=1.0)
 
 
-    def Grid(self, row: int, column: int, sticky: str or AnchorAndSticky = tk.NSEW, rowspan: int = 1, columnspan: int = 1, **kwargs):
+    def Grid(self, row: int, column: int, sticky: str or AnchorAndSticky = tk.NSEW, rowspan: int = 1, columnspan: int = 1, padx: int = 0, pady: int = 0, **kwargs):
         """Position a widget in the master widget in a grid. Use as options:
         column=number - use cell identified with given column (starting with 0)
         columnspan=number - this widget will span several columns
         in=master - use master to contain this widget
         in_=master - see 'in' option description
-        ipadx=amount - add internal padding in x direction
-        ipady=amount - add internal padding in y direction
-        padx=amount - add padding in x direction
-        pady=amount - add padding in y direction
+        ipadx=amount - add internal padding in _x direction
+        ipady=amount - add internal padding in _y direction
+        padx=amount - add padding in _x direction
+        pady=amount - add padding in _y direction
         row=number - use cell identified with given row (starting with 0)
         rowspan=number - this widget will span several rows
         sticky=NSEW - if cell is larger on which sides will this
                       widget stick to the cell boundary
         """
-        self.grid(row=row, column=column, sticky=sticky, rowspan=rowspan, columnspan=columnspan, **kwargs)
+        self.grid(row=row, column=column, sticky=sticky, rowspan=rowspan, columnspan=columnspan, padx=padx, pady=pady, **kwargs)
         self._pi = self.grid_info()
         self._manager_ = Layout.grid
         return self
@@ -191,7 +190,7 @@ class BaseTkinterWidget(tk.Widget):
         The default anchor is nw."""
         self.grid_anchor(anchor=anchor)
         return self
-    def Grid_RowConfigure(self, index: int, weight: int = 1, **kwargs):
+    def Grid_RowConfigure(self, index: int, weight: int, **kwargs):
         """Configure row INDEX of a grid.
 
         Valid resources are minsize (minimum size of the row),
@@ -199,7 +198,7 @@ class BaseTkinterWidget(tk.Widget):
         and pad (how much space to let additionally)."""
         self.grid_rowconfigure(index, weight=weight, **kwargs)
         return self
-    def Grid_ColumnConfigure(self, index: int, weight: int = 1, **kwargs):
+    def Grid_ColumnConfigure(self, index: int, weight: int, **kwargs):
         """Configure column INDEX of a grid.
 
         Valid resources are minsize (minimum size of the column),

@@ -501,17 +501,17 @@ class Text(tk.Text, BaseTextTkinterWidget, CommandMixin):
         return super()._options(cnf, kw)
 # class ScrolledText(Text, BaseTextTkinterWidget):
 #     def __init__(self, master, **kw):
-#         self.frame = Frame(master)
+#         self._root_frame = Frame(master)
 #
-#         self.vbar = Scrollbar(self.frame)
+#         self.vbar = Scrollbar(self._root_frame)
 #         kw.update(yscrollcommand=self.vbar.set)
 #         self.vbar.Pack(side=tk.RIGHT, fill=tk.Y)
 #         self.vbar.SetCommand(self.yview)
 #
-#         tk.Text.__init__(self, self.frame, **kw)
+#         tk.Text.__init__(self, self._root_frame, **kw)
 #         self.Pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 #
-#     def __str__(self): return str(self.frame)
+#     def __str__(self): return str(self._root_frame)
 
 class ScrolledText(Frame, BaseTextTkinterWidget):
     def __init__(self, master, **kw):

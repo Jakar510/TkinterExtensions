@@ -173,7 +173,7 @@ class TreeViewHolder(Frame):
         foreground, background, font, image
 
     --------------------------------------------------------------
-    Also creates ttk.scrollbar and the frame that conatins
+    Also creates ttk.scrollbar and the _root_frame that conatins
     both TreeView and ScrollBar objects
     """
     TreeView: TreeView
@@ -185,7 +185,7 @@ class TreeViewHolder(Frame):
         self.TreeView.pack(side='left', fill=tk.BOTH, expand=1)
 
         self.vsb = ttk.Scrollbar(master=self, orient="vertical", command=self)
-        self.vsb.pack(side='right', fill='y')
+        self.vsb.pack(side='right', fill='_y')
         self.vsb.pi = self.vsb.place_info()
         self.TreeView.configure(yscrollcommand=self.vsb.set)
 
