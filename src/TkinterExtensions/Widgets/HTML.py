@@ -6,7 +6,7 @@ import sys
 
 import tk_html_widgets as tk_html
 
-from TkinterExtensions.Widgets.Widgets import ScrolledText
+from ..Widgets.Widgets import ScrolledText
 
 
 

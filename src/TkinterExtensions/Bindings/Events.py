@@ -16,7 +16,7 @@ from .Enumerations import *
 __all__ = ['TkinterEvent']
 
 class TkinterEvent(tkEvent):
-    __slots__ = ['serial', 'num', 'height', 'keycode', 'state', 'time', 'width', '_x', '_y', 'char', 'keysym', 'keysym_num', 'type', 'widget', 'x_root', 'y_root', 'delta']
+    __slots__ = ['serial', 'num', 'height', 'keycode', 'state', 'time', 'width', 'x', 'y', 'char', 'keysym', 'keysym_num', 'type', 'widget', 'x_root', 'y_root', 'delta']
     def __init__(self, source: tkEvent = None):
         super().__init__()
         if source is not None:

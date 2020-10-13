@@ -24,6 +24,6 @@ This project is licensed under the GNU GENERAL PUBLIC LICENSE Version 3 License 
 ## Acknowledgments
 
 * Tkinter library authors
-* [olesk75/AnimatedGIF](https://github.com/olesk75/AnimatedGIF) for [AnimatedGIF](src/TkinterExtensions/Widgets/Custom.py)
+* [olesk75/AnimatedGIF](https://github.com/olesk75/AnimatedGIF) for [AnimatedGIF](src/TkinterExtensions/Widgets/AnimatedGIF.py)
 * [paolo-gurisatti/tk_html_widgets](https://github.com/paolo-gurisatti/tk_html_widgets) for [Html Widgets](src/TkinterExtensions/Widgets/HTML.py)
 * [petemojeiko/tkinter-keyboard](https://github.com/petemojeiko/tkinter-keyboard) for [Keyboard](src/TkinterExtensions/Widgets/KeyBoard.py)

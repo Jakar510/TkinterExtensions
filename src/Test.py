@@ -5,7 +5,11 @@
 #
 # ------------------------------------------------------------------------------
 
-from TkinterExtensions import *
+from ..examples import *
 
 
 
+
+if __name__ == '__main__':
+    Root().Run()
+    test()

@@ -7,8 +7,8 @@
 from enum import Enum
 from typing import Union
 
-from TkinterExtensions.Widgets.BaseWidgets import *
-from TkinterExtensions.Widgets.base import *
+from ..Widgets.BaseWidgets import *
+from ..Widgets.base import *
 
 
 

@@ -1,4 +1,4 @@
 
-import TkinterExtensions.Bindings.Enumerations as Bindings
-import TkinterExtensions.Bindings.Raw as RawBindings
+
+from .Enumerations import Bindings
 from .Events import *

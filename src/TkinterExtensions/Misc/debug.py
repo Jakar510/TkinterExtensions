@@ -4,8 +4,8 @@
 #
 # ------------------------------------------------------------------------------
 
-from TkinterExtensions.Widgets.base import tk
-from TkinterExtensions.Widgets.BaseWidgets import BaseTkinterWidget
+from ..Widgets.base import tk
+from ..Widgets.BaseWidgets import BaseTkinterWidget
 
 
 

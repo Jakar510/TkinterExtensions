@@ -6,7 +6,7 @@
 
 from typing import List, Tuple
 
-from TkinterExtensions.Widgets.base import *
+from ..Widgets.base import *
 
 
 

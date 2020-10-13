@@ -8,13 +8,16 @@ import queue
 import random
 import threading
 from time import sleep
-from typing import List, Union
+from typing import Union
 
-from TkinterExtensions import *
 from TkinterExtensions.Widgets.KeyBoard import *
+from . import *
+from .__version__ import version
 
 
 
+
+print('TkinterExtensions.version', version)
 
 class MainMenu_Colors: NumPadEntry = None
 
@@ -67,8 +70,8 @@ class HomeWindow(Frame):
         b = Widgets.Button(master=self, Text=f'{w.__class__.__name__} [ {len(self.root.w)} ]')
         b.SetCommand(lambda: self.closeWindow(w))
         i = len(self.root.w)
-        self.Grid_RowConfigure(i)
-        self.Grid_ColumnConfigure(0)
+        self.Grid_RowConfigure(i, weight=1)
+        self.Grid_ColumnConfigure(0, weight=1)
         b.Grid(column=0, row=i)
         w.hide()
         self.root.w.append(w)
@@ -120,9 +123,3 @@ class LabelWindow(LabelFrame):
     def exit(self):
         self.hide()
         self.master.home.show()
-
-
-
-if __name__ == '__main__':
-    # Root().Run()
-    test()

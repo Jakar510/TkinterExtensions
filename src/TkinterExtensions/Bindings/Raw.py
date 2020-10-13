@@ -168,5 +168,5 @@ three = "3"
 two = "2"
 zero = "0"
 
-# class TreeView(Enum):
+# class ThemedTreeView(Enum):
 TreeViewSelect = "<<TreeviewSelect>>"

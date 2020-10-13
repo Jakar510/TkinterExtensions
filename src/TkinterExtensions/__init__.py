@@ -4,6 +4,7 @@
 #
 # ------------------------------------------------------------------------------
 
-from TkinterExtensions.Bindings import *
-from TkinterExtensions.Misc import *
-from TkinterExtensions.Widgets import *
+
+from .Bindings import *
+from .Misc import *
+from .Widgets import *

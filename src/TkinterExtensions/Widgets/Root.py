@@ -5,8 +5,8 @@
 # ------------------------------------------------------------------------------
 from enum import Enum
 
-from TkinterExtensions.Widgets.Style import *
-from TkinterExtensions.Widgets.base import *
+from ..Widgets.Style import *
+from ..Widgets.base import *
 
 
 

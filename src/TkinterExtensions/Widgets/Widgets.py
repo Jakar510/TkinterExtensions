@@ -11,10 +11,10 @@ from enum import Enum
 from typing import Tuple
 from urllib.request import urlopen
 
-from TkinterExtensions.Bindings import Bindings
-from TkinterExtensions.Bindings.Events import *
-from TkinterExtensions.Misc.Enumerations import *
-from TkinterExtensions.Widgets.base import *
+from ..Bindings import Bindings
+from ..Bindings.Events import *
+from ..Misc.Enumerations import *
+from ..Widgets.base import *
 from .BaseWidgets import *
 from .Frames import Frame
 
