@@ -5,7 +5,7 @@
 #
 # ------------------------------------------------------------------------------
 
-from ..examples import *
+from TkinterExtensions.examples import *
 
 
 

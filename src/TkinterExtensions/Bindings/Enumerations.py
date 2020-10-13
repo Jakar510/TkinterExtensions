@@ -184,3 +184,6 @@ class Bindings(object):
 
     class TreeView(Enum):
         TreeViewSelect = TreeViewSelect
+
+    @staticmethod
+    def IsEnter(keysym: str) -> bool: return keysym == Bindings.Core.Enter.value or keysym == Bindings.Core.KP_Enter.value or keysym == Bindings.Core.Return.value

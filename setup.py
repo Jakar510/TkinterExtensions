@@ -7,24 +7,19 @@ import os
 
 from setuptools import setup
 
+from src.TkinterExtensions.__version__ import version
 
-def GetVesion():
-      from src.TkinterExtensions.__version__ import version
-      return version
+
 
 
 with open(os.path.abspath("PyPiReadme.md"), "r") as f:
     long_description = f.read()
 
-package = 'TkinterExtensions'
-data_files = [
-        f'{package}/*.py'
-        ]
 
-setup(name=package,
-      version=GetVesion(),
-      packages=[package],
-      url=f'https://github.com/Jakar510/{package}',
+setup(name='TkinterExtensions',
+      version=version,
+      packages=['TkinterExtensions', 'TkinterExtensions.Widgets', 'TkinterExtensions.Misc', 'TkinterExtensions.Bindings'],
+      url=f'https://github.com/Jakar510/TkinterExtensions',
       # download_url=f'https://github.com/Jakar510/PyDebug/TkinterExtensions/releases/tag/{version}',
       license='MIT',
       author='Tyler Stegmaier',
@@ -56,9 +51,12 @@ setup(name=package,
 
               'Programming Language :: Python :: 3',
               ],
-      keywords=f'{package} Tkinter Extensions tk ttk tkinter',
-      package_dir={ package: f'src/{package}' },
+      keywords=f'TkinterExtensions Tkinter Extensions tk ttk tkinter',
+      package_dir={ 'TkinterExtensions': f'src/TkinterExtensions' },
       package_data={
-              package: data_files,
+              'TkinterExtensions': ['__init__.py', '__version__.py', 'Mixins.py', 'examples.py'],
+              'TkinterExtensions.Bindings': ['TkinterExtensions.Bindings/*.py'],
+              'TkinterExtensions.Widgets': ['TkinterExtensions.Widgets/*.py'],
+              'TkinterExtensions.Misc': ['TkinterExtensions.Misc/*.py'],
               },
       )

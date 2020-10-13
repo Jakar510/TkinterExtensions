@@ -5,7 +5,7 @@
 # ------------------------------------------------------------------------------
 
 from .AnimatedGIF import *
-from .BaseWidgets import CallWrapper
+from .BaseWidgets import CurrentValue
 from .Custom import *
 from .Frames import *
 from .HTML import *

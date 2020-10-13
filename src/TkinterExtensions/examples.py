@@ -38,6 +38,7 @@ PhotoData = _GetPhotoByteData()
 
 q = queue.Queue()
 
+
 class Root(Root):
     # sets up Tkinter and creates the other windows and places them accordingly.
     def __init__(self):

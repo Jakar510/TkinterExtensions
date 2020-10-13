@@ -4,7 +4,7 @@
 #
 # ------------------------------------------------------------------------------
 
-
+from .__version__ import *
 from .Bindings import *
 from .Misc import *
 from .Widgets import *

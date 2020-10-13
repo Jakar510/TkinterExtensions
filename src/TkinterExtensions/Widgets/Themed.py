@@ -83,6 +83,16 @@ class ComboBoxThemed(ttk.Combobox, BaseTextTkinterWidget, CommandMixin):
 
         return super()._options(cnf, kw)
 
+class ScrollbarThemed(ttk.Scrollbar, BaseTkinterWidget):
+    def _options(self, cnf, kwargs=None) -> dict:
+        kw = { }
+        if isinstance(kwargs, dict):
+            for k, v in kwargs.items():
+                if isinstance(v, Enum): v = v.value
+                kw[k] = v
+
+        return super()._options(cnf, kw)
+
 class TreeViewThemed(ttk.Treeview, BaseTkinterWidget, CommandMixin):
     last_focus: int or str
     focus_tags: List[str] = []
@@ -177,16 +187,14 @@ class TreeViewHolderThemed(Frame):
     both ThemedTreeView and ScrollBar objects
     """
     TreeView: TreeViewThemed
-    vsb: ttk.Scrollbar
+    vsb: ScrollbarThemed
     def __init__(self, master, backgroundColor: str, **kwargs):
         Frame.__init__(self, master=master, bg=backgroundColor, **kwargs)
 
         self.TreeView = TreeViewThemed(master=self, **kwargs)
         self.TreeView.pack(side='left', fill=tk.BOTH, expand=1)
 
-        self.vsb = ttk.Scrollbar(master=self, orient="vertical", command=self)
-        self.vsb.pack(side='right', fill='_y')
-        self.vsb.pi = self.vsb.place_info()
+        self.vsb = ScrollbarThemed(master=self, orient="vertical", command=self).Pack(side='right', fill=Fill.y)
         self.TreeView.configure(yscrollcommand=self.vsb.set)
 
     def _options(self, cnf, kwargs=None) -> dict:

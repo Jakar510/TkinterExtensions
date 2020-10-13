@@ -53,11 +53,12 @@ class TkinterEvent(tkEvent):
         return self.__dict__
 
 
-    def isEnter(self) -> bool: return self.keysym == Core.Enter.value or self.keysym == Core.KP_Enter.value or self.keysym == Core.Return.value
+    def IsEnter(self) -> bool: return Bindings.IsEnter(self.keysym)
 
 
     @staticmethod
     def IsValid(o: str):
-        if isinstance(o, str): return o != '??'
-
-        raise TypeError(f'expected str, got {type(o)}')
+        try:
+            return o != '??'
+        except (TypeError, ValueError) as e:
+            raise TypeError(f'expected str, got {type(o)}') from e
