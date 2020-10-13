@@ -26,7 +26,7 @@ class AnimatedGIF(Label, object):
     Based off of:
         AnimatedGIF - a class to show an animated gif without blocking the tkinter mainloop()
         Copyright (c) 2016 Ole Jakob Skjelten <olesk@pvv.org>
-        Released under the terms of the MIT license (https://opensource.org/licenses/MIT) as described in LICENSE.md
+        Released under the terms of the MIT license (https://opensource.org/licenses/MIT) as described in LICENSE.md.md
         https://github.com/olesk75/AnimatedGIF/blob/master/AnimatedGif.py
     """
     _callback_id = None
