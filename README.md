@@ -1,6 +1,6 @@
 # TkinterExtensions
 
-Strongly typed widgets and event with multiple helper functions build in to speed up development.
+Strongly typed widgets and event with multiple built in helper functions to speed up development.
 
 ## Tktiner Bindings
 
