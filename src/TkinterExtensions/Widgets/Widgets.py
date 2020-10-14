@@ -162,7 +162,7 @@ class Entry(tk.Entry, BaseTextTkinterWidget, CommandMixin):
         self.delete(0, Tags.End.value)
 
     def _setCommand(self):
-        self.bind(Bindings.Mouse.Button.value, self._cmd)
+        self.bind(Bindings.Button.value, self._cmd)
         return self
 
     @property
@@ -384,7 +384,7 @@ class Listbox(tk.Listbox, BaseTextTkinterWidget, CommandMixin):
 
 
     def _setCommand(self):
-        self.bind(Bindings.ListBox.ListboxSelect.value, self._cmd)
+        self.bind(Bindings.ListboxSelect.value, self._cmd)
         return self
     def ResetColors(self, color: str):
         for i in range(self.size()):
@@ -515,6 +515,7 @@ class Text(tk.Text, BaseTextTkinterWidget, CommandMixin):
 
 class ScrolledText(Frame, BaseTextTkinterWidget):
     def __init__(self, master, **kw):
+        super().__init__(master=master, **kw)
         self.text = Text(master=self)
 
         self.vbar = Scrollbar(self)
@@ -522,7 +523,6 @@ class ScrolledText(Frame, BaseTextTkinterWidget):
         self.vbar.SetCommand(self.text.yview)
         self.text.configure(yscrollcommand=self.vbar.set)
 
-        Frame.__init__(self, master=master, **kw)
         self.Pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
     @property

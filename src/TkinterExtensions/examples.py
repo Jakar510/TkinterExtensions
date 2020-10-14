@@ -46,8 +46,12 @@ class Root(Root):
 
         self.w: List[tk.Widget] = []
         self.home = HomeWindow(master=self).PlaceFull()
+
+        self.html = HTMLScrolledText(master=self).PlaceFull()
+        self.html.hide()
     def Run(self):
         threading.Thread(target=self.__run__, daemon=True).start()
+
         self.mainloop()
 
     def __run__(self):

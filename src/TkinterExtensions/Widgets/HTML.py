@@ -25,12 +25,12 @@ class HTMLScrolledText(ScrolledText):
             self.set_html(html)
     def _w_init(self, kwargs):
         if not 'wrap' in kwargs.keys():
-            self.config(wrap='word')
+            self.text.config(wrap='word')
         if not 'background' in kwargs.keys():
             if sys.platform.startswith('win'):
-                self.config(background='SystemWindow')
+                self.text.config(background='SystemWindow')
             else:
-                self.config(background='white')
+                self.text.config(background='white')
     def fit_height(self):
         """ Fit widget height to wrapped lines """
         for h in range(1, 4):
@@ -84,14 +84,14 @@ class HTMLLabel(HTMLText):
         super()._w_init(kwargs)
         if not 'background' in kwargs.keys():
             if sys.platform.startswith('win'):
-                self.config(background='SystemButtonFace')
+                self.text.config(background='SystemButtonFace')
             else:
-                self.config(background='#d9d9d9')
+                self.text.config(background='#d9d9d9')
 
         if not 'borderwidth' in kwargs.keys():
-            self.config(borderwidth=0)
+            self.text.config(borderwidth=0)
 
         if not 'padx' in kwargs.keys():
-            self.config(padx=3)
+            self.text.config(padx=3)
 
     def set_html(self, *args, **kwargs): return super().set_html(*args, **kwargs).Disable()

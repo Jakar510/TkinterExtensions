@@ -178,7 +178,7 @@ class KeyboardEntry(Frame):
     def _destroy_popup(self): self.kb.destroy()
 
 def test():
-    root = Root(Screen_Width=800, Screen_Height=480)
+    root = Root(Screen_Width=800, Screen_Height=480, x=100, y=100)
     KeyboardEntry(root, keysize=6, keycolor='white').Pack()
     KeyboardEntry(root).Pack()
     root.mainloop()

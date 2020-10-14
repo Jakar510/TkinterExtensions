@@ -5,7 +5,7 @@
 # ------------------------------------------------------------------------------
 
 from .Constants import *
-from .debug import *
 from .Enumerations import *
-from .Helpers import *
 from .HID import *
+from .Helpers import *
+from .debug import *

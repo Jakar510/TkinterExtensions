@@ -16,7 +16,7 @@ from PIL import Image
 
 
 __all__ = [
-        'ResizePhoto', 'CalculateWrapLength', 'RoundFloat', 'AutoCounter', 'AutoStartThread', 'lazy_property', 'sizeof', 'IsImage', 'AutoStartTargetedThread'
+        'ResizePhoto', 'CalculateWrapLength', 'RoundFloat', 'AutoCounter', 'AutoStartThread', 'sizeof', 'IsImage', 'AutoStartTargetedThread'
         ]
 
 def RoundFloat(Float: float, Precision: int) -> str:
@@ -84,20 +84,6 @@ class AutoStartTargetedThread(threading.Thread):
         if AutoStart: self.start()
 
 
-class lazy_property(object):
-    """A @property that is only evaluated once."""
-    def __init__(self, func, name=None, doc=None):
-        self.__name__ = name or func.__name__
-        self.__module__ = func.__module__
-        self.__doc__ = doc or func.__doc__
-        self._func = func
-
-    def __get__(self, obj, cls=None):
-        if obj is None:
-            return self
-        value = self._func(obj)
-        setattr(obj, self._func.__name__, value)
-        return value
 
 
 class AutoCounter(object):

@@ -154,10 +154,10 @@ class BaseTkinterWidget(tk.Widget):
         self._pi = self.place_info()
         self._manager_ = Layout.place
         return self
-    def PlaceAbsolute(self, x: float, y: float, width: float, height: float, anchor: str or AnchorAndSticky = AnchorAndSticky.NorthEast):
-        return self.Place(x=x, y=y, width=width, height=height, anchor=anchor)
-    def PlaceRelative(self, relx: float, rely: float, relwidth: float, relheight: float, anchor: str or AnchorAndSticky = AnchorAndSticky.NorthEast):
-        return self.Place(relx=relx, rely=rely, relwidth=relwidth, relheight=relheight, anchor=anchor)
+    def PlaceAbsolute(self, x: float, y: float, width: float, height: float):
+        return self.Place(x=x, y=y, width=width, height=height)
+    def PlaceRelative(self, relx: float, rely: float, relwidth: float, relheight: float):
+        return self.Place(relx=relx, rely=rely, relwidth=relwidth, relheight=relheight)
     def PlaceFull(self):
         """ Default placement in _root_frame occupying the full screen and/or space available in master. """
         return self.PlaceRelative(relx=0.0, rely=0.0, relwidth=1.0, relheight=1.0)
