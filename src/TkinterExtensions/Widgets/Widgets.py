@@ -11,12 +11,12 @@ from enum import Enum
 from typing import Tuple
 from urllib.request import urlopen
 
+from .BaseWidgets import *
+from .Frames import Frame
 from ..Bindings import Bindings
 from ..Bindings.Events import *
 from ..Misc.Enumerations import *
 from ..Widgets.base import *
-from .BaseWidgets import *
-from .Frames import Frame
 
 
 
@@ -41,7 +41,6 @@ Scale
 Spinbox
 Text
 """
-
 
 # noinspection DuplicatedCode
 class Button(tk.Button, BaseTextTkinterWidget, ImageMixin, CommandMixin):
@@ -90,8 +89,9 @@ class Button(tk.Button, BaseTextTkinterWidget, ImageMixin, CommandMixin):
 
         return super()._options(cnf, kw)
 
+
 # noinspection DuplicatedCode
-class Label(tk.Label, BaseTextTkinterWidget, ImageMixin):
+class Label(tk.Label, BaseTextTkinterWidget, ImageMixin, CommandMixin):
     __doc__ = """Construct a label _widget with the master MASTER.
 
     STANDARD OPTIONS
@@ -132,6 +132,11 @@ class Label(tk.Label, BaseTextTkinterWidget, ImageMixin):
                 kw[k] = v
 
         return super()._options(cnf, kw)
+
+    def _setCommand(self):
+        self.bind(Bindings.Button, func=self._cmd)
+        return self
+
 
 # noinspection DuplicatedCode
 class Entry(tk.Entry, BaseTextTkinterWidget, CommandMixin):
@@ -183,6 +188,7 @@ class Entry(tk.Entry, BaseTextTkinterWidget, CommandMixin):
                 kw[k] = v
 
         return super()._options(cnf, kw)
+
 
 class CheckBox(tk.Checkbutton, BaseTextTkinterWidget, ImageMixin, CommandMixin):
     """Construct a checkbutton _widget with the master MASTER.
@@ -260,6 +266,7 @@ class CheckBox(tk.Checkbutton, BaseTextTkinterWidget, ImageMixin, CommandMixin):
                 kw[k] = v
 
         return super()._options(cnf, kw)
+
 
 class Listbox(tk.Listbox, BaseTextTkinterWidget, CommandMixin):
     """Construct a listbox _widget with the master MASTER.
@@ -428,26 +435,37 @@ class Listbox(tk.Listbox, BaseTextTkinterWidget, CommandMixin):
 
         return super()._options(cnf, kw)
 
-class Canvas(tk.Canvas, BaseTkinterWidget, CommandMixin):
-    def SetImage(self, X: int, Y: int, ImagePath: str = None, ImageData: str = None, url: str = None) -> Tuple[ImageTk.PhotoImage, Tuple[int, int], int]:
-        if url: return self.DownloadImage(url, X, Y)
-        elif ImageData and ImagePath: raise KeyError('Cannot use both ImageData and ImageName')
-        elif ImageData: return self.SetImageFromBytes(base64.b64decode(ImageData), X, Y)
-        elif ImagePath: return self.OpenImage(ImagePath, X=X, Y=Y)
-    def DownloadImage(self, url: str, X: int, Y: int): return self.SetImageFromBytes(urlopen(url).read(), X, Y)
-    def OpenImage(self, path: str, X: int, Y: int) -> Tuple[ImageTk.PhotoImage, Tuple[int, int], int]:
+
+class Canvas(tk.Canvas, BaseTkinterWidget):
+    def __init__(self, master, *args, **kwargs):
+        super().__init__(master, *args, **kwargs)
+        self._setupBindings()
+    def _setupBindings(self):
+        self.bind(Bindings.Button.value, func=self.HandleRelease)
+        self.bind(Bindings.ButtonRelease.value, func=self.HandlePress)
+
+        self.bind(Bindings.FocusIn.value, func=self.HandleFocusIn)
+        self.bind(Bindings.FocusOut.value, func=self.HandleFocusOut)
+
+    def SetImage(self, x: int, y: int, path: str = None, data: str = None, url: str = None) -> Tuple[ImageTk.PhotoImage, Tuple[int, int], int]:
+        if url: return self.DownloadImage(url, x, y)
+        elif data and path: raise KeyError('Cannot use both ImageData and ImageName')
+        elif data: return self.SetImageFromBytes(base64.b64decode(data), x, y)
+        elif path: return self.OpenImage(path, x=x, y=y)
+    def DownloadImage(self, url: str, x: int, y: int): return self.SetImageFromBytes(urlopen(url).read(), x, y)
+    def OpenImage(self, path: str, x: int, y: int) -> Tuple[ImageTk.PhotoImage, Tuple[int, int], int]:
         assert (os.path.isfile(path))
         with open(path, 'rb') as f:
             with Image.open(f) as img:
-                return self.CreateImage(image=img, X=X, Y=Y)
-    def SetImageFromBytes(self, data: bytes, X: int, Y: int) -> Tuple[ImageTk.PhotoImage, Tuple[int, int], int]:
+                return self.CreateImage(image=img, x=x, y=y)
+    def SetImageFromBytes(self, data: bytes, x: int, y: int) -> Tuple[ImageTk.PhotoImage, Tuple[int, int], int]:
         assert (isinstance(data, bytes))
         with io.BytesIO(data) as buf:
             with Image.open(buf) as tempImg:
-                return self.CreateImage(image=tempImg, X=X, Y=Y)
-    def CreateImage(self, image: Image.Image, X: int, Y: int, anchor: str or AnchorAndSticky = tk.NW) -> Tuple[ImageTk.PhotoImage, Tuple[int, int], int]:
+                return self.CreateImage(image=tempImg, x=x, y=y)
+    def CreateImage(self, image: Image.Image, x: int, y: int, anchor: str or AnchorAndSticky = tk.NW) -> Tuple[ImageTk.PhotoImage, Tuple[int, int], int]:
         img_tk = ImageTk.PhotoImage(image)
-        return img_tk, image.size, self.create_image(X, Y, anchor=anchor, image=img_tk)
+        return img_tk, image.size, self.create_image(x, y, anchor=anchor, image=img_tk)
 
     def _options(self, cnf, kwargs=None) -> dict:
         kw = { }
@@ -457,6 +475,69 @@ class Canvas(tk.Canvas, BaseTkinterWidget, CommandMixin):
                 kw[k] = v
 
         return super()._options(cnf, kw)
+
+    def HandlePress(self, event: tkEvent):
+        """
+            Must Be overridden to work.
+
+            suggestion:
+                def HandlePress(self, event: tkEvent):
+                    event = TkinterEvent(event)
+                    ...
+
+        :param event:
+        :type event: tkEvent
+        :return:
+        :rtype:
+        """
+        pass
+    def HandleRelease(self, event: tkEvent):
+        """
+            Must Be overridden to work.
+
+            suggestion:
+                def HandleRelease(self, event: tkEvent):
+                    event = TkinterEvent(event)
+                    ...
+
+        :param event:
+        :type event: tkEvent
+        :return:
+        :rtype:
+        """
+        pass
+
+    def HandleFocusIn(self, event: tkEvent):
+        """
+            Must Be overridden to work.
+
+            suggestion:
+                def HandleFocusIn(self, event: tkEvent):
+                    event = TkinterEvent(event)
+                    ...
+
+        :param event:
+        :type event: tkEvent
+        :return:
+        :rtype:
+        """
+        pass
+    def HandleFocusOut(self, event: tkEvent):
+        """
+            Must Be overridden to work.
+
+            suggestion:
+                def HandleFocusOut(self, event: tkEvent):
+                    event = TkinterEvent(event)
+                    ...
+
+        :param event:
+        :type event: tkEvent
+        :return:
+        :rtype:
+        """
+        pass
+
 
 class CheckButton(tk.Checkbutton, BaseTextTkinterWidget, CommandMixin):
 
@@ -469,6 +550,7 @@ class CheckButton(tk.Checkbutton, BaseTextTkinterWidget, CommandMixin):
 
         return super()._options(cnf, kw)
 
+
 class Scrollbar(tk.Scrollbar, BaseTkinterWidget, CommandMixin):
 
     def _options(self, cnf, kwargs=None) -> dict:
@@ -479,6 +561,7 @@ class Scrollbar(tk.Scrollbar, BaseTkinterWidget, CommandMixin):
                 kw[k] = v
 
         return super()._options(cnf, kw)
+
 
 class Text(tk.Text, BaseTextTkinterWidget, CommandMixin):
     def Clear(self): self.delete(self.GetIndex(1, 0), tk.END)
@@ -499,31 +582,22 @@ class Text(tk.Text, BaseTextTkinterWidget, CommandMixin):
                 kw[k] = v
 
         return super()._options(cnf, kw)
-# class ScrolledText(Text, BaseTextTkinterWidget):
-#     def __init__(self, master, **kw):
-#         self._root_frame = Frame(master)
-#
-#         self.vbar = Scrollbar(self._root_frame)
-#         kw.update(yscrollcommand=self.vbar.set)
-#         self.vbar.Pack(side=tk.RIGHT, fill=tk.Y)
-#         self.vbar.SetCommand(self.yview)
-#
-#         tk.Text.__init__(self, self._root_frame, **kw)
-#         self.Pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-#
-#     def __str__(self): return str(self._root_frame)
+    def _setCommand(self):
+        self.bind(Bindings.Button, func=self._cmd)
+        return self
 
-class ScrolledText(Frame, BaseTextTkinterWidget):
+
+class ScrolledText(Frame, BaseTextTkinterWidget, CommandMixin):
     def __init__(self, master, **kw):
         super().__init__(master=master, **kw)
         self.text = Text(master=self)
 
         self.vbar = Scrollbar(self)
-        self.vbar.Pack(side=tk.RIGHT, fill=tk.Y)
+        self.vbar.Pack(side=tk.RIGHT, fill=Fill.y)
         self.vbar.SetCommand(self.text.yview)
         self.text.configure(yscrollcommand=self.vbar.set)
 
-        self.Pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        self.text.Pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
     @property
     def txt(self) -> str: return self.text.txt
@@ -538,3 +612,7 @@ class ScrolledText(Frame, BaseTextTkinterWidget):
                 kw[k] = v
 
         return super()._options(cnf, kw)
+
+    def _setCommand(self):
+        self.text.bind(Bindings.Button, func=self._cmd)
+        return self

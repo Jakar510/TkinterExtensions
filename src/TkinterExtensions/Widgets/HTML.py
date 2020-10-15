@@ -6,7 +6,7 @@ import sys
 
 import tk_html_widgets as tk_html
 
-from ..Widgets.Widgets import ScrolledText
+from ..Widgets.Widgets import ScrolledText, ViewState
 
 
 
@@ -34,12 +34,12 @@ class HTMLScrolledText(ScrolledText):
     def fit_height(self):
         """ Fit widget height to wrapped lines """
         for h in range(1, 4):
-            self.config(height=h)
+            self.text.config(height=h)
             self.master.update()
             if self.text.yview()[1] >= 1:
                 break
         else:
-            self.config(height=0.5 + 3 / self.text.yview()[1])
+            self.text.config(height=0.5 + 3 / self.text.yview()[1])
 
         return self
     def set_html(self, html, strip=True):
@@ -48,12 +48,12 @@ class HTMLScrolledText(ScrolledText):
         Set HTML widget text. If strip is enabled (default) it ignores spaces and new lines.
 
         """
-        prev_state = self.cget('state')
-        self.Enable()
+        prev_state = ViewState(self.text['state'])
+        self.text.Enable()
         self.text.Clear()
         self.text.tag_delete(self.text.tag_names)
         self.html_parser.w_set_html(self.text, html, strip=strip)
-        return self.Enable(state=prev_state)
+        return self.text.Enable(state=prev_state)
 
 
     @property

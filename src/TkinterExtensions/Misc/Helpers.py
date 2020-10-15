@@ -22,8 +22,8 @@ __all__ = [
 def RoundFloat(Float: float, Precision: int) -> str:
     """ Rounds the Float to the given Precision and returns It as string. """
     return f"{Float:.{Precision}f}"
-def ResizePhoto(image: Image.Image, *, MaxWidth: int, MaxHeight: int) -> Image:
-    scalingFactor = min((MaxWidth / image.width, MaxHeight / image.height))
+def ResizePhoto(image: Image.Image, *, WidthMax: int or float, HeightMax: int or float) -> Image:
+    scalingFactor = min((WidthMax / image.width, HeightMax / image.height))
     newSize = (int(scalingFactor * image.width), int(scalingFactor * image.height))
     return image.resize(newSize)
 def CalculateWrapLength(screenWidth: int, *args: Union[int, float]) -> int:

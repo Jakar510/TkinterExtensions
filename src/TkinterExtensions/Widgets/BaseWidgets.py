@@ -333,14 +333,14 @@ class ImageMixin:
     _pi: dict
     configure: callable
     _IMG: Union[ImageTk.PhotoImage, tk.PhotoImage] = None
-    def SetImage(self, ImagePath: str = None, ImageData: str = None, url: str = None):
+    def SetImage(self, path: str = None, data: str = None, url: str = None):
         if url: self.DownloadImage(url)
-        elif ImageData and ImagePath: raise KeyError('Cannot use both ImageData and ImageName')
-        elif ImageData:
-            self._IMG = tk.PhotoImage(master=self, data=ImageData)
+        elif data and path: raise KeyError('Cannot use both ImageData and ImageName')
+        elif data:
+            self._IMG = tk.PhotoImage(master=self, data=data)
             self.configure(image=self._IMG)
-        elif ImagePath:
-            self.OpenImage(ImagePath)
+        elif path:
+            self.OpenImage(path)
         return self
     def DownloadImage(self, url: str):
         raw_data = urlopen(url).read()
@@ -362,7 +362,7 @@ class ImageMixin:
         assert (isinstance(rawData, bytes))
         with io.BytesIO(rawData) as buf:
             with Image.open(buf) as tempImg:
-                self._IMG = ImageTk.PhotoImage(master=self, image=ResizePhoto(tempImg, MaxWidth=int(MaxWidth), MaxHeight=int(MaxHeight)))
+                self._IMG = ImageTk.PhotoImage(master=self, image=ResizePhoto(tempImg, WidthMax=int(MaxWidth), HeightMax=int(MaxHeight)))
                 self.configure(image=self._IMG)
 
     # # noinspection DuplicatedCode
