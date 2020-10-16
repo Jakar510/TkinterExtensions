@@ -38,6 +38,10 @@ class _rootMixin:
         self.resizable(width=resizable, height=resizable)
         return self
 
+    def Bind(self, sequence: str or Enum = None, func: callable = None, add: bool = None):
+        if isinstance(sequence, Enum): sequence = sequence.value
+        return self.bind(sequence, func, add)
+
     @property
     def width(self) -> int: return self.winfo_width()
     @property
