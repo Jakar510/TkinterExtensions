@@ -11,7 +11,7 @@ from ..Widgets.base import *
 
 
 
-__all__ = ['Root', 'TopLevel']
+__all__ = ['tkRoot', 'tkTopLevel']
 
 # noinspection PyUnresolvedReferences
 class _rootMixin:
@@ -62,7 +62,7 @@ class _rootMixin:
     @property
     def height(self) -> int: return self.winfo_height()
 # noinspection DuplicatedCode
-class Root(tk.Tk, _rootMixin):
+class tkRoot(tk.Tk, _rootMixin):
     def __init__(self, Screen_Width: int = None, Screen_Height: int = None, x: int = 0, y: int = 0, fullscreen: bool = None, **kwargs):
         super().__init__(**kwargs)
         self.SetDimmensions(Screen_Width, Screen_Height, x, y)
@@ -81,9 +81,9 @@ class Root(tk.Tk, _rootMixin):
 
 
 # noinspection DuplicatedCode
-class TopLevel(tk.Toplevel, _rootMixin):
-    def __init__(self, master: Root, Screen_Width: int = None, Screen_Height: int = None, x: int = 0, y: int = 0, fullscreen: bool = None, **kwargs):
-        assert (isinstance(master, Root))
+class tkTopLevel(tk.Toplevel, _rootMixin):
+    def __init__(self, master: tkRoot, Screen_Width: int = None, Screen_Height: int = None, x: int = 0, y: int = 0, fullscreen: bool = None, **kwargs):
+        assert (isinstance(master, tkRoot))
         super().__init__(master=master, **kwargs)
         self.SetDimmensions(Screen_Width, Screen_Height, x, y)
         if fullscreen is not None: self.SetFullScreen(fullscreen)

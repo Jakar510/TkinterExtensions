@@ -19,11 +19,11 @@ from .base import *
 
 
 
-class _PopupKeyboard(TopLevel):
+class _PopupKeyboard(tkTopLevel):
     '''A Toplevel instance that displays a keyboard that is attached to
     another widget. Only the Entry widget has a subclass in this version.
     '''
-    def __init__(self, master: Root, attach: Entry, x: int, y: int, keycolor: str, keysize: int =5, takefocus: bool = False):
+    def __init__(self, master: tkRoot, attach: Entry, x: int, y: int, keycolor: str, keysize: int =5, takefocus: bool = False):
         super().__init__(master=master, takefocus=takefocus)
 
         self.overrideredirect(True)
@@ -178,7 +178,7 @@ class KeyboardEntry(Frame):
     def _destroy_popup(self): self.kb.destroy()
 
 def test():
-    root = Root(Screen_Width=800, Screen_Height=480, x=100, y=100)
+    root = tkRoot(Screen_Width=800, Screen_Height=480, x=100, y=100)
     KeyboardEntry(root, keysize=6, keycolor='white').Pack()
     KeyboardEntry(root).Pack()
     root.mainloop()
