@@ -84,6 +84,7 @@ class ComboBoxThemed(ttk.Combobox, BaseTextTkinterWidget, CommandMixin):
         return super()._options(cnf, kw)
 
 
+
 class ScrollbarThemed(ttk.Scrollbar, BaseTkinterWidget):
     def _options(self, cnf, kwargs=None) -> dict:
         kw = { }
@@ -93,6 +94,7 @@ class ScrollbarThemed(ttk.Scrollbar, BaseTkinterWidget):
                 kw[k] = v
 
         return super()._options(cnf, kw)
+
 
 
 class TreeViewThemed(ttk.Treeview, BaseTkinterWidget, CommandMixin):
@@ -168,6 +170,8 @@ class TreeViewThemed(ttk.Treeview, BaseTkinterWidget, CommandMixin):
                 kw[k] = v
 
         return super()._options(cnf, kw)
+
+
 class TreeViewHolderThemed(Frame):
     """Construct a Ttk Treeview with master scale.
 
@@ -207,6 +211,7 @@ class TreeViewHolderThemed(Frame):
                 kw[k] = v
 
         return super()._options(cnf, kw)
+
 
 
 # noinspection DuplicatedCode
@@ -257,6 +262,7 @@ class ButtonThemed(ttk.Button, BaseTextTkinterWidget, ImageMixin, CommandMixin):
         return super()._options(cnf, kw)
 
 
+
 # noinspection DuplicatedCode
 class LabelThemed(ttk.Label, BaseTextTkinterWidget, ImageMixin):
     __doc__ = """Construct a label _widget with the master MASTER.
@@ -299,6 +305,7 @@ class LabelThemed(ttk.Label, BaseTextTkinterWidget, ImageMixin):
                 kw[k] = v
 
         return super()._options(cnf, kw)
+
 
 
 # noinspection DuplicatedCode
@@ -350,3 +357,5 @@ class EntryThemed(ttk.Entry, BaseTextTkinterWidget, CommandMixin):
                 kw[k] = v
 
         return super()._options(cnf, kw)
+
+

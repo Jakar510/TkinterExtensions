@@ -47,14 +47,27 @@ class Root(Root):
         super().__init__(Screen_Width=800, Screen_Height=480, x=100, y=100)
 
         self.w: List[tk.Widget] = []
-        self.home = HomeWindow(master=self).PlaceFull()
+        # self.home = HomeWindow(master=self).PlaceFull()
 
         self.html = HTMLScrolledText(master=self).PlaceFull()
         self.html.txt = 'Test'
         self.html.hide()
 
+        self.other = Widgets.Label(master=self, Text='PlaceHodler').PlaceRelative(relx=0.5, rely=0, relwidth=.5, relheight=1)
+
+        self.btn = Widgets.Text(master=self, font='-size 20').PlaceRelative(relx=0, rely=0, relwidth=.5, relheight=1)
+        self.btn.txt =  'events'
+        self.btn.bind(Bindings.Button, self.HandleEvent)
+        self.btn.bind(Bindings.FocusIn, self.HandleEvent)
+        self.btn.bind(Bindings.FocusOut, self.HandleEvent)
+        self.btn.bind(Bindings.ButtonRelease, self.HandleEvent)
+
+    def HandleEvent(self, event: tkEvent):
+        print('HandleEvent', event)
+        event = TkinterEvent(event)
+        print('HandleEvent.TkinterEvent', event)
     def Run(self):
-        threading.Thread(target=self.__run__, daemon=True).start()
+        threading.Thread(target=self.__run__, daemon=True)#.start()
 
         self.mainloop()
 

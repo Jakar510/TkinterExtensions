@@ -90,6 +90,7 @@ class Button(tk.Button, BaseTextTkinterWidget, ImageMixin, CommandMixin):
         return super()._options(cnf, kw)
 
 
+
 # noinspection DuplicatedCode
 class Label(tk.Label, BaseTextTkinterWidget, ImageMixin, CommandMixin):
     __doc__ = """Construct a label _widget with the master MASTER.
@@ -136,6 +137,7 @@ class Label(tk.Label, BaseTextTkinterWidget, ImageMixin, CommandMixin):
     def _setCommand(self):
         self.bind(Bindings.Button, func=self._cmd)
         return self
+
 
 
 # noinspection DuplicatedCode
@@ -188,6 +190,7 @@ class Entry(tk.Entry, BaseTextTkinterWidget, CommandMixin):
                 kw[k] = v
 
         return super()._options(cnf, kw)
+
 
 
 class CheckBox(tk.Checkbutton, BaseTextTkinterWidget, ImageMixin, CommandMixin):
@@ -266,6 +269,7 @@ class CheckBox(tk.Checkbutton, BaseTextTkinterWidget, ImageMixin, CommandMixin):
                 kw[k] = v
 
         return super()._options(cnf, kw)
+
 
 
 class Listbox(tk.Listbox, BaseTextTkinterWidget, CommandMixin):
@@ -436,6 +440,7 @@ class Listbox(tk.Listbox, BaseTextTkinterWidget, CommandMixin):
         return super()._options(cnf, kw)
 
 
+
 class Canvas(tk.Canvas, BaseTkinterWidget):
     def __init__(self, master, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
@@ -539,6 +544,7 @@ class Canvas(tk.Canvas, BaseTkinterWidget):
         pass
 
 
+
 class CheckButton(tk.Checkbutton, BaseTextTkinterWidget, CommandMixin):
 
     def _options(self, cnf, kwargs=None) -> dict:
@@ -551,6 +557,7 @@ class CheckButton(tk.Checkbutton, BaseTextTkinterWidget, CommandMixin):
         return super()._options(cnf, kw)
 
 
+
 class Scrollbar(tk.Scrollbar, BaseTkinterWidget, CommandMixin):
 
     def _options(self, cnf, kwargs=None) -> dict:
@@ -561,6 +568,7 @@ class Scrollbar(tk.Scrollbar, BaseTkinterWidget, CommandMixin):
                 kw[k] = v
 
         return super()._options(cnf, kw)
+
 
 
 class Text(tk.Text, BaseTextTkinterWidget, CommandMixin):
@@ -585,6 +593,7 @@ class Text(tk.Text, BaseTextTkinterWidget, CommandMixin):
     def _setCommand(self):
         self.bind(Bindings.Button, func=self._cmd)
         return self
+
 
 
 class ScrolledText(Frame, BaseTextTkinterWidget, CommandMixin):
@@ -616,3 +625,5 @@ class ScrolledText(Frame, BaseTextTkinterWidget, CommandMixin):
     def _setCommand(self):
         self.text.bind(Bindings.Button, func=self._cmd)
         return self
+
+

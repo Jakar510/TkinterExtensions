@@ -8,6 +8,7 @@
 import base64
 import io
 import os
+from enum import Enum
 from typing import Union
 from urllib.request import urlopen
 
@@ -96,6 +97,10 @@ class BaseTkinterWidget(tk.Widget):
         self._SetState(state=ViewState.Hidden)
         return True
 
+
+    def Bind(self, sequence: str or Enum = None, func: callable = None, add: bool = None):
+        if isinstance(sequence, Enum): sequence = sequence.value
+        return self.bind(sequence, func, add)
 
 
     def Pack(self, cnf: dict = { }, **kwargs):
