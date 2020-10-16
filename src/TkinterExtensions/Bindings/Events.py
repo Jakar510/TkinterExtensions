@@ -120,6 +120,7 @@ class TkinterEvent(tkEvent):
         if source is not None:
             assert (isinstance(source, tkEvent))
             self.__dict__.update(source.__dict__)
+            for name, value in source.__dict__.items(): setattr(self, name, value)
 
     def __str__(self) -> str: return self.ToString()
     def __repr__(self) -> str: return self.ToString()

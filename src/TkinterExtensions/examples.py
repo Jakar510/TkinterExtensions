@@ -57,15 +57,16 @@ class Root(Root):
 
         self.btn = Widgets.Text(master=self, font='-size 20').PlaceRelative(relx=0, rely=0, relwidth=.5, relheight=1)
         self.btn.txt =  'events'
-        self.btn.bind(Bindings.Button, self.HandleEvent)
-        self.btn.bind(Bindings.FocusIn, self.HandleEvent)
-        self.btn.bind(Bindings.FocusOut, self.HandleEvent)
-        self.btn.bind(Bindings.ButtonRelease, self.HandleEvent)
+        self.btn.Bind(Bindings.Button, self.HandleEvent)
+        self.btn.Bind(Bindings.FocusIn, self.HandleEvent)
+        self.btn.Bind(Bindings.FocusOut, self.HandleEvent)
+        self.btn.Bind(Bindings.ButtonRelease, self.HandleEvent)
 
     def HandleEvent(self, event: tkEvent):
         print('HandleEvent', event)
         event = TkinterEvent(event)
         print('HandleEvent.TkinterEvent', event)
+        print(event.widget)
     def Run(self):
         threading.Thread(target=self.__run__, daemon=True)#.start()
 
