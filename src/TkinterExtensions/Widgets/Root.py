@@ -42,6 +42,21 @@ class _rootMixin:
         if isinstance(sequence, Enum): sequence = sequence.value
         return self.bind(sequence, func, add)
 
+    def MultiUnbindAll(self, *args: str or Enum):
+        for arg in args: self.UnbindAll(arg)
+    def UnbindAll(self, sequence: str or Enum = None):
+        """Unbind for all widgets for event SEQUENCE all functions."""
+        if isinstance(sequence, Enum): sequence = sequence.value
+        return self.unbind_all(sequence)
+
+    def BindAll(self, sequence: str or Enum = None, func: callable = None, add: bool = None):
+        """Bind to all widgets at an event SEQUENCE a call to function FUNC.
+        An additional boolean parameter ADD specifies whether FUNC will
+        be called additionally to the other bound function or whether
+        it will replace the previous function. See bind for the return value."""
+        if isinstance(sequence, Enum): sequence = sequence.value
+        return self.bind_all(sequence, func, add)
+
     @property
     def width(self) -> int: return self.winfo_width()
     @property
