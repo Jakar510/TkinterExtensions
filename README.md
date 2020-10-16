@@ -4,7 +4,7 @@ Strongly typed widgets and event with multiple built in helper functions to spee
 
 ## Tktiner Bindings
 
-This project only uses the most common bindings. For the full list, see [All Tkinter bindings](src/TkinterExtensions/Bindings/Enumerations.py).
+This project only uses the most common bindings. For the full list, see [All Tkinter bindings](src/TkinterExtensions/Bindings/Bindings.py).
 
 ## Contributing
 

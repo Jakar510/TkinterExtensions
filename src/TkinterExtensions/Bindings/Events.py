@@ -8,7 +8,7 @@
 import pprint
 from tkinter import Event as tkEvent
 
-from .Enumerations import *
+from .Bindings import *
 
 
 

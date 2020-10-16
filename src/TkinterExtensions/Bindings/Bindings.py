@@ -35,9 +35,9 @@ class Bindings(Enum):
     B1_Motion = "<B1-Motion>"
     B2_Motion = "<B2-Motion>"
     Button = "<Button>"
-    Button1 = "<Button1>"
-    Button2 = "<Button2>"
-    Button3 = "<Button3>"
+    Button1 = "<Button-1>"
+    Button2 = "<Button-2>"
+    Button3 = "<Button-3>"
     ButtonRelease = "<ButtonRelease>"
     ButtonRelease1 = "<ButtonRelease-1>"
     ButtonRelease2 = "<ButtonRelease-2>"
@@ -170,6 +170,9 @@ class Bindings(Enum):
 
     # class ComboBox(Enum):
     ComboboxSelected = "<<ComboboxSelected>>"
+
+    # class Text(Enum):
+    Selection = "<<Selection>>"
 
     # class Numbers(Enum):
     eight = "8"
