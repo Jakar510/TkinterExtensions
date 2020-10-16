@@ -122,6 +122,7 @@ class TkinterEvent(tkEvent):
             self.__dict__.update(source.__dict__)
             for name, value in source.__dict__.items(): setattr(self, name, value)
 
+
     def __str__(self) -> str: return self.ToString()
     def __repr__(self) -> str: return self.ToString()
 
@@ -167,3 +168,9 @@ class TkinterEvent(tkEvent):
             return o != '??'
         except (TypeError, ValueError) as e:
             raise TypeError(f'expected str, got {type(o)}') from e
+
+    @classmethod
+    def FromShiftTabEvent(cls, event: tkEvent):
+        e = cls(event)
+        e.keysym = Bindings.ShiftTab
+        return e
