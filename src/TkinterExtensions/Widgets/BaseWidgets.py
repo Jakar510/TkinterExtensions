@@ -321,10 +321,8 @@ class CommandMixin:
     def __call__(self, *args, **kwargs):
         """ Execute the Command """
         if callable(self._cmd): self._cmd(*args, **kwargs)
-    def SetCommand(self, func: Union[callable, CurrentValue], z: int or str = None, **kwargs):
-        try:
-            assert (callable(func) or isinstance(func, CurrentValue))
-        except AssertionError:
+    def SetCommand(self, func: Union[callable, CurrentValue], z: Union[int, float, str, Enum] = None, **kwargs):
+        if not callable(func) or not isinstance(func, CurrentValue):
             raise ValueError(f'_func is not callable. got {type(func)}')
 
         if isinstance(func, CurrentValue): self._cmd = func.SetWidget(self)

@@ -5,7 +5,7 @@
 # ------------------------------------------------------------------------------
 
 from abc import ABC
-from typing import Dict
+from typing import Any, Dict
 
 from .Frames import *
 from .Widgets import *
@@ -18,20 +18,28 @@ __all__ = [
         ]
 
 class ButtonGrid(Frame, ABC):
-    __buttons: Dict[int, Button] = { }
-    def __init__(self, *, master, rows: int = None, cols: int = None, NumberOfButtons: int = None, **kwargs):
+    _buttons: Dict[int, Button] = { }
+    def __init__(self, *, master, rows: int = None, cols: int = None, **kwargs):
         """
-            :param kwargs: Button kwargs
+
+        :param master: parent of this grid
+        :type master: Frame, LabelFrame, tkRoot, tkTopLevel
+        :param rows: number of rows
+        :type rows: int
+        :param cols: number of columns
+        :type cols: int
+        :param kwargs: Button kwargs
+        :type kwargs:
         """
-        super().__init__(master=master)
+        Frame.__init__(self, master=master)
         self._rows = rows or len(self.ButtonTitles)
         self._cols = cols or 1
-        self._NumberOfButtons = NumberOfButtons or self._rows * self._cols
 
-        if len(self.ButtonCommands) != self._NumberOfButtons:
-            raise ValueError(f"len(self.ButtonCommands) [ {len(self.ButtonCommands)} ]  does not Match self._NumberOfButtons [ {self._NumberOfButtons} ]")
-        if len(self.ButtonTitles) != self._NumberOfButtons:
-            raise ValueError(f"len(self.ButtonTitles) [ {len(self.ButtonTitles)} ]  does not Match self._NumberOfButtons [ {self._NumberOfButtons} ]")
+        if len(self.ButtonCommands) != self._Count:
+            raise ValueError(f"len(self.ButtonCommands) [ {len(self.ButtonCommands)} ]  does not match Number Of Buttons [ {self._Count} ]")
+
+        if len(self.ButtonTitles) != self._Count:
+            raise ValueError(f"len(self.ButtonTitles) [ {len(self.ButtonTitles)} ]  does not match Number Of Buttons [ {self._Count} ]")
 
         self._MakeGrid(kwargs)
     def _MakeGrid(self, kwargs: dict):
@@ -40,43 +48,38 @@ class ButtonGrid(Frame, ABC):
 
         r = 0
         c = 0
-        for i in range(self._NumberOfButtons):
+        for i in range(self._Count):
             if c >= self._cols:
                 r += 1
                 c = 0
 
-            self.__buttons[i] = Button(self, Text=self.ButtonTitles[i], **kwargs).Grid(row=r, column=c).SetCommand(self.ButtonCommands[i])
+            self._buttons[i] = Button(self, Text=self.ButtonTitles[i], **kwargs).Grid(row=r, column=c).SetCommand(self.ButtonCommands[i])
             c += 1
 
     def HideAll(self):
-        for w in self.__buttons.values(): w.hide()
+        for w in self._buttons.values(): w.hide()
     def ShowAll(self):
-        for w in self.__buttons.values(): w.show()
+        for w in self._buttons.values(): w.show()
 
-    def UpdateText(self, Titles: dict = None):
+    def UpdateText(self, Titles: Dict[int, str] = None):
         if Titles is None: Titles = self.ButtonTitles
-        if len(Titles) != self._NumberOfButtons: raise ValueError("len(Titles) Doesn't Match NumberOfButtons")
+        if len(Titles) != self._Count: raise ValueError("len(Titles) Doesn't Match NumberOfButtons")
 
-        for i in range(self._NumberOfButtons):
-            self.__buttons[i].txt = Titles[i]
-    def UpdateCommands(self, commands: dict = { }, kwz: dict = { }, z: dict = { }):
-        if len(commands) != self._NumberOfButtons: raise ValueError("len(commands) Doesn't Match NumberOfButtons")
+        for i, title in Titles.items():
+            self._buttons[i].txt = title
+    def UpdateCommands(self, commands: Dict[int, callable], kwz: Dict[int, Any] = { }, z: Dict[int, Any] = { }):
+        if len(commands) != self._Count: raise ValueError("len(commands) Doesn't Match NumberOfButtons")
 
         for i, Command in commands.items():
-            widget = self.__buttons[i]
-            if i in kwz and kwz[i] is not None and Command:
-                widget.cmd = lambda x=kwz[i]: Command(**x)
-                widget.configure(command=widget.cmd)
-            elif i in z and z[i] is not None and Command:
-                widget.cmd = lambda x=z[i]: Command(x)
-                widget.configure(command=widget.cmd)
-            elif Command:
-                widget.configure(command=Command)
+            self._buttons[i].SetCommand(Command, z=z.get(i), **kwz.get(i, { }))
 
     @property
-    def ButtonTitles(self) -> dict: raise NotImplementedError()
+    def _Count(self) -> int: return self._rows * self._cols
+
     @property
-    def ButtonCommands(self) -> dict: raise NotImplementedError()
+    def ButtonTitles(self) -> Dict[int, str]: raise NotImplementedError()
+    @property
+    def ButtonCommands(self) -> Dict[int, callable]: raise NotImplementedError()
 
 
 class TitledEntry(Frame):
