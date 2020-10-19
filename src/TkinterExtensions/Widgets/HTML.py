@@ -5,7 +5,7 @@ tkinter HTML text widgets
 import sys
 
 import tk_html_widgets as tk_html
-from TkinterExtensions.Events import Bindings
+from ..Events import Bindings
 
 from ..Widgets.Widgets import ScrolledText, ViewState, tkEvent
 
