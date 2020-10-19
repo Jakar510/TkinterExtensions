@@ -19,12 +19,11 @@ __all__ = [
 
 class ButtonGrid(Frame, ABC):
     __buttons: Dict[int, Button] = { }
-    def __init__(self, *, master: Frame, rows: int = None, cols: int = None, NumberOfButtons: int = None, **kwargs):
+    def __init__(self, *, master, rows: int = None, cols: int = None, NumberOfButtons: int = None, **kwargs):
         """
             :param kwargs: Button kwargs
         """
-        assert (isinstance(master, Frame))
-        Frame.__init__(self, master=master)
+        super().__init__(master=master)
         self._rows = rows or len(self.ButtonTitles)
         self._cols = cols or 1
         self._NumberOfButtons = NumberOfButtons or self._rows * self._cols
@@ -36,8 +35,8 @@ class ButtonGrid(Frame, ABC):
 
         self._MakeGrid(kwargs)
     def _MakeGrid(self, kwargs: dict):
-        for r in range(self._rows): self.grid_rowconfigure(r, weight=1)
-        for c in range(self._cols): self.grid_columnconfigure(c, weight=1)
+        for r in range(self._rows): self.Grid_RowConfigure(r, weight=1)
+        for c in range(self._cols): self.Grid_ColumnConfigure(c, weight=1)
 
         r = 0
         c = 0
@@ -45,9 +44,8 @@ class ButtonGrid(Frame, ABC):
             if c >= self._cols:
                 r += 1
                 c = 0
-            self.__buttons[i] = Button(self, Text=self.ButtonTitles[i], **kwargs)
-            self.__buttons[i].grid(row=r, column=c)
-            self.__buttons[i].SetCommand(self.ButtonCommands[i])
+
+            self.__buttons[i] = Button(self, Text=self.ButtonTitles[i], **kwargs).Grid(row=r, column=c).SetCommand(self.ButtonCommands[i])
             c += 1
 
     def HideAll(self):
