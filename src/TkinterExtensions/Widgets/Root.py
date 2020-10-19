@@ -15,13 +15,13 @@ __all__ = ['tkRoot', 'tkTopLevel']
 
 # noinspection PyUnresolvedReferences
 class _rootMixin:
-    Style: Style
-    Screen_Width: int
-    Screen_Height: int
+    Style: Style = None
+    Screen_Width: int = None
+    Screen_Height: int = None
     def SetDimmensions(self, Screen_Width: int = None, Screen_Height: int = None, x: int = 0, y: int = 0):
         self.Screen_Width = Screen_Width or int(self.winfo_screenwidth())
         self.Screen_Height = Screen_Height or int(self.winfo_screenheight())
-        self.geometry(self.Dimmensions(x, y))
+        return self.geometry(self.Dimmensions(x, y))
     def Dimmensions(self, x: int = 0, y: int = 0) -> str: return f"{self.Screen_Width}x{self.Screen_Height}+{x}+{y}"
 
     def HideCursor(self):

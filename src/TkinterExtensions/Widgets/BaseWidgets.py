@@ -98,7 +98,7 @@ class BaseTkinterWidget(tk.Widget):
         return True
 
 
-    def Bind(self, sequence: str or Enum = None, func: callable = None, add: bool = None):
+    def Bind(self, sequence: str or Enum = None, func: callable = None, add: bool = None) -> str:
         if isinstance(sequence, Enum): sequence = sequence.value
         return self.bind(sequence, func, add)
 

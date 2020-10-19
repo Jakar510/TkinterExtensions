@@ -25,21 +25,21 @@ class HTMLScrolledText(ScrolledText):
             self.set_html(html)
     def _w_init(self, kwargs):
         if not 'wrap' in kwargs.keys():
-            self.text.config(wrap='word')
+            self.tb.config(wrap='word')
         if not 'background' in kwargs.keys():
             if sys.platform.startswith('win'):
-                self.text.config(background='SystemWindow')
+                self.tb.config(background='SystemWindow')
             else:
-                self.text.config(background='white')
+                self.tb.config(background='white')
     def fit_height(self):
         """ Fit widget height to wrapped lines """
         for h in range(1, 4):
-            self.text.config(height=h)
+            self.tb.config(height=h)
             self.master.update()
-            if self.text.yview()[1] >= 1:
+            if self.tb.yview()[1] >= 1:
                 break
         else:
-            self.text.config(height=0.5 + 3 / self.text.yview()[1])
+            self.tb.config(height=0.5 + 3 / self.tb.yview()[1])
 
         return self
     def set_html(self, html, strip=True):
@@ -48,16 +48,16 @@ class HTMLScrolledText(ScrolledText):
         Set HTML widget text. If strip is enabled (default) it ignores spaces and new lines.
 
         """
-        prev_state = ViewState(self.text['state'])
-        self.text.Enable()
-        self.text.Clear()
-        self.text.tag_delete(self.text.tag_names)
-        self.html_parser.w_set_html(self.text, html, strip=strip)
-        return self.text.Enable(state=prev_state)
+        prev_state = ViewState(self.tb['state'])
+        self.tb.Enable()
+        self.tb.Clear()
+        self.tb.tag_delete(self.tb.tag_names)
+        self.html_parser.w_set_html(self.tb, html, strip=strip)
+        return self.tb.Enable(state=prev_state)
 
 
     @property
-    def txt(self) -> str: return self.text.txt
+    def txt(self) -> str: return self.tb.txt
     @txt.setter
     def txt(self, value: str): self.set_html(value)
 
@@ -84,14 +84,14 @@ class HTMLLabel(HTMLText):
         super()._w_init(kwargs)
         if not 'background' in kwargs.keys():
             if sys.platform.startswith('win'):
-                self.text.config(background='SystemButtonFace')
+                self.tb.config(background='SystemButtonFace')
             else:
-                self.text.config(background='#d9d9d9')
+                self.tb.config(background='#d9d9d9')
 
         if not 'borderwidth' in kwargs.keys():
-            self.text.config(borderwidth=0)
+            self.tb.config(borderwidth=0)
 
         if not 'padx' in kwargs.keys():
-            self.text.config(padx=3)
+            self.tb.config(padx=3)
 
     def set_html(self, *args, **kwargs): return super().set_html(*args, **kwargs).Disable()

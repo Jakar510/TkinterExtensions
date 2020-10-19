@@ -11,5 +11,5 @@ from TkinterExtensions.examples import *
 
 
 if __name__ == '__main__':
-    tkRoot().Run()
+    Root().Run()
     test()

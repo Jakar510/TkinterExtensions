@@ -55,18 +55,18 @@ class Root(tkRoot):
 
         self.other = Widgets.Label(master=self, Text='PlaceHodler').PlaceRelative(relx=0.5, rely=0, relwidth=.5, relheight=1)
 
-        self.btn = Widgets.Text(master=self, font='-size 20').PlaceRelative(relx=0, rely=0, relwidth=.5, relheight=1)
-        self.btn.txt =  'events'
-        self.btn.Bind(Bindings.Button, self.HandleEvent)
-        self.btn.Bind(Bindings.FocusIn, self.HandleEvent)
-        self.btn.Bind(Bindings.FocusOut, self.HandleEvent)
-        self.btn.Bind(Bindings.ButtonRelease, self.HandleEvent)
+        self.t = HTMLLabel(master=self).PlaceRelative(relx=0, rely=0, relwidth=.5, relheight=1)
+        self.t.txt = 'events'
+        self.t.tb.Bind(Bindings.Button, self.HandleEvent, add=True)
+        self.t.tb.Bind(Bindings.FocusIn, self.HandleEvent, add=True)
+        self.t.tb.Bind(Bindings.FocusOut, self.HandleEvent, add=True)
+        self.t.tb.Bind(Bindings.ButtonRelease, self.HandleEvent, add=True)
 
-    def HandleEvent(self, event: tkEvent):
-        print('HandleEvent', event)
+    @staticmethod
+    def HandleEvent(event: tkEvent):
+        print('HandleEvent.tkEvent', event)
         event = TkinterEvent(event)
         print('HandleEvent.TkinterEvent', event)
-        print(event.widget)
     def Run(self):
         threading.Thread(target=self.__run__, daemon=True)#.start()
 

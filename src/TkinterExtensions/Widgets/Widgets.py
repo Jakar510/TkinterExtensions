@@ -597,21 +597,23 @@ class Text(tk.Text, BaseTextTkinterWidget, CommandMixin):
 
 
 class ScrolledText(Frame, BaseTextTkinterWidget, CommandMixin):
+    tb: Text
+    vbar: Scrollbar
     def __init__(self, master, **kw):
         super().__init__(master=master, **kw)
-        self.text = Text(master=self)
+        self.tb = Text(master=self)
 
         self.vbar = Scrollbar(self)
         self.vbar.Pack(side=tk.RIGHT, fill=Fill.y)
-        self.vbar.SetCommand(self.text.yview)
-        self.text.configure(yscrollcommand=self.vbar.set)
+        self.vbar.SetCommand(self.tb.yview)
+        self.tb.configure(yscrollcommand=self.vbar.set)
 
-        self.text.Pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        self.tb.Pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
     @property
-    def txt(self) -> str: return self.text.txt
+    def txt(self) -> str: return self.tb.txt
     @txt.setter
-    def txt(self, value: str): self.text.txt = value
+    def txt(self, value: str): self.tb.txt = value
 
     def _options(self, cnf, kwargs=None) -> dict:
         kw = { }
@@ -623,7 +625,7 @@ class ScrolledText(Frame, BaseTextTkinterWidget, CommandMixin):
         return super()._options(cnf, kw)
 
     def _setCommand(self):
-        self.text.bind(Bindings.Button, func=self._cmd)
+        self.tb.bind(Bindings.Button, func=self._cmd)
         return self
 
 
