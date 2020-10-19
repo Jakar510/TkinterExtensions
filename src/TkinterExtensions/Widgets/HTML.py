@@ -5,7 +5,7 @@ tkinter HTML text widgets
 import sys
 
 import tk_html_widgets as tk_html
-from TkinterExtensions.Bindings import Bindings
+from TkinterExtensions.Events import Bindings
 
 from ..Widgets.Widgets import ScrolledText, ViewState, tkEvent
 
@@ -63,7 +63,7 @@ class HTMLScrolledText(ScrolledText):
         return self.tb.Enable(state=prev_state)
 
     def _setupBindings(self):
-        self._bindIDs.add(self.tb.Bind(Bindings.Button, func=self.HandlePress, add=True))
+        self._bindIDs.add(self.tb.Bind(Bindings.ButtonPress, func=self.HandlePress, add=True))
         self._bindIDs.add(self.tb.Bind(Bindings.ButtonRelease, func=self.HandleRelease, add=True))
 
         self._bindIDs.add(self.tb.Bind(Bindings.FocusIn, func=self.HandleFocusIn, add=True))

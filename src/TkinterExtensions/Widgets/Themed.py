@@ -7,7 +7,7 @@ from enum import Enum
 from typing import List
 
 from .BaseWidgets import *
-from ..Bindings import Bindings, TkinterEvent
+from ..Events import Bindings, TkinterEvent
 from ..Misc.Enumerations import *
 from ..Widgets.Frames import *
 from ..Widgets.base import *

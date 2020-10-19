@@ -5,6 +5,6 @@
 # ------------------------------------------------------------------------------
 
 from .__version__ import *
-from .Bindings import *
+from .Events import *
 from .Misc import *
 from .Widgets import *

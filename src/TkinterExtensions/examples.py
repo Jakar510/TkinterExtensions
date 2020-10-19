@@ -12,6 +12,7 @@ from typing import Union
 
 from TkinterExtensions.Widgets.KeyBoard import *
 from . import *
+from .Events import *
 from .__version__ import version
 
 
@@ -45,14 +46,10 @@ class HTMLViewer(HTMLLabel):
         self.master = master
         super().__init__(master=master, **kwargs)
 
-    def HandlePress(self, event: tkEvent):
-        TkinterEvent.Debug(event)
-    def HandleRelease(self, event: tkEvent):
-        TkinterEvent.Debug(event)
-    def HandleFocusIn(self, event: tkEvent):
-        TkinterEvent.Debug(event)
-    def HandleFocusOut(self, event: tkEvent):
-        TkinterEvent.Debug(event)
+    # def HandlePress(self, event: tkEvent): TkinterEvent.Debug(event)
+    # def HandleRelease(self, event: tkEvent): TkinterEvent.Debug(event)
+    # def HandleFocusIn(self, event: tkEvent): TkinterEvent.Debug(event)
+    # def HandleFocusOut(self, event: tkEvent): TkinterEvent.Debug(event)
 
 class Root(tkRoot):
     # sets up Tkinter and creates the other windows and places them accordingly.
@@ -70,6 +67,12 @@ class Root(tkRoot):
 
         self.t = HTMLViewer(master=self).PlaceRelative(relx=0, rely=0, relwidth=.5, relheight=1)
         self.t.txt = 'events'
+        self.Bind(Bindings.Key, self.HandlePress)
+        self.Bind(Bindings.ButtonPress, self.HandlePress)
+        self.Bind(Bindings.ButtonRelease, self.HandlePress)
+
+    @staticmethod
+    def HandlePress(event: tkEvent): TkinterEvent.Debug(event)
 
     def Run(self):
         threading.Thread(target=self.__run__, daemon=True)#.start()

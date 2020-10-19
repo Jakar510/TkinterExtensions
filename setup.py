@@ -18,7 +18,7 @@ with open(os.path.abspath("PyPiReadme.md"), "r") as f:
 
 setup(name='TkinterExtensions',
       version=version,
-      packages=['TkinterExtensions', 'TkinterExtensions.Widgets', 'TkinterExtensions.Misc', 'TkinterExtensions.Bindings'],
+      packages=['TkinterExtensions', 'TkinterExtensions.Widgets', 'TkinterExtensions.Misc', 'TkinterExtensions.Events'],
       url=f'https://github.com/Jakar510/TkinterExtensions',
       # download_url=f'https://github.com/Jakar510/PyDebug/TkinterExtensions/releases/tag/{version}',
       license='MIT',
@@ -55,7 +55,7 @@ setup(name='TkinterExtensions',
       package_dir={ 'TkinterExtensions': f'src/TkinterExtensions' },
       package_data={
               'TkinterExtensions': ['__init__.py', '__version__.py', 'Mixins.py', 'examples.py'],
-              'TkinterExtensions.Bindings': ['TkinterExtensions.Bindings/*.py'],
+              'TkinterExtensions.Events': ['TkinterExtensions.Events/*.py'],
               'TkinterExtensions.Widgets': ['TkinterExtensions.Widgets/*.py'],
               'TkinterExtensions.Misc': ['TkinterExtensions.Misc/*.py'],
               },

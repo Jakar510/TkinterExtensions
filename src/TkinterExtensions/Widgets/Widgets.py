@@ -13,8 +13,7 @@ from urllib.request import urlopen
 
 from .BaseWidgets import *
 from .Frames import Frame
-from ..Bindings import Bindings
-from ..Bindings.Events import *
+from ..Events import *
 from ..Misc.Enumerations import *
 from ..Widgets.base import *
 
