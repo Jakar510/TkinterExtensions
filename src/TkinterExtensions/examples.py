@@ -40,6 +40,19 @@ PhotoData = _GetPhotoByteData()
 
 q = queue.Queue()
 
+class HTMLViewer(HTMLLabel):
+    def __init__(self, master, **kwargs):
+        self.master = master
+        super().__init__(master=master, **kwargs)
+
+    def HandlePress(self, event: tkEvent):
+        TkinterEvent.Debug(event)
+    def HandleRelease(self, event: tkEvent):
+        TkinterEvent.Debug(event)
+    def HandleFocusIn(self, event: tkEvent):
+        TkinterEvent.Debug(event)
+    def HandleFocusOut(self, event: tkEvent):
+        TkinterEvent.Debug(event)
 
 class Root(tkRoot):
     # sets up Tkinter and creates the other windows and places them accordingly.
@@ -55,18 +68,9 @@ class Root(tkRoot):
 
         self.other = Widgets.Label(master=self, Text='PlaceHodler').PlaceRelative(relx=0.5, rely=0, relwidth=.5, relheight=1)
 
-        self.t = HTMLLabel(master=self).PlaceRelative(relx=0, rely=0, relwidth=.5, relheight=1)
+        self.t = HTMLViewer(master=self).PlaceRelative(relx=0, rely=0, relwidth=.5, relheight=1)
         self.t.txt = 'events'
-        self.t.tb.Bind(Bindings.Button, self.HandleEvent, add=True)
-        self.t.tb.Bind(Bindings.FocusIn, self.HandleEvent, add=True)
-        self.t.tb.Bind(Bindings.FocusOut, self.HandleEvent, add=True)
-        self.t.tb.Bind(Bindings.ButtonRelease, self.HandleEvent, add=True)
 
-    @staticmethod
-    def HandleEvent(event: tkEvent):
-        print('HandleEvent.tkEvent', event)
-        event = TkinterEvent(event)
-        print('HandleEvent.TkinterEvent', event)
     def Run(self):
         threading.Thread(target=self.__run__, daemon=True)#.start()
 

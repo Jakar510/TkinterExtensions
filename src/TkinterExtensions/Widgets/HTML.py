@@ -5,8 +5,9 @@ tkinter HTML text widgets
 import sys
 
 import tk_html_widgets as tk_html
+from TkinterExtensions.Bindings import Bindings
 
-from ..Widgets.Widgets import ScrolledText, ViewState
+from ..Widgets.Widgets import ScrolledText, ViewState, tkEvent
 
 
 
@@ -16,6 +17,7 @@ __all__ = [
         ]
 
 class HTMLScrolledText(ScrolledText):
+    _bindIDs = set()
     __doc__ = tk_html.HTMLScrolledText.__doc__
     def __init__(self, *args, html=None, **kwargs):
         super().__init__(*args, **kwargs)
@@ -23,6 +25,7 @@ class HTMLScrolledText(ScrolledText):
         self.html_parser = tk_html.html_parser.HTMLTextParser()
         if isinstance(html, str):
             self.set_html(html)
+
     def _w_init(self, kwargs):
         if not 'wrap' in kwargs.keys():
             self.tb.config(wrap='word')
@@ -48,18 +51,33 @@ class HTMLScrolledText(ScrolledText):
         Set HTML widget text. If strip is enabled (default) it ignores spaces and new lines.
 
         """
+        for ID in self._bindIDs: self.unbind(ID)
         prev_state = ViewState(self.tb['state'])
         self.tb.Enable()
         self.tb.Clear()
         self.tb.tag_delete(self.tb.tag_names)
         self.html_parser.w_set_html(self.tb, html, strip=strip)
+
+        self._bindIDs.clear()
+        self._setupBindings()
         return self.tb.Enable(state=prev_state)
 
+    def _setupBindings(self):
+        self._bindIDs.add(self.tb.Bind(Bindings.Button, func=self.HandlePress, add=True))
+        self._bindIDs.add(self.tb.Bind(Bindings.ButtonRelease, func=self.HandleRelease, add=True))
+
+        self._bindIDs.add(self.tb.Bind(Bindings.FocusIn, func=self.HandleFocusIn, add=True))
+        self._bindIDs.add(self.tb.Bind(Bindings.FocusOut, func=self.HandleFocusOut, add=True))
+    def HandlePress(self, event: tkEvent): pass
+    def HandleRelease(self, event: tkEvent): pass
+    def HandleFocusIn(self, event: tkEvent): pass
+    def HandleFocusOut(self, event: tkEvent): pass
 
     @property
     def txt(self) -> str: return self.tb.txt
     @txt.setter
     def txt(self, value: str): self.set_html(value)
+
 
 
 class HTMLText(HTMLScrolledText):

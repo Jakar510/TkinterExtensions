@@ -124,9 +124,10 @@ class TkinterEvent(tkEvent):
 
 
     def __str__(self) -> str: return self.ToString()
-    def __repr__(self) -> str: return self.ToString()
+    # def __repr__(self) -> str: return self.ToString()
 
-    def ToString(self) -> str: return f'<{self.__class__.__name__} Object. State: \n{pprint.pformat(self.ToDict(), indent=4)} >'
+    def ToString(self) -> str: return f"""<{self.__class__.__name__} ({repr(self).replace('>', '').replace('<', '')}) Object.
+State: {pprint.pformat(self.ToDict(), indent=4)} >"""
     def ToDict(self) -> dict:
         """
             {
@@ -150,7 +151,6 @@ class TkinterEvent(tkEvent):
         :return:
         """
         return self.__dict__.copy()
-
     def __enter__(self): return self
     def __exit__(self, exc_type, exc_val, exc_tb): pass
     def __call__(self, *, keysym: Bindings = None) -> bool:
@@ -174,3 +174,10 @@ class TkinterEvent(tkEvent):
         e = cls(event)
         e.keysym = Bindings.ShiftTab
         return e
+
+
+    @staticmethod
+    def Debug(event: tkEvent):
+        print('Debug.tkEvent', event)
+        event = TkinterEvent(event)
+        print('Debug.TkinterEvent', event)
