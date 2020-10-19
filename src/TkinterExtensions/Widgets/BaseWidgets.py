@@ -322,8 +322,8 @@ class CommandMixin:
         """ Execute the Command """
         if callable(self._cmd): self._cmd(*args, **kwargs)
     def SetCommand(self, func: Union[callable, CurrentValue], z: Union[int, float, str, Enum] = None, **kwargs):
-        if not callable(func) or not isinstance(func, CurrentValue):
-            raise ValueError(f'_func is not callable. got {type(func)}')
+        if not callable(func):
+            raise ValueError(f'func is not callable. got {type(func)}')
 
         if isinstance(func, CurrentValue): self._cmd = func.SetWidget(self)
         else: self._cmd = CallWrapper.Create(func, z, **kwargs)
