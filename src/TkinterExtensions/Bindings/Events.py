@@ -172,7 +172,7 @@ State: {pprint.pformat(self.ToDict(), indent=4)} >"""
     @classmethod
     def FromShiftTabEvent(cls, event: tkEvent):
         e = cls(event)
-        e.keysym = Bindings.ShiftTab
+        e.keysym = Bindings.ShiftTab.value
         return e
 
 

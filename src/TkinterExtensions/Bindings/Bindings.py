@@ -103,7 +103,7 @@ class Bindings(Enum):
     z = "z"
 
     # class Custom(Enum):
-    ShiftTab = "ShiftTab",
+    ShiftTab = "Shift_Tab",
     ShiftTabEvent = "<Shift-KeyPress-Tab>"
 
     # class FunctionKeys(Enum):

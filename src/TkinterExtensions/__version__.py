@@ -5,6 +5,6 @@
 # ------------------------------------------------------------------------------
 
 # major.minor[.maintenance]
-VERSION = (1, 4, 38)
+VERSION = (1, 4, 39)
 
 __version__ = version = '.'.join(map(str, VERSION))
