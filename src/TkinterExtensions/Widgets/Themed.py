@@ -336,7 +336,7 @@ class EntryThemed(ttk.Entry, BaseTextTkinterWidget, CommandMixin):
     def Clear(self): self.delete(0, Tags.End.value)
 
     def _setCommand(self):
-        self.bind(Bindings.Button.value, self._cmd)
+        self.bind(Bindings.ButtonPress.value, self._cmd)
         return self
 
     @property

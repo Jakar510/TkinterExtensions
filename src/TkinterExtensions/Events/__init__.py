@@ -222,7 +222,7 @@ class Bindings(Enum):
         :return:
         :rtype: bool
         """
-        if isinstance(keysym, str): keysym = Bindings(keysym)
+        if isinstance(keysym, str): keysym = Bindings.FromKeysym(keysym)
 
         return keysym == Bindings.Enter or keysym == Bindings.KP_Enter or keysym == Bindings.Return
 

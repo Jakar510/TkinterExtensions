@@ -134,7 +134,7 @@ class Label(tk.Label, BaseTextTkinterWidget, ImageMixin, CommandMixin):
         return super()._options(cnf, kw)
 
     def _setCommand(self):
-        self.bind(Bindings.Button, func=self._cmd)
+        self.bind(Bindings.ButtonPress, func=self._cmd)
         return self
 
 
@@ -168,7 +168,7 @@ class Entry(tk.Entry, BaseTextTkinterWidget, CommandMixin):
         self.delete(0, Tags.End.value)
 
     def _setCommand(self):
-        self.bind(Bindings.Button.value, self._cmd)
+        self.bind(Bindings.ButtonPress.value, self._cmd)
         return self
 
     @property
@@ -445,7 +445,7 @@ class Canvas(tk.Canvas, BaseTkinterWidget):
         super().__init__(master, *args, **kwargs)
         self._setupBindings()
     def _setupBindings(self):
-        self.bind(Bindings.Button.value, func=self.HandleRelease)
+        self.bind(Bindings.ButtonPress.value, func=self.HandleRelease)
         self.bind(Bindings.ButtonRelease.value, func=self.HandlePress)
 
         self.bind(Bindings.FocusIn.value, func=self.HandleFocusIn)
@@ -590,7 +590,7 @@ class Text(tk.Text, BaseTextTkinterWidget, CommandMixin):
 
         return super()._options(cnf, kw)
     def _setCommand(self):
-        self.bind(Bindings.Button, func=self._cmd)
+        self.bind(Bindings.ButtonPress, func=self._cmd)
         return self
 
 
@@ -624,7 +624,7 @@ class ScrolledText(Frame, BaseTextTkinterWidget, CommandMixin):
         return super()._options(cnf, kw)
 
     def _setCommand(self):
-        self.tb.bind(Bindings.Button, func=self._cmd)
+        self.tb.bind(Bindings.ButtonPress, func=self._cmd)
         return self
 
 
