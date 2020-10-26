@@ -201,6 +201,14 @@ class Bindings(Enum):
     # class ThemedTreeView(Enum):
     TreeViewSelect = '<<TreeviewSelect>>'
 
+    # media controls XF86Audio
+    XF86AudioPlay = 'XF86AudioPlay'
+    XF86AudioRaiseVolume = 'XF86AudioRaiseVolume'
+    XF86AudioLowerVolume = 'XF86AudioLowerVolume'
+    XF86AudioMute = 'XF86AudioMute'
+    XF86AudioPrev = 'XF86AudioPrev'
+    XF86AudioNext = 'XF86AudioNext'
+
 
     @staticmethod
     def IsUnknown(keysym) -> bool:

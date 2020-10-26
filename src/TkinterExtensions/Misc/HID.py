@@ -10,37 +10,43 @@ import time
 
 
 
-__all__ = ['HID_BUFFER']
+__all__ = ['HID_BUFFER', 'TimeKeeperMixin']
 
-class HID_BUFFER(object):
-    _text = ''
+class TimeKeeperMixin(object):
     _LastTime = time.time()
-    def __update(self): self.LastTime = time.time()
+    def UpdateTime(self): self._LastTime = time.time()
+
     @property
-    def TimeSinceLastInteraction(self) -> float: return abs(self._LastTime - time.time())
+    def ElapsedTime(self) -> float: return abs(self.CurrentTime - self._LastTime)
+
+    @property
+    def CurrentTime(self) -> float: return time.time()
 
 
+
+class HID_BUFFER(TimeKeeperMixin):
+    _text = ''
     def Clear(self, s: str = '') -> str:
         if not isinstance(s, str): s = str(s)
         self._text = s
-        self.__update()
+        self.UpdateTime()
         return self._text
     def Add(self, s: str):
         if not isinstance(s, str): s = str(s)
         self._text += s
-        self.__update()
+        self.UpdateTime()
         return self
     def Sub(self, s: str):
         if not isinstance(s, str): s = str(s)
         self._text -= s
-        self.__update()
+        self.UpdateTime()
         return self
     def Backspace(self):
         self._text = self._text[:-1]
-        self.__update()
+        self.UpdateTime()
         return self
     def Backspace_Number(self):
-        self.__update()
+        self.UpdateTime()
         self._text = self._text[:-1]
         if len(self._text) == 0: return self
         if self._text[-1] == '.' or self._text[-1] == ',':
@@ -70,7 +76,7 @@ class HID_BUFFER(object):
             Throws RuntimeError if text is empty.
         :return: float
         """
-        self.__update()
+        self.UpdateTime()
         if self._text == '': return ''
         return float(self._text)
     def MultiplyByFactor(self, factor: int or float = -1) -> float or str:

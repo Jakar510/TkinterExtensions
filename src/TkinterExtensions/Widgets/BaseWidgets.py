@@ -9,6 +9,7 @@ import base64
 import io
 import os
 from enum import Enum
+from pprint import PrettyPrinter
 from typing import Union
 from urllib.request import urlopen
 
@@ -20,6 +21,8 @@ from ..Widgets.base import *
 
 
 
+
+pp = PrettyPrinter(indent=4)
 
 __all__ = ['BaseTkinterWidget', 'BaseTextTkinterWidget', 'Image', 'ImageTk',
            'CurrentValue', 'CallWrapper', 'CurrentValue', 'CommandMixin', 'ImageMixin']
@@ -37,7 +40,42 @@ class BaseTkinterWidget(tk.Widget):
     def IsVisible(self) -> bool: return self._state_ != ViewState.Hidden
 
     @property
-    def State(self) -> ViewState: return self._state_
+    def CurrentViewState(self) -> ViewState: return self._state_
+
+    def ToString(self, IncludeState: bool = None) -> str:
+        start = self.__repr__().replace('>', '').replace('<', '').replace('object', 'Tkinter Widget')
+        if IncludeState is None: return f'<{start}. State: {pp.pformat(self.Details)}>'
+        if IncludeState: return f'<{start}. State: {pp.pformat(self.FullDetails)}>'
+
+        return f'<{start}>'
+    @property
+    def Details(self) -> dict: return dict(IsVisible=self.IsVisible)
+    @property
+    def FullDetails(self) -> dict:
+        d = self.Details
+        d.update({
+                'Type':               type(self),
+                'repr':               repr(self),
+                'str':                str(self),
+                'ViewState':          self.CurrentViewState,
+                'LayoutManger':       self._manager_,
+                'children':           self.children.copy(),
+                'PI (position info)': self.pi,
+                'dir':                dir(self),
+                '__dict__':           self.__dict__.copy(),
+                'winfo':              {
+                        'name':               self.winfo_name(),
+                        'manager':            self.winfo_manager(),
+                        'id':                 self.winfo_id(),
+                        'parent':             self.winfo_parent(),
+                        'ismapped':           self.winfo_ismapped(),
+                        'pathname(winfo_id)': self.winfo_pathname(self.winfo_id()),
+                        'children':           self.winfo_children(),
+                        },
+                })
+        return d
+
+
 
     @property
     def width(self) -> int: return self.winfo_width()
@@ -96,6 +134,7 @@ class BaseTkinterWidget(tk.Widget):
     def _hide(self) -> bool:
         self._SetState(state=ViewState.Hidden)
         return True
+
 
 
     def Bind(self, sequence: str or Enum = None, func: callable = None, add: bool = None) -> str:
