@@ -8,6 +8,7 @@
 import base64
 import io
 import os
+from abc import ABC
 from enum import Enum
 from pprint import PrettyPrinter
 from typing import Union
@@ -27,7 +28,7 @@ pp = PrettyPrinter(indent=4)
 __all__ = ['BaseTkinterWidget', 'BaseTextTkinterWidget', 'Image', 'ImageTk',
            'CurrentValue', 'CallWrapper', 'CurrentValue', 'CommandMixin', 'ImageMixin']
 
-class BaseTkinterWidget(tk.Widget):
+class BaseTkinterWidget(tk.Widget, ABC):
     _state_: ViewState = ViewState.Hidden
     _pi: dict = { }
     _manager_: Layout = None
@@ -90,6 +91,7 @@ class BaseTkinterWidget(tk.Widget):
         """
         if self._manager_ is None: return False
 
+        self.OnAppearing()
         state = kwargs.get('state', None) or kwargs.get('State', ViewState.Normal)
         assert (isinstance(state, ViewState))
 
@@ -118,6 +120,8 @@ class BaseTkinterWidget(tk.Widget):
         Can be overridden to add additional functionality if needed.
         """
         if self._manager_ is None: return False
+
+        self.OnDisppearing()
         if self._manager_ == Layout.pack:
             self.pack_forget()
             return self._hide()
@@ -271,6 +275,13 @@ class BaseTkinterWidget(tk.Widget):
 
         self._state_ = state
         return self
+
+    def OnAppearing(self):
+        """ this is called just before widget appears. override to implement desired effects """
+        pass
+    def OnDisppearing(self):
+        """ this is called just before widget disappears. override to implement desired effects """
+        pass
 class BaseTextTkinterWidget(BaseTkinterWidget):
     _txt: tk.StringVar
     # noinspection PyMissingConstructor
