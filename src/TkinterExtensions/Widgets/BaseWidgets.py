@@ -387,36 +387,29 @@ class ImageMixin:
     height: callable
     configure: callable
     update_idletasks: callable
+    update: callable
     _IMG: Union[ImageTk.PhotoImage, tk.PhotoImage] = None
-    def SetImage(self, *, path: str = None, data: str = None, url: str = None, WidthMax: int = None, HeightMax: int = None):
-        if url: self.DownloadImage(url, WidthMax=WidthMax, HeightMax=HeightMax)
-        elif data and path: raise KeyError('Cannot use both data and path')
-        elif data:
-            self.SetImageAndResize(data, WidthMax=WidthMax, HeightMax=HeightMax)
-        elif path:
-            self.OpenImage(path, WidthMax=WidthMax, HeightMax=HeightMax)
-        return self
-    def DownloadImage(self, url: str, *, WidthMax: int = None, HeightMax: int = None):
-        self.SetImageAndResize(urlopen(url).read(), WidthMax=WidthMax, HeightMax=HeightMax)
-    def OpenImage(self, path: str, *, WidthMax: int = None, HeightMax: int = None):
+    def SetImage(self, path: str = None, *, WidthMax: int = None, HeightMax: int = None):
         if not os.path.isfile(path): raise FileNotFoundError(path)
         with open(path, 'rb') as f:
-            self._open(f, WidthMax, HeightMax)
-    def SetImageAndResize(self, data: str or bytes = None, *, WidthMax: int = None, HeightMax: int = None):
-        if isinstance(data, str):
-            data = base64.decodebytes(data.encode())
-
-        assert (isinstance(data, bytes))
-        with io.BytesIO(data) as buf:
-            self._open(buf, WidthMax, HeightMax)
+            return self._open(f, WidthMax, HeightMax)
+    def SetPhoto(self, base64Data: bytes or str = None, *, WidthMax: int = None, HeightMax: int = None):
+        with io.BytesIO(base64.b64decode(base64Data)) as buf:
+            return self._open(buf, WidthMax, HeightMax)
+    def DownloadImage(self, url: str, *, WidthMax: int = None, HeightMax: int = None):
+        with io.BytesIO(urlopen(url).read()) as buf:
+            return self._open(buf, WidthMax, HeightMax)
 
     def _open(self, f, WidthMax: int, HeightMax: int):
         self.update_idletasks()
         if WidthMax is None: WidthMax = self.width
         if HeightMax is None: HeightMax = self.height
 
-        if WidthMax < 0: raise ValueError('WidthMax must be positive')
-        if HeightMax < 0: raise ValueError('HeightMax must be positive')
+        if WidthMax <= 0: raise ValueError('WidthMax must be positive')
+        if HeightMax <= 0: raise ValueError('HeightMax must be positive')
         with Image.open(f) as img:
-            self._IMG = ImageTk.PhotoImage(master=self, image=ResizePhoto(img, WidthMax=int(WidthMax), HeightMax=int(HeightMax)))
+            self._IMG = ImageTk.PhotoImage(master=self, image=ResizePhoto(img, WidthMax=WidthMax, HeightMax=HeightMax))
             self.configure(image=self._IMG)
+
+        return self
+

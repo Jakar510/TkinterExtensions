@@ -57,19 +57,20 @@ class Root(tkRoot):
         super().__init__(Screen_Width=800, Screen_Height=480, x=100, y=100)
 
         self.w: List[tk.Widget] = []
-        # self.home = HomeWindow(master=self).PlaceFull()
+        self.home = HomeWindow(master=self).PlaceFull()
 
-        self.html = HTMLScrolledText(master=self).PlaceFull()
-        self.html.txt = 'Test'
-        self.html.hide()
-
-        self.other = Widgets.Label(master=self, Text='PlaceHodler').PlaceRelative(relx=0.5, rely=0, relwidth=.5, relheight=1)
-
-        self.t = HTMLViewer(master=self).PlaceRelative(relx=0, rely=0, relwidth=.5, relheight=1)
-        self.t.txt = 'events'
-        self.Bind(Bindings.Key, self.HandlePress)
-        self.Bind(Bindings.ButtonPress, self.HandlePress)
-        self.Bind(Bindings.ButtonRelease, self.HandlePress)
+        # self.html = HTMLScrolledText(master=self).PlaceFull()
+        # self.html.txt = 'Test'
+        # self.html.hide()
+        #
+        # self.other = Widgets.Label(master=self, Text='PlaceHodler').PlaceRelative(relx=0.5, rely=0, relwidth=.5, relheight=1)
+        #
+        # self.t = HTMLViewer(master=self).PlaceRelative(relx=0, rely=0, relwidth=.5, relheight=1)
+        # self.t.txt = 'events'
+        # self.Bind(Bindings.Key, self.HandlePress)
+        # self.Bind(Bindings.ButtonPress, self.HandlePress)
+        # self.Bind(Bindings.ButtonRelease, self.HandlePress)
+        AutoStartTargetedThread(target=self.__run__)
 
     @staticmethod
     def HandlePress(event: tkEvent): TkinterEvent.Debug(event)
@@ -124,21 +125,24 @@ class BaseWindow(Frame):
         self.hide()
         self.master.home.show()
 
+    def OnAppearing(self):
+        self.button.SetPhoto(PhotoData['exit'])
 
 class Window1(BaseWindow):
     def CreateWidgets(self):
-        self.button = Widgets.Button(master=self, Text="button 1").SetCommand(self.exit).Place(relx=0.0, rely=0.0, relheight=1.0, relwidth=1.0).SetImage()
+        self.button = Widgets.Button(master=self, Text="button 1").SetCommand(self.exit).Place(relx=0.0, rely=0.0, relheight=1.0, relwidth=1.0)
+
 
 
 class Window2(BaseWindow):
     def CreateWidgets(self):
-        self.button = Widgets.Button(master=self, Text="button 2").SetCommand(self.exit).Place(relx=0.0, rely=0.0, relheight=1.0, relwidth=1.0).SetImage()
+        self.button = Widgets.Button(master=self, Text="button 2").SetCommand(self.exit).Place(relx=0.0, rely=0.0, relheight=1.0, relwidth=1.0)
 
 
 class Window3(BaseWindow):
     nested: Window2
     def CreateWidgets(self):
-        self.button = Widgets.Button(master=self, Text="button 3").SetCommand(self.exit).Place(relx=0.0, rely=0.0, relheight=1.0, relwidth=0.5).SetImage()
+        self.button = Widgets.Button(master=self, Text="button 3").SetCommand(self.exit).Place(relx=0.0, rely=0.0, relheight=1.0, relwidth=0.5)
         self.nested = LabelWindow(master=self).Place(relx=0.5, rely=0.0, relheight=1.0, relwidth=0.5)
 
 
