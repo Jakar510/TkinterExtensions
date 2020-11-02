@@ -25,6 +25,7 @@ def RoundFloat(Float: float, Precision: int) -> str:
 def ResizePhoto(image: Image.Image, *, WidthMax: int or float, HeightMax: int or float) -> Image:
     scalingFactor = min((WidthMax / image.width, HeightMax / image.height))
     newSize = (int(scalingFactor * image.width), int(scalingFactor * image.height))
+    print('ResizePhoto__newSize', newSize)
     return image.resize(newSize)
 def CalculateWrapLength(screenWidth: int, *args: Union[int, float]) -> int:
     """
