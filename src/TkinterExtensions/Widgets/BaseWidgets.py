@@ -404,7 +404,7 @@ class ImageMixin:
             self._open(f, WidthMax, HeightMax)
     def SetImageAndResize(self, data: str or bytes = None, *, WidthMax: int = None, HeightMax: int = None):
         if isinstance(data, str):
-            data = base64.decodestring(data.encode())
+            data = base64.decodebytes(data.encode())
 
         assert (isinstance(data, bytes))
         with io.BytesIO(data) as buf:
