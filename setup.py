@@ -28,7 +28,7 @@ setup(name='TkinterExtensions',
       long_description=long_description,
       long_description_content_type="text/markdown",
       install_requires=[
-              'pillow', 'tk_html_widgets',
+              'pillow', 'tk_html_widgets', 'PythonDebugTools',
               ],
       classifiers=[
               # How mature is this project? Common values are

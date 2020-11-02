@@ -11,12 +11,13 @@ from abc import ABC
 from typing import Union
 
 from PIL import Image
+from PythonDebugTools import PRINT
 
 
 
 
 __all__ = [
-        'ResizePhoto', 'CalculateWrapLength', 'RoundFloat', 'AutoCounter', 'AutoStartThread', 'sizeof', 'IsImage', 'AutoStartTargetedThread'
+        'ResizePhoto', 'CalculateOffset', 'RoundFloat', 'AutoCounter', 'AutoStartThread', 'sizeof', 'IsImage', 'AutoStartTargetedThread'
         ]
 
 def RoundFloat(Float: float, Precision: int) -> str:
@@ -25,20 +26,20 @@ def RoundFloat(Float: float, Precision: int) -> str:
 def ResizePhoto(image: Image.Image, *, WidthMax: int or float, HeightMax: int or float) -> Image:
     scalingFactor = min((WidthMax / image.width, HeightMax / image.height))
     newSize = (int(scalingFactor * image.width), int(scalingFactor * image.height))
-    print('ResizePhoto__newSize', newSize)
+    PRINT('ResizePhoto', dict(newSize=newSize, WidthMax=WidthMax, HeightMax=HeightMax, image=image))
     return image.resize(newSize)
-def CalculateWrapLength(screenWidth: int, *args: Union[int, float]) -> int:
+def CalculateOffset(starting: int, *args: Union[int, float]) -> int:
     """
-        Example: WrapLength = self._screenWidth * relWidgetWidth * offset
+        Example: WrapLength = ScreenWidth * Widget.Parent.relwidth * Widget.relwidth * offset
 
-    :param screenWidth: base screen width
+    :param starting: starting value (such as width or height)
     :param args: a list of float or integers to be cumulatively multiplied together.
     :return:
     """
     for arg in args:
-        assert (isinstance(arg, (int, float)))
-        screenWidth *= arg
-    return int(screenWidth)
+        if not isinstance(arg, (int, float)): arg = float(arg)
+        starting *= arg
+    return int(starting)
 
 
 
@@ -83,7 +84,6 @@ class AutoStartTargetedThread(threading.Thread):
 
         super().__init__(name=Name, target=target, args=args, kwargs=kwargs, daemon=Daemon)
         if AutoStart: self.start()
-
 
 
 
