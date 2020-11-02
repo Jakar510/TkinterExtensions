@@ -383,58 +383,31 @@ class CommandMixin:
         self.configure(command=self._cmd)
         return self
 class ImageMixin:
-    _pi: dict
     configure: callable
     _IMG: Union[ImageTk.PhotoImage, tk.PhotoImage] = None
-    def SetImage(self, path: str = None, data: str = None, url: str = None):
-        if url: self.DownloadImage(url)
-        elif data and path: raise KeyError('Cannot use both ImageData and ImageName')
+    def SetImage(self, *, path: str = None, data: str = None, url: str = None, WidthMax: int = None, HeightMax: int = None):
+        if url: self.DownloadImage(url, WidthMax=WidthMax, HeightMax=HeightMax)
+        elif data and path: raise KeyError('Cannot use both data and path')
         elif data:
-            self._IMG = tk.PhotoImage(master=self, data=data)
-            self.configure(image=self._IMG)
+            self.SetImageAndResize(data, WidthMax=WidthMax, HeightMax=HeightMax)
         elif path:
-            self.OpenImage(path)
+            self.OpenImage(path, WidthMax=WidthMax, HeightMax=HeightMax)
         return self
-    def DownloadImage(self, url: str):
-        raw_data = urlopen(url).read()
-        with io.BytesIO(raw_data) as buf:
-            with Image.open(buf) as img:
-                self._IMG = ImageTk.PhotoImage(img, master=self)
-                self.configure(image=self._IMG)
-    def OpenImage(self, path: str):
-        assert (os.path.isfile(path))
+    def DownloadImage(self, url: str, *, WidthMax: int = None, HeightMax: int = None):
+        self.SetImageAndResize(urlopen(url).read(), WidthMax=WidthMax, HeightMax=HeightMax)
+    def OpenImage(self, path: str, *, WidthMax: int = None, HeightMax: int = None):
+        if not os.path.isfile(path): raise FileNotFoundError(path)
         with open(path, 'rb') as f:
-            with Image.open(f) as img:
-                self._IMG = ImageTk.PhotoImage(img, master=self)
-                self.configure(image=self._IMG)
-    def SetPhoto(self, *, Base64Data: str = None, rawData: bytes = None, MaxWidth: int, MaxHeight: int):
-        if Base64Data:
-            assert (isinstance(Base64Data, str))
-            rawData = base64.b64decode(Base64Data)
+            self._open(f, WidthMax, HeightMax)
+    def SetImageAndResize(self, data: str or bytes = None, *, WidthMax: int, HeightMax: int):
+        if isinstance(data, str):
+            data = base64.decodestring(data.encode())
 
-        assert (isinstance(rawData, bytes))
-        with io.BytesIO(rawData) as buf:
-            with Image.open(buf) as tempImg:
-                self._IMG = ImageTk.PhotoImage(master=self, image=ResizePhoto(tempImg, WidthMax=int(MaxWidth), HeightMax=int(MaxHeight)))
-                self.configure(image=self._IMG)
+        assert (isinstance(data, bytes))
+        with io.BytesIO(data) as buf:
+            self._open(buf, WidthMax, HeightMax)
 
-    # # noinspection DuplicatedCode
-    # def SetDefaultImage(self, ImagePath: str = None, ImageData: str = None, display=True):
-    #     if ImageData and ImagePath: raise KeyError('Cannot use both ImageData and ImageName')
-    #     elif ImageData:
-    #         self._defaultImage = tk.PhotoImage(master=self, data=ImageData)
-    #         if display: self.configure(image=self._defaultImage)
-    #     elif ImagePath:
-    #         self.OpenImage(ImagePath)
-    #         if display: self.configure(image=self._defaultImage)
-    #     return self
-    # # noinspection DuplicatedCode
-    # def SetOptionalImage(self, ImagePath: str = None, ImageData: str = None, display=True):
-    #     if ImageData and ImagePath: raise KeyError('Cannot use both ImageData and ImageName')
-    #     elif ImageData:
-    #         self._optionalImage = tk.PhotoImage(master=self, data=ImageData)
-    #         if display: self.configure(image=self._optionalImage)
-    #     elif ImagePath:
-    #         self.OpenImage(ImagePath)
-    #         if display: self.configure(image=self._optionalImage)
-    #     return self
+    def _open(self, f, WidthMax: int, HeightMax: int):
+        with Image.open(f) as img:
+            self._IMG = ImageTk.PhotoImage(master=self, image=ResizePhoto(img, WidthMax=int(WidthMax), HeightMax=int(HeightMax)))
+            self.configure(image=self._IMG)
