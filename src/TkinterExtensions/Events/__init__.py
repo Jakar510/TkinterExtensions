@@ -223,6 +223,18 @@ class Bindings(Enum):
         return keysym == Bindings.UNKNOWN
 
     @staticmethod
+    def IsDigit(keysym: int or str) -> bool:
+        """
+        :param keysym:
+        :type keysym: int or str or Bindings
+        :return:
+        :rtype: bool
+        """
+        if isinstance(keysym, Bindings): keysym = keysym.value
+
+        return keysym in ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'period', 'comma', ',', '.', 0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+
+    @staticmethod
     def IsEnter(keysym) -> bool:
         """
         :param keysym:
@@ -413,6 +425,17 @@ State: {pprint.pformat(self.ToDict(), indent=4)} >"""
         if keysym is not None: return self.KeySynonym == keysym
 
         raise ValueError('Unknown value passed')
+
+    @staticmethod
+    def IsDigit(keysym: int or str) -> bool:
+        """
+        :param keysym:
+        :type keysym: int or str or TkinterEvent
+        :return:
+        :rtype: bool
+        """
+        if isinstance(keysym, TkinterEvent): keysym = keysym.keysym
+        return Bindings.IsDigit(keysym)
 
     @property
     def EventType(self) -> tkEventType: return self.type
