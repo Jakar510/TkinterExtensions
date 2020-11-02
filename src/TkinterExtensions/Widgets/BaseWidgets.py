@@ -383,7 +383,10 @@ class CommandMixin:
         self.configure(command=self._cmd)
         return self
 class ImageMixin:
+    width: int
+    height: callable
     configure: callable
+    update_idletasks: callable
     _IMG: Union[ImageTk.PhotoImage, tk.PhotoImage] = None
     def SetImage(self, *, path: str = None, data: str = None, url: str = None, WidthMax: int = None, HeightMax: int = None):
         if url: self.DownloadImage(url, WidthMax=WidthMax, HeightMax=HeightMax)
@@ -399,7 +402,7 @@ class ImageMixin:
         if not os.path.isfile(path): raise FileNotFoundError(path)
         with open(path, 'rb') as f:
             self._open(f, WidthMax, HeightMax)
-    def SetImageAndResize(self, data: str or bytes = None, *, WidthMax: int, HeightMax: int):
+    def SetImageAndResize(self, data: str or bytes = None, *, WidthMax: int = None, HeightMax: int = None):
         if isinstance(data, str):
             data = base64.decodestring(data.encode())
 
@@ -408,6 +411,12 @@ class ImageMixin:
             self._open(buf, WidthMax, HeightMax)
 
     def _open(self, f, WidthMax: int, HeightMax: int):
+        self.update_idletasks()
+        if WidthMax is None: WidthMax = self.width
+        if HeightMax is None: HeightMax = self.height
+
+        if WidthMax < 0: raise ValueError('WidthMax must be positive')
+        if HeightMax < 0: raise ValueError('HeightMax must be positive')
         with Image.open(f) as img:
             self._IMG = ImageTk.PhotoImage(master=self, image=ResizePhoto(img, WidthMax=int(WidthMax), HeightMax=int(HeightMax)))
             self.configure(image=self._IMG)
