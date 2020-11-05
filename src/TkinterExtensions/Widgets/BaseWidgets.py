@@ -33,7 +33,7 @@ class BaseTkinterWidget(tk.Widget, ABC):
     _pi: dict = { }
     _manager_: Layout = None
     _wrap: int = None
-
+    _cb: str or None = None
     @property
     def pi(self) -> dict: return self._pi.copy()
 
@@ -91,7 +91,6 @@ class BaseTkinterWidget(tk.Widget, ABC):
         """
         if self._manager_ is None: return False
 
-        self.OnAppearing()
         state = kwargs.get('state', None) or kwargs.get('State', ViewState.Normal)
         assert (isinstance(state, ViewState))
 
@@ -111,6 +110,7 @@ class BaseTkinterWidget(tk.Widget, ABC):
     def _show(self, state: ViewState) -> bool:
         assert (isinstance(state, ViewState))
         self._SetState(state)
+        self._cb = self.after(10, self.OnAppearing)
         return True
 
     # noinspection PyUnresolvedReferences
@@ -276,8 +276,12 @@ class BaseTkinterWidget(tk.Widget, ABC):
         self._state_ = state
         return self
 
+    def Cancel_OnAppearing(self):
+        if self._cb is None: return
+        self.after_cancel(self._cb)
+        self._cb = None
     def OnAppearing(self):
-        """ this is called just before widget appears. override to implement desired effects """
+        """ this is called just after widget appears. override to implement desired effects """
         pass
     def OnDisppearing(self):
         """ this is called just before widget disappears. override to implement desired effects """

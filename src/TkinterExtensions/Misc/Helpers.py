@@ -7,6 +7,7 @@ import itertools
 import os
 import sys
 import threading
+import time
 from abc import ABC
 from typing import Union
 
@@ -17,7 +18,7 @@ from PythonDebugTools import PRINT
 
 
 __all__ = [
-        'ResizePhoto', 'CalculateOffset', 'RoundFloat', 'AutoCounter', 'AutoStartThread', 'sizeof', 'IsImage', 'AutoStartTargetedThread'
+        'ResizePhoto', 'CalculateOffset', 'RoundFloat', 'AutoCounter', 'AutoStartThread', 'sizeof', 'IsImage', 'AutoStartTargetedThread', 'Wait'
         ]
 
 def RoundFloat(Float: float, Precision: int) -> str:
@@ -26,7 +27,7 @@ def RoundFloat(Float: float, Precision: int) -> str:
 def ResizePhoto(image: Image.Image, *, WidthMax: int or float, HeightMax: int or float) -> Image:
     scalingFactor = min((WidthMax / image.width, HeightMax / image.height))
     newSize = (int(scalingFactor * image.width), int(scalingFactor * image.height))
-    PRINT('ResizePhoto', dict(newSize=newSize, WidthMax=WidthMax, HeightMax=HeightMax, image=image))
+    # PRINT('ResizePhoto', dict(newSize=newSize, WidthMax=WidthMax, HeightMax=HeightMax, image=image))
     return image.resize(newSize)
 def CalculateOffset(starting: int, *args: Union[int, float]) -> int:
     """
@@ -102,3 +103,5 @@ class AutoCounter(object):
 
     @property
     def value(self) -> int: return self._value
+
+def Wait(delay: Union[int, float]): time.sleep(delay)
