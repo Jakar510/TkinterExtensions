@@ -130,6 +130,7 @@ class Bindings(Enum):
     PrevWindow = '<<PrevWindow>>'
 
     # class Core(Enum):
+    Alt = 'Alt'
     Alt_L = 'Alt_L'
     Alt_R = 'Alt_R'
     AsciiTilde = 'asciitilde'
@@ -140,7 +141,9 @@ class Bindings(Enum):
     Cancel = 'Cancel'
     Caps_Lock = 'Caps_Lock'
     Comma = 'comma'
+    Control = 'Control'
     Control_L = 'Control_L'
+    Control_R = 'Control_R'
     Delete = 'Delete'
     Down = 'Down'
     End = 'End'
