@@ -8,7 +8,7 @@ import base64
 import io
 import os
 from enum import Enum
-from typing import Tuple
+from typing import Tuple, Union
 from urllib.request import urlopen
 
 from .BaseWidgets import *
@@ -38,7 +38,7 @@ Popupmenu
 RadioButton
 Scale
 Spinbox
-Text
+text
 """
 
 # noinspection DuplicatedCode
@@ -61,13 +61,13 @@ class Button(tk.Button, BaseTextTkinterWidget, ImageMixin, CommandMixin):
         command, compound, default, height,
         overrelief, state, width
     """
-    def __init__(self, master, Text: str = '', Override_var: tk.StringVar = None,  Command: callable = None, **kwargs):
+    def __init__(self, master, text: str = '', Override_var: tk.StringVar = None, Color: dict = None, Command: callable = None, **kwargs):
         tk.Button.__init__(self, master=master, **kwargs)
         cmd = kwargs.pop('command', None)
         if cmd: self.SetCommand(cmd)
 
         if Command: self.SetCommand(Command)
-        BaseTextTkinterWidget.__init__(self, Override_var=Override_var, Text=Text)
+        BaseTextTkinterWidget.__init__(self, Override_var=Override_var, text=text, Color=Color)
 
     def _options(self, cnf, kwargs=None) -> dict:
         kw = { }
@@ -99,9 +99,9 @@ class Label(tk.Label, BaseTextTkinterWidget, ImageMixin, CommandMixin):
         height, state, width
 
     """
-    def __init__(self, master, Text: str = '', Override_var: tk.StringVar = None,  **kwargs):
+    def __init__(self, master, text: str = '', Override_var: tk.StringVar = None, Color: dict = None, **kwargs):
         tk.Label.__init__(self, master=master, **kwargs)
-        BaseTextTkinterWidget.__init__(self, Override_var=Override_var, Text=Text)
+        BaseTextTkinterWidget.__init__(self, Override_var=Override_var, text=text, Color=Color)
 
     def _options(self, cnf, kwargs=None) -> dict:
         kw = { }
@@ -131,9 +131,9 @@ class Entry(tk.Entry, BaseTextTkinterWidget, CommandMixin):
     textvariable, validate, validatecommand, vcmd, width,
     xscrollcommand.
     """
-    def __init__(self, master,  Text: str = '', Override_var: tk.StringVar = None, **kwargs):
+    def __init__(self, master, text: str = '', Override_var: tk.StringVar = None, Color: dict = None, **kwargs):
         tk.Entry.__init__(self, master=master, **kwargs)
-        BaseTextTkinterWidget.__init__(self, Override_var=Override_var, Text=Text)
+        BaseTextTkinterWidget.__init__(self, Override_var=Override_var, text=text, Color=Color)
 
     def Clear(self):
         self.delete(0, Tags.End.value)
@@ -214,9 +214,9 @@ class CheckBox(tk.Checkbutton, BaseTextTkinterWidget, ImageMixin, CommandMixin):
 
     """
     _value: tk.BooleanVar
-    def __init__(self, master, Text: str = '', Override_var: tk.StringVar = None, **kwargs):
+    def __init__(self, master, text: str = '', Override_var: tk.StringVar = None, Color: dict = None, **kwargs):
         tk.Checkbutton.__init__(self, master=master, **kwargs)
-        BaseTextTkinterWidget.__init__(self, Override_var=Override_var, Text=Text)
+        BaseTextTkinterWidget.__init__(self, Override_var=Override_var, text=text, Color=Color)
         self._value = tk.BooleanVar(master=self, value=False)
         self.configure(variable=self._value)
 
@@ -254,23 +254,14 @@ class Listbox(tk.Listbox, BaseTextTkinterWidget, CommandMixin):
     Allowed WordWrap modes are ('word', 'none', 'char')
     """
     _Current_ListBox_Index: int = None
-    def __init__(self, master, *, Command: callable = None, z=None,  selectMode: str = tk.SINGLE, **kwargs):
-        if 'SelectMode' in kwargs: selectMode = kwargs.pop('SelectMode')
-        if 'selectmode' in kwargs: selectMode = kwargs.pop('selectmode')
-        assert (selectMode in (tk.SINGLE, tk.MULTIPLE))
-        tk.Listbox.__init__(self, master=master, selectmode=selectMode, **kwargs)
+    def __init__(self, master, *, Command: callable = None, z=None, selectMode: Union[str, SelectionMode] = tk.SINGLE, Color: dict = None, **kwargs):
+        tk.Listbox.__init__(self, master=master, **kwargs)
+        BaseTextTkinterWidget.__init__(self, text='', Color=Color, configure=False)
+        self.SetSelectMode(selectMode)
         if Command is not None: self.SetCommand(Command, z=z)
-        # if Color:
-        #     self.configure(activebackground=Color['ABG'])
-        #     self.configure(activeforeground=Color['AFG'])
-        #     self.configure(background=Color['BG'])
-        #     self.configure(disabledforeground=Color['DFG'])
-        #     self.configure(foreground=Color['FG'])
-        #     self.configure(highlightbackground=Color['HBG'])
-        #     self.configure(highlightcolor=Color['HFG'])
-        #     self.configure(selectbackground=Color["SBG"])
-        #     self.configure(selectforeground=Color["SBG"])
-        #     self.configure(insertbackground=Color["IBG"])
+    def SetSelectMode(self, mode: Union[str, SelectionMode] = tk.SINGLE):
+        if isinstance(mode, SelectionMode): mode = mode.value
+        self.configure(selectmode=mode)
     def SelectRow(self, index: int = None):
         if index is None: index = self._Current_ListBox_Index
         if index is None: return
@@ -408,9 +399,10 @@ class Listbox(tk.Listbox, BaseTextTkinterWidget, CommandMixin):
 
 
 class Canvas(tk.Canvas, BaseTkinterWidget):
-    def __init__(self, master, *args, **kwargs):
+    def __init__(self, master, *args, Color: dict = None, **kwargs):
         super().__init__(master, *args, **kwargs)
         self._setupBindings()
+        BaseTkinterWidget.__init__(self, Color)
     def _setupBindings(self):
         self.bind(Bindings.ButtonPress.value, func=self.HandleRelease)
         self.bind(Bindings.ButtonRelease.value, func=self.HandlePress)
@@ -525,7 +517,6 @@ class CheckButton(tk.Checkbutton, BaseTextTkinterWidget, CommandMixin):
 
 
 class Scrollbar(tk.Scrollbar, BaseTkinterWidget, CommandMixin):
-
     def _options(self, cnf, kwargs=None) -> dict:
         kw = { }
         if isinstance(kwargs, dict):
@@ -593,5 +584,3 @@ class ScrolledText(Frame, BaseTextTkinterWidget, CommandMixin):
     def _setCommand(self):
         self.tb.bind(Bindings.ButtonPress, func=self._cmd)
         return self
-
-

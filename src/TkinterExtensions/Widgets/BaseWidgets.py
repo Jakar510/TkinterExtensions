@@ -29,6 +29,10 @@ __all__ = ['BaseTkinterWidget', 'BaseTextTkinterWidget', 'Image', 'ImageTk',
            'CurrentValue', 'CallWrapper', 'CurrentValue', 'CommandMixin', 'ImageMixin']
 
 class BaseTkinterWidget(tk.Widget, ABC):
+    # noinspection PyMissingConstructor
+    def __init__(self, Color: dict = None, ):
+        if Color: self.configure(**Color)
+
     _state_: ViewState = ViewState.Hidden
     _pi: dict = { }
     _manager_: Layout = None
@@ -311,13 +315,12 @@ class BaseTkinterWidget(tk.Widget, ABC):
 class BaseTextTkinterWidget(BaseTkinterWidget):
     _txt: tk.StringVar
     # noinspection PyMissingConstructor
-    def __init__(self, *, Override_var: tk.StringVar or None, Text: str, configure: bool = True):
-        if Override_var is not None:
-            self._txt = Override_var
-        else:
-            self._txt = tk.StringVar(master=self, value=Text)
-        if configure: self.configure(textvariable=self._txt)
-
+    def __init__(self, *, Override_var: tk.StringVar = None, text: str, Color: dict = None, configure: bool = True):
+        if configure:
+            if Override_var is not None: self._txt = Override_var
+            else: self._txt = tk.StringVar(master=self, value=text)
+            self.configure(textvariable=self._txt)
+        BaseTkinterWidget.__init__(self, Color)
     @property
     def txt(self) -> str: return self._txt.get()
     @txt.setter

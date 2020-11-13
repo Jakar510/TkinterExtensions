@@ -50,11 +50,9 @@ class LabelFrame(tk.LabelFrame, BaseTextTkinterWidget):
         height, labelanchor, labelwidget,
         visual, width
     """
-    def __init__(self, master, Text: str = '', **kwargs):
-        if 'text' in kwargs: Text = kwargs.pop('text') or Text
-        if 'v' in kwargs: Text = kwargs.pop('v') or Text
-        tk.LabelFrame.__init__(self, master=master, text=Text, **kwargs)
-        BaseTextTkinterWidget.__init__(self, Override_var=None, Text=Text, configure=False)
+    def __init__(self, master, text: str = '', **kwargs):
+        tk.LabelFrame.__init__(self, master=master, text=text, **kwargs)
+        BaseTextTkinterWidget.__init__(self, Override_var=None, text=text, configure=False)
 
     @property
     def txt(self) -> str: return self._txt.get()

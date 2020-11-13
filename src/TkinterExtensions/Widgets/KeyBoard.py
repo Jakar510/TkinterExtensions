@@ -70,7 +70,7 @@ class _PopupKeyboard(tkTopLevel):
                 self._root_frame.Grid_ColumnConfigure(c, weight=1)
                 size = self._keysize * 3 if 'space' in text else self._keysize
 
-                self._buttons[r][c] = Button(master=self._Frames[r], width=size, Text=text, bg=self._keycolor).Grid(row=r, column=c).SetCommand(self._attach_key_press, z=text)
+                self._buttons[r][c] = Button(master=self._Frames[r], width=size, text=text, bg=self._keycolor).Grid(row=r, column=c).SetCommand(self._attach_key_press, z=text)
 
 
     def _attach_key_press(self, k: str):

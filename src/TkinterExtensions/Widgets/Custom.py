@@ -56,7 +56,7 @@ class ButtonGrid(Frame, ABC):
                 r += 1
                 c = 0
 
-            self._buttons[i] = Button(self, Text=self.ButtonTitles[i], **kwargs).Grid(row=r, column=c, padx=padx, pady=pady).SetCommand(self.ButtonCommands[i])
+            self._buttons[i] = Button(self, text=self.ButtonTitles[i], **kwargs).Grid(row=r, column=c, padx=padx, pady=pady).SetCommand(self.ButtonCommands[i])
             c += 1
 
     def HideAll(self):

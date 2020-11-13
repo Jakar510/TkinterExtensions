@@ -63,7 +63,7 @@ class Root(tkRoot):
         # self.html.txt = 'Test'
         # self.html.hide()
         #
-        # self.other = Widgets.Label(master=self, Text='PlaceHodler').PlaceRelative(relx=0.5, rely=0, relwidth=.5, relheight=1)
+        # self.other = Widgets.Label(master=self, text='PlaceHodler').PlaceRelative(relx=0.5, rely=0, relwidth=.5, relheight=1)
         #
         # self.t = HTMLViewer(master=self).PlaceRelative(relx=0, rely=0, relwidth=.5, relheight=1)
         # self.t.txt = 'events'
@@ -98,7 +98,7 @@ class HomeWindow(Frame):
     def Add(self, cls: Union[Frame, LabelFrame]):
         assert (callable(cls))
         w = cls(master=self.root).PlaceFull()
-        b = Widgets.Button(master=self, Text=f'{w.__class__.__name__} [ {len(self.root.w)} ]')
+        b = Widgets.Button(master=self, text=f'{w.__class__.__name__} [ {len(self.root.w)} ]')
         b.SetCommand(lambda: self.closeWindow(w))
         i = len(self.root.w)
         self.Grid_RowConfigure(i, weight=1)
@@ -130,19 +130,19 @@ class BaseWindow(Frame):
 
 class Window1(BaseWindow):
     def CreateWidgets(self):
-        self.button = Widgets.Button(master=self, Text="button 1").SetCommand(self.exit).Place(relx=0.0, rely=0.0, relheight=1.0, relwidth=1.0)
+        self.button = Widgets.Button(master=self, text="button 1").SetCommand(self.exit).Place(relx=0.0, rely=0.0, relheight=1.0, relwidth=1.0)
 
 
 
 class Window2(BaseWindow):
     def CreateWidgets(self):
-        self.button = Widgets.Button(master=self, Text="button 2").SetCommand(self.exit).Place(relx=0.0, rely=0.0, relheight=1.0, relwidth=1.0)
+        self.button = Widgets.Button(master=self, text="button 2").SetCommand(self.exit).Place(relx=0.0, rely=0.0, relheight=1.0, relwidth=1.0)
 
 
 class Window3(BaseWindow):
     nested: Window2
     def CreateWidgets(self):
-        self.button = Widgets.Button(master=self, Text="button 3").SetCommand(self.exit).Place(relx=0.0, rely=0.0, relheight=1.0, relwidth=0.5)
+        self.button = Widgets.Button(master=self, text="button 3").SetCommand(self.exit).Place(relx=0.0, rely=0.0, relheight=1.0, relwidth=0.5)
         self.nested = LabelWindow(master=self).Place(relx=0.5, rely=0.0, relheight=1.0, relwidth=0.5)
 
 
@@ -151,8 +151,8 @@ class LabelWindow(LabelFrame):
     CreateWidgets: callable
     def __init__(self, master: Root or BaseWindow):
         self.master = master
-        super().__init__(master, Text=self.__class__.__name__)
-        self.button = Widgets.Button(master=self, Text="button 4").SetCommand(self.exit).Place(relx=0.0, rely=0.0, relheight=1.0, relwidth=0.5)
+        super().__init__(master, text=self.__class__.__name__)
+        self.button = Widgets.Button(master=self, text="button 4").SetCommand(self.exit).Place(relx=0.0, rely=0.0, relheight=1.0, relwidth=0.5)
 
     def exit(self):
         self.hide()

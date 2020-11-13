@@ -58,9 +58,9 @@ class ComboBoxThemed(ttk.Combobox, BaseTextTkinterWidget, CommandMixin):
         height
         width
     """
-    def __init__(self, master, Text: str = '', Override_var: tk.StringVar = None, **kwargs):
+    def __init__(self, master, text: str = '', Override_var: tk.StringVar = None, Color: dict = None, **kwargs):
         ttk.Combobox.__init__(self, master=master, **kwargs)
-        BaseTextTkinterWidget.__init__(self, Override_var=Override_var, Text=Text)
+        BaseTextTkinterWidget.__init__(self, Override_var=Override_var, text=text, Color=Color)
 
     @property
     def value(self) -> bool: return self._txt.get()
@@ -100,8 +100,9 @@ class ScrollbarThemed(ttk.Scrollbar, BaseTkinterWidget):
 class TreeViewThemed(ttk.Treeview, BaseTkinterWidget, CommandMixin):
     last_focus: int or str
     focus_tags: List[str] = []
-    def __init__(self, master: tk.Frame,  **kwargs):
+    def __init__(self, master: tk.Frame, Color: dict = None, **kwargs):
         ttk.Treeview.__init__(self, master=master, **kwargs)
+        BaseTkinterWidget.__init__(self, Color)
 
     def _setCommand(self):
         self.bind(Bindings.TreeViewSelect.value, self._cmd)
@@ -226,13 +227,13 @@ class ButtonThemed(ttk.Button, BaseTextTkinterWidget, ImageMixin, CommandMixin):
         command, compound, default, height,
         overrelief, state, width
     """
-    def __init__(self, master, Text: str = '', Override_var: tk.StringVar = None,  Command: callable = None, **kwargs):
+    def __init__(self, master, text: str = '', Override_var: tk.StringVar = None, Color: dict = None, Command: callable = None, **kwargs):
         ttk.Button.__init__(self, master=master, **kwargs)
         cmd = kwargs.pop('command', None)
         if cmd: self.SetCommand(cmd)
 
         if Command: self.SetCommand(Command)
-        BaseTextTkinterWidget.__init__(self, Override_var=Override_var, Text=Text)
+        BaseTextTkinterWidget.__init__(self, Override_var=Override_var, text=text, Color=Color)
 
     def _options(self, cnf, kwargs=None) -> dict:
         kw = { }
@@ -264,9 +265,9 @@ class LabelThemed(ttk.Label, BaseTextTkinterWidget, ImageMixin):
         height, state, width
 
     """
-    def __init__(self, master, Text: str = '', Override_var: tk.StringVar = None,  **kwargs):
+    def __init__(self, master, text: str = '', Override_var: tk.StringVar = None, Color: dict = None, **kwargs):
         ttk.Label.__init__(self, master=master, **kwargs)
-        BaseTextTkinterWidget.__init__(self, Override_var=Override_var, Text=Text)
+        BaseTextTkinterWidget.__init__(self, Override_var=Override_var, text=text, Color=Color)
 
     def _options(self, cnf, kwargs=None) -> dict:
         kw = { }
@@ -292,9 +293,10 @@ class EntryThemed(ttk.Entry, BaseTextTkinterWidget, CommandMixin):
     textvariable, validate, validatecommand, vcmd, width,
     xscrollcommand.
     """
-    def __init__(self, master,  Text: str = '', Override_var: tk.StringVar = None, **kwargs):
+    def __init__(self, master, text: str = '', Override_var: tk.StringVar = None, Color: dict = None, **kwargs):
         ttk.Entry.__init__(self, master=master, **kwargs)
-        BaseTextTkinterWidget.__init__(self, Override_var=Override_var, Text=Text)
+        BaseTextTkinterWidget.__init__(self, Override_var=Override_var, text=text, Color=Color)
+
 
     def Clear(self): self.delete(0, Tags.End.value)
 
@@ -320,5 +322,3 @@ class EntryThemed(ttk.Entry, BaseTextTkinterWidget, CommandMixin):
                 kw[k] = v
 
         return super()._options(cnf, kw)
-
-
