@@ -100,16 +100,8 @@ class ScrollbarThemed(ttk.Scrollbar, BaseTkinterWidget):
 class TreeViewThemed(ttk.Treeview, BaseTkinterWidget, CommandMixin):
     last_focus: int or str
     focus_tags: List[str] = []
-    def __init__(self, master: tk.Frame, Color: dict = None, **kwargs):
+    def __init__(self, master: tk.Frame,  **kwargs):
         ttk.Treeview.__init__(self, master=master, **kwargs)
-        if Color:
-            self.configure(activebackground=Color['ABG'])
-            self.configure(activeforeground=Color['AFG'])
-            self.configure(background=Color['BG'])
-            self.configure(disabledforeground=Color['DFG'])
-            self.configure(foreground=Color['FG'])
-            self.configure(highlightbackground=Color['HBG'])
-            self.configure(highlightcolor=Color['HFG'])
 
     def _setCommand(self):
         self.bind(Bindings.TreeViewSelect.value, self._cmd)
@@ -234,20 +226,10 @@ class ButtonThemed(ttk.Button, BaseTextTkinterWidget, ImageMixin, CommandMixin):
         command, compound, default, height,
         overrelief, state, width
     """
-    def __init__(self, master, Text: str = '', Override_var: tk.StringVar = None, Color: dict = None, Command: callable = None, **kwargs):
+    def __init__(self, master, Text: str = '', Override_var: tk.StringVar = None,  Command: callable = None, **kwargs):
         ttk.Button.__init__(self, master=master, **kwargs)
         cmd = kwargs.pop('command', None)
         if cmd: self.SetCommand(cmd)
-        if Color:
-            self.configure(activebackground=Color['ABG'])
-            self.configure(activeforeground=Color['AFG'])
-            self.configure(background=Color['BG'])
-            self.configure(disabledforeground='black')
-            self.configure(foreground=Color['FG'])
-            self.configure(highlightbackground='light gray')
-            self.configure(highlightcolor='black')
-            self.configure(highlightbackground=Color['HBG'])
-            self.configure(highlightcolor=Color['HFG'])
 
         if Command: self.SetCommand(Command)
         BaseTextTkinterWidget.__init__(self, Override_var=Override_var, Text=Text)
@@ -282,20 +264,9 @@ class LabelThemed(ttk.Label, BaseTextTkinterWidget, ImageMixin):
         height, state, width
 
     """
-    def __init__(self, master, Text: str = '', Override_var: tk.StringVar = None, Color: dict = None, **kwargs):
+    def __init__(self, master, Text: str = '', Override_var: tk.StringVar = None,  **kwargs):
         ttk.Label.__init__(self, master=master, **kwargs)
         BaseTextTkinterWidget.__init__(self, Override_var=Override_var, Text=Text)
-
-        if Color:
-            self.configure(activebackground=Color['ABG'])
-            self.configure(activeforeground=Color['AFG'])
-            self.configure(background=Color['BG'])
-            self.configure(disabledforeground='black')
-            self.configure(foreground=Color['FG'])
-            self.configure(highlightbackground='light gray')
-            self.configure(highlightcolor='black')
-            self.configure(highlightbackground=Color['HBG'])
-            self.configure(highlightcolor=Color['HFG'])
 
     def _options(self, cnf, kwargs=None) -> dict:
         kw = { }
@@ -321,17 +292,9 @@ class EntryThemed(ttk.Entry, BaseTextTkinterWidget, CommandMixin):
     textvariable, validate, validatecommand, vcmd, width,
     xscrollcommand.
     """
-    def __init__(self, master, Color: dict = None, Text: str = '', Override_var: tk.StringVar = None, **kwargs):
+    def __init__(self, master,  Text: str = '', Override_var: tk.StringVar = None, **kwargs):
         ttk.Entry.__init__(self, master=master, **kwargs)
         BaseTextTkinterWidget.__init__(self, Override_var=Override_var, Text=Text)
-        if Color:
-            self.configure(background=Color['BG'])
-            self.configure(disabledforeground='black')
-            self.configure(foreground=Color['FG'])
-            self.configure(highlightbackground='light gray')
-            self.configure(highlightcolor='black')
-            self.configure(highlightbackground=Color['HBG'])
-            self.configure(highlightcolor=Color['HFG'])
 
     def Clear(self): self.delete(0, Tags.End.value)
 

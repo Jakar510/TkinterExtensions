@@ -61,20 +61,10 @@ class Button(tk.Button, BaseTextTkinterWidget, ImageMixin, CommandMixin):
         command, compound, default, height,
         overrelief, state, width
     """
-    def __init__(self, master, Text: str = '', Override_var: tk.StringVar = None, Color: dict = None, Command: callable = None, **kwargs):
+    def __init__(self, master, Text: str = '', Override_var: tk.StringVar = None,  Command: callable = None, **kwargs):
         tk.Button.__init__(self, master=master, **kwargs)
         cmd = kwargs.pop('command', None)
         if cmd: self.SetCommand(cmd)
-        if Color:
-            self.configure(activebackground=Color['ABG'])
-            self.configure(activeforeground=Color['AFG'])
-            self.configure(background=Color['BG'])
-            self.configure(disabledforeground='black')
-            self.configure(foreground=Color['FG'])
-            self.configure(highlightbackground='light gray')
-            self.configure(highlightcolor='black')
-            self.configure(highlightbackground=Color['HBG'])
-            self.configure(highlightcolor=Color['HFG'])
 
         if Command: self.SetCommand(Command)
         BaseTextTkinterWidget.__init__(self, Override_var=Override_var, Text=Text)
@@ -109,20 +99,9 @@ class Label(tk.Label, BaseTextTkinterWidget, ImageMixin, CommandMixin):
         height, state, width
 
     """
-    def __init__(self, master, Text: str = '', Override_var: tk.StringVar = None, Color: dict = None, **kwargs):
+    def __init__(self, master, Text: str = '', Override_var: tk.StringVar = None,  **kwargs):
         tk.Label.__init__(self, master=master, **kwargs)
         BaseTextTkinterWidget.__init__(self, Override_var=Override_var, Text=Text)
-
-        if Color:
-            self.configure(activebackground=Color['ABG'])
-            self.configure(activeforeground=Color['AFG'])
-            self.configure(background=Color['BG'])
-            self.configure(disabledforeground='black')
-            self.configure(foreground=Color['FG'])
-            self.configure(highlightbackground='light gray')
-            self.configure(highlightcolor='black')
-            self.configure(highlightbackground=Color['HBG'])
-            self.configure(highlightcolor=Color['HFG'])
 
     def _options(self, cnf, kwargs=None) -> dict:
         kw = { }
@@ -152,17 +131,9 @@ class Entry(tk.Entry, BaseTextTkinterWidget, CommandMixin):
     textvariable, validate, validatecommand, vcmd, width,
     xscrollcommand.
     """
-    def __init__(self, master, Color: dict = None, Text: str = '', Override_var: tk.StringVar = None, **kwargs):
+    def __init__(self, master,  Text: str = '', Override_var: tk.StringVar = None, **kwargs):
         tk.Entry.__init__(self, master=master, **kwargs)
         BaseTextTkinterWidget.__init__(self, Override_var=Override_var, Text=Text)
-        if Color:
-            self.configure(background=Color['BG'])
-            self.configure(disabledforeground='black')
-            self.configure(foreground=Color['FG'])
-            self.configure(highlightbackground='light gray')
-            self.configure(highlightcolor='black')
-            self.configure(highlightbackground=Color['HBG'])
-            self.configure(highlightcolor=Color['HFG'])
 
     def Clear(self):
         self.delete(0, Tags.End.value)
@@ -283,16 +254,12 @@ class Listbox(tk.Listbox, BaseTextTkinterWidget, CommandMixin):
     Allowed WordWrap modes are ('word', 'none', 'char')
     """
     _Current_ListBox_Index: int = None
-    def __init__(self, master, *, Command: callable = None, z=None, Color: dict = None, selectMode: str = tk.SINGLE, **kwargs):
+    def __init__(self, master, *, Command: callable = None, z=None,  selectMode: str = tk.SINGLE, **kwargs):
         if 'SelectMode' in kwargs: selectMode = kwargs.pop('SelectMode')
         if 'selectmode' in kwargs: selectMode = kwargs.pop('selectmode')
         assert (selectMode in (tk.SINGLE, tk.MULTIPLE))
         tk.Listbox.__init__(self, master=master, selectmode=selectMode, **kwargs)
         if Command is not None: self.SetCommand(Command, z=z)
-        if Color:
-            self.configure(background=Color['BG'])
-            self.configure(disabledforeground=Color['DFG'])
-            self.configure(foreground=Color['FG'])
         # if Color:
         #     self.configure(activebackground=Color['ABG'])
         #     self.configure(activeforeground=Color['AFG'])

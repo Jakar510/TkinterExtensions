@@ -139,7 +139,29 @@ class BaseTkinterWidget(tk.Widget, ABC):
         self._SetState(state=ViewState.Hidden)
         return True
 
+    @staticmethod
+    def convert_kwargs(kwargs: dict) -> dict:
+        d = {}
+        for k, v in kwargs.items():
+            d[str(k).lower()] = v
 
+        return d
+
+    def SetColors(self, text: str, background: str):
+        if background: self.configure(background=background)
+        if text: self.configure(foreground=text)
+        return self
+    def SetActiveColors(self, text: str, background: str):
+        if background: self.configure(activebackground=background)
+        if text: self.configure(activeforeground=text)
+        return self
+    def SetHighlightColors(self, text: str, background: str):
+        if background:  self.configure(highlightcolor=text)
+        if text: self.configure(highlightbackground=background)
+        return self
+    def SetDisabledColor(self, color: str):
+        if color: self.configure(disabledforeground=color)
+        return self
 
     def Bind(self, sequence: str or Enum = None, func: callable = None, add: bool = None) -> str:
         if isinstance(sequence, Enum): sequence = sequence.value
@@ -416,4 +438,3 @@ class ImageMixin:
             self.configure(image=self._IMG)
 
         return self
-
