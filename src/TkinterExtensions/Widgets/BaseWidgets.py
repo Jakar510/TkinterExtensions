@@ -369,7 +369,9 @@ class CallWrapper(object):
 
     @classmethod
     def Create(cls, func: callable, z: int or str = None, widget: BaseTkinterWidget = None, **kwargs):
-        if kwargs and func:
+        if z is not None and kwargs and func:
+            return cls(lambda x=kwargs: func(z, **x), widget=widget)
+        elif kwargs and func:
             return cls(lambda x=kwargs: func(**x), widget=widget)
         elif z is not None and func:
             return cls(lambda x=z: func(x), widget=widget)
