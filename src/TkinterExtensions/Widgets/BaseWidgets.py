@@ -336,7 +336,7 @@ class BaseTextTkinterWidget(BaseTkinterWidget):
 
 
 
-class CallWrapper(object):
+class CallWrapper(tk.CallWrapper):
     """Internal class. Stores function to call when some user
     defined Tcl function is called e.g. after an event occurred."""
 

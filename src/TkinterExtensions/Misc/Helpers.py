@@ -9,16 +9,16 @@ import sys
 import threading
 import time
 from abc import ABC
+from types import FunctionType, MethodType
 from typing import Union
 
 from PIL import Image
-from PythonDebugTools import PRINT
 
 
 
 
 __all__ = [
-        'ResizePhoto', 'CalculateOffset', 'RoundFloat', 'AutoCounter', 'AutoStartThread', 'sizeof', 'IsImage', 'AutoStartTargetedThread', 'Wait'
+        'ResizePhoto', 'CalculateOffset', 'RoundFloat', 'AutoCounter', 'AutoStartThread', 'sizeof', 'IsImage', 'AutoStartTargetedThread', 'Wait', 'IsMethod', 'IsFunction'
         ]
 
 def RoundFloat(Float: float, Precision: int) -> str:
@@ -105,3 +105,28 @@ class AutoCounter(object):
     def value(self) -> int: return self._value
 
 def Wait(delay: Union[int, float]): time.sleep(delay)
+
+
+
+def IsMethod(o) -> bool:
+    """
+        Checks if passed object is a method
+
+        https://stackoverflow.com/questions/37455426/advantages-of-using-methodtype-in-python
+    :param o: object being checked
+    :type o: any
+    :return: weather it is a method
+    :rtype: bool
+    """
+    return isinstance(o, MethodType)
+def IsFunction(o) -> bool:
+    """
+        Checks if passed object is a function
+
+        https://stackoverflow.com/questions/37455426/advantages-of-using-methodtype-in-python
+    :param o: object being checked
+    :type o: any
+    :return: weather it is a method
+    :rtype: bool
+    """
+    return isinstance(o, FunctionType)
