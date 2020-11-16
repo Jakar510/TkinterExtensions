@@ -4,7 +4,7 @@
 #
 # ------------------------------------------------------------------------------
 from enum import Enum
-from typing import List
+from typing import Dict, List, Tuple, Union
 
 from .BaseWidgets import *
 from ..Events import Bindings, TkinterEvent
@@ -96,7 +96,7 @@ class ScrollbarThemed(ttk.Scrollbar, BaseTkinterWidget):
         return super()._options(cnf, kw)
 
 
-
+class DelimiterError(Exception): pass
 class TreeViewThemed(ttk.Treeview, BaseTkinterWidget, CommandMixin):
     last_focus: int or str
     focus_tags: List[str] = []
@@ -116,31 +116,62 @@ class TreeViewThemed(ttk.Treeview, BaseTkinterWidget, CommandMixin):
     def SetItems(self, items: list or tuple or dict, *, clear: bool = True):
         assert (isinstance(items, (list, tuple, dict)))
         if clear: self.Clear()
-        self._json_tree(tree=self, parent='', dictionary=items)
-    def _json_tree(self, tree: ttk.Treeview, parent: str, dictionary: list or tuple or dict):
+        self._json_tree(tree=self, parent='', d=items)
+    def _json_tree(self, tree: ttk.Treeview, parent: str,
+                   d: Union[List, Tuple, Dict[str, Union[List, Tuple, Dict[str, Union[List, Tuple, Dict[str, Union[List, Tuple, Dict, str]], str]], str]]]):
         GroupName = ''
-        for key in dictionary:
-            try:
-                uid, GroupName = key.split('=')
-            except (AttributeError, ValueError):
-                uid = key
-            if isinstance(dictionary[key], dict):
-                tree.insert(parent, 'end', uid, text=key)
-                self._json_tree(tree, uid, dictionary[key])
+        if isinstance(d, dict):
+            for key, value in d.items():
+                try:
+                    uid, GroupName = key.split('=')
+                except (AttributeError, ValueError):
+                    uid = key
+                if isinstance(value, dict):
+                    tree.insert(parent, tk.END, uid, text=key)
+                    self._json_tree(tree, uid, value)
 
-            elif isinstance(dictionary[key], (list, tuple)):
-                tree.insert(parent, 'end', uid, text=GroupName)
-                result = { }
-                for x in dictionary[key]:
-                    k, v = x.split('=')
-                    result[k] = v
-                self._json_tree(tree, uid, result)
+                elif isinstance(value, (list, tuple)):
+                    tree.insert(parent, tk.END, uid, text=GroupName)
+                    result = { }
+                    for x in value:
+                        if isinstance(x, str): k, v = x.split('=')
+                        else:
+                            k = x.ID  # Key Property
+                            v = x.Name  # Value Property
 
-            else:
-                value = dictionary[key]
-                if value is None:
-                    value = 'None'
-                tree.insert(parent, 'end', uid, text=value)  # text=key, value=value)
+                        result[k] = v
+
+                    self._json_tree(tree, uid, result)
+
+                else:
+                    if value is None: value = 'None'
+                    tree.insert(parent, tk.END, uid, text=value)  # text=key, value=value)
+        elif isinstance(d, (list, tuple)):
+            for item in d:
+                if isinstance(item, str):
+                    try:
+                        GroupName, children = item.split(':')
+                    except (AttributeError, ValueError) as e:
+                        raise DelimiterError('GroupName must be delimited by a :') from e
+
+                    tree.insert(parent, tk.END, GroupName, text=GroupName)
+                    result = { }
+                    try:
+                        for x in children.split(','):
+                            try:
+                                k, v = x.split('=')
+                                result[k] = v
+                            except (AttributeError, ValueError) as e:
+                                raise DelimiterError('Key Value Pair must be delimited by a =') from e
+                    except (AttributeError, ValueError) as e:
+                        raise DelimiterError('Key Value Pairs must be delimited by a ,') from e
+
+                    self._json_tree(tree, GroupName, result)
+
+                else: self._json_tree(tree, parent, item)
+
+
+
 
 
     def OnSelectRow(self, event: tkEvent):
