@@ -268,12 +268,10 @@ class Listbox(tk.Listbox, BaseTextTkinterWidget, CommandMixin):
         self.activate(index)
         self.selection_clear(0, Tags.End.value)
         self.selection_set(index)
-        self.focus_set()
         self._Current_ListBox_Index = index
     def SelectRows(self, *args):
         if args:
             self.selection_clear(0, Tags.End.value)
-            self.focus_set()
             for index in args:
                 if isinstance(index, int):
                     self.activate(index)
