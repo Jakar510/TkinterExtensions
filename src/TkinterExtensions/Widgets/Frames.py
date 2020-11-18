@@ -7,6 +7,7 @@
 from enum import Enum
 from typing import Union
 
+from .BaseApp import BaseApp
 from ..Widgets.BaseWidgets import *
 from ..Widgets.base import *
 
@@ -16,8 +17,9 @@ from ..Widgets.base import *
 __all__ = ['Frame', 'LabelFrame']
 
 class Frame(tk.Frame, BaseTkinterWidget):
-    def __init__(self, master, **kwargs):
+    def __init__(self, master, app: BaseApp = None, **kwargs):
         tk.Frame.__init__(self, master=master, **kwargs)
+        self.app = app
 
     def __name__(self, InstanceID: Union[str, int, Enum]):
         if isinstance(InstanceID, Enum): InstanceID = InstanceID.value
@@ -50,9 +52,10 @@ class LabelFrame(tk.LabelFrame, BaseTextTkinterWidget):
         height, labelanchor, labelwidget,
         visual, width
     """
-    def __init__(self, master, text: str = '', **kwargs):
+    def __init__(self, master, app: BaseApp = None, text: str = '', **kwargs):
         tk.LabelFrame.__init__(self, master=master, text=text, **kwargs)
-        BaseTextTkinterWidget.__init__(self, Override_var=None, text=text, configure=False)
+        BaseTextTkinterWidget.__init__(self, text=text, configure=False)
+        self.app = app
 
     @property
     def txt(self) -> str: return self._txt.get()

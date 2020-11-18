@@ -61,6 +61,8 @@ class _rootMixin:
     def width(self) -> int: return self.winfo_width()
     @property
     def height(self) -> int: return self.winfo_height()
+
+
 # noinspection DuplicatedCode
 class tkRoot(tk.Tk, _rootMixin):
     def __init__(self, Screen_Width: int = None, Screen_Height: int = None, x: int = 0, y: int = 0, fullscreen: bool = None, **kwargs):
