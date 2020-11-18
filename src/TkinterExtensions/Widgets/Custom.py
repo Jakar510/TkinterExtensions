@@ -19,7 +19,7 @@ __all__ = [
 
 class ButtonGrid(Frame, ABC):
     _buttons: Dict[int, Button] = { }
-    def __init__(self, *, master, rows: int = None, cols: int = None, padx: int = 0, pady: int = 0, **kwargs):
+    def __init__(self, *, master, rows: int = None, cols: int = None, padx: int = 0, pady: int = 0, **Button_kwargs):
         """
         :param master: parent of this grid
         :type master: Frame, LabelFrame, tkRoot, tkTopLevel
@@ -44,8 +44,8 @@ class ButtonGrid(Frame, ABC):
         if len(self.ButtonTitles) != self._Count:
             raise ValueError(f"len(self.ButtonTitles) [ {len(self.ButtonTitles)} ]  does not match Number Of Buttons [ {self._Count} ]")
 
-        self._MakeGrid(kwargs, padx, pady)
-    def _MakeGrid(self, kwargs: dict, padx: int, pady: int):
+        self._MakeGrid(padx, pady, **Button_kwargs)
+    def _MakeGrid(self, padx: int, pady: int, **Button_kwargs):
         for r in range(self._rows): self.Grid_RowConfigure(r, weight=1)
         for c in range(self._cols): self.Grid_ColumnConfigure(c, weight=1)
 
@@ -56,7 +56,7 @@ class ButtonGrid(Frame, ABC):
                 r += 1
                 c = 0
 
-            self._buttons[i] = Button(self, text=self.ButtonTitles[i], **kwargs).Grid(row=r, column=c, padx=padx, pady=pady).SetCommand(self.ButtonCommands[i])
+            self._buttons[i] = Button(self, text=self.ButtonTitles[i], **Button_kwargs).Grid(row=r, column=c, padx=padx, pady=pady).SetCommand(self.ButtonCommands[i])
             c += 1
 
     def HideAll(self):
