@@ -70,15 +70,22 @@ class Root(tkRoot):
         # self.Bind(Bindings.Key, self.HandlePress)
         # self.Bind(Bindings.ButtonPress, self.HandlePress)
         # self.Bind(Bindings.ButtonRelease, self.HandlePress)
-        AutoStartTargetedThread(target=self.__run__)
+
+
+        self.nb = NotebookThemed(master=self).PlaceFull()
+
+        self.p1 = Label(master=self.nb, text='page 1').PlaceFull()
+        self.nb.Add(self.p1, title='page 1')
+
+        self.p2 = Button(master=self.nb, text='page 2').PlaceFull()
+        self.nb.Add(self.p2, title='page 2')
+
+        # AutoStartTargetedThread(target=self.__run__)
 
     @staticmethod
     def HandlePress(event: tkEvent): TkinterEvent.Debug(event)
 
-    def Run(self):
-        threading.Thread(target=self.__run__, daemon=True)#.start()
-
-        self.mainloop()
+    def Run(self): self.mainloop()
 
     def __run__(self):
         while True:

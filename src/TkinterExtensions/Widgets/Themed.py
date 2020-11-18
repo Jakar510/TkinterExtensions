@@ -6,6 +6,8 @@
 from enum import Enum
 from typing import Dict, List, Tuple, Union
 
+from PythonDebugTools import PRINT
+
 from .BaseWidgets import *
 from ..Events import Bindings, TkinterEvent
 from ..Misc.Enumerations import *
@@ -16,7 +18,7 @@ from ..Widgets.base import *
 
 
 __all__ = [
-        'TreeViewThemed', 'TreeViewHolderThemed', 'ComboBoxThemed', 'ButtonThemed', 'EntryThemed', 'LabelThemed',
+        'TreeViewThemed', 'TreeViewHolderThemed', 'ComboBoxThemed', 'ButtonThemed', 'EntryThemed', 'LabelThemed', 'NotebookThemed',
         ]
 
 """
@@ -353,3 +355,128 @@ class EntryThemed(ttk.Entry, BaseTextTkinterWidget, CommandMixin):
                 kw[k] = v
 
         return super()._options(cnf, kw)
+
+
+
+class NotebookThemed(BaseTextTkinterWidget, ttk.Notebook):
+    def __init__(self, master, Color: dict = None, **kwargs):
+        ttk.Notebook.__init__(self, master=master, **kwargs)
+        BaseTkinterWidget.__init__(self, Color=Color)
+
+    def _options(self, cnf, kwargs=None) -> dict:
+        kw = { }
+        if isinstance(kwargs, dict):
+            for k, v in kwargs.items():
+                if isinstance(v, Enum): v = v.value
+                kw[k] = v
+
+        return super()._options(cnf, kw)
+
+    def Add(self, w: BaseTkinterWidget, add: dict = dict(padding=2), *, title: str, **kwargs) -> int:
+        """Adds a new tab to the notebook.
+
+        If window is currently managed by the notebook but hidden, it is restored to its previous position."""
+        index = self.add(w, **add)
+        self.tab(index, text=title, **kwargs)
+        return index
+    def add(self, child: BaseTkinterWidget, **kw) -> int:
+        """Adds a new tab to the notebook.
+
+        If window is currently managed by the notebook but hidden, it is restored to its previous position.
+
+        Returns the index of the child. """
+        ttk.Notebook.add(self, child, **kw)
+        return self.index_of(child)
+
+    def hide_tab(self, tab_id: Union[int, str]):
+        """Hides the tab specified by tab_id.
+
+        The tab will not be displayed, but the associated window remains managed by the notebook and its configuration remembered.
+        Hidden tabs may be restored with the add command."""
+        return ttk.Notebook.hide(self, tab_id)
+    def forget(self, tab_id: Union[int, str]):
+        """Removes the tab specified by tab_id, unmaps and unmanages the associated window."""
+        return ttk.Notebook.forget(self, tab_id)
+    def identify(self, x: int, y: int) -> Union[int, str]:
+        """Returns the name of the tab element at position x, y, or the empty string if none."""
+        return ttk.Notebook.identify(self, x, y)
+
+    def index_of(self, widget: Union[BaseTkinterWidget, str]) -> int:
+        if not isinstance(widget, str): _w = str(widget)
+        else: _w = widget
+
+        for i, w in enumerate(self.tabs()):
+            if w == _w: return i
+
+        raise ValueError(f'widget {widget} is not found in the tabs.')
+    def index(self, tab_id: Union[int, str]):
+        """Returns the numeric index of the tab specified by tab_id, or the total number of tabs if tab_id is the string "end"."""
+        return ttk.Notebook.index(self, tab_id)
+
+    def insert(self, pos: int, child: BaseTkinterWidget, **kw):
+        """Inserts a pane at the specified position.
+
+        pos is either the string end, an integer index, or the name of a managed child.
+        If child is already managed by the notebook, moves it to the specified position."""
+        return ttk.Notebook.insert(self, pos, child, **kw)
+
+    def select(self, tab_id: Union[int, str] = None) -> Union[int, str]:
+        """Selects the specified tab.
+
+        The associated child window will be displayed, and the previously-selected window (if different) is unmapped.
+        If tab_id is omitted, returns the widget name of the currently selected pane."""
+        return ttk.Notebook.select(self, tab_id)
+
+    def tab(self, tab_id: Union[int, str], option: str = None, **kw) -> Union[dict, Union[int, str]]:
+        """Query or modify the options of the specific tab_id.
+
+        If kw is not given, returns a dict of the tab option values.
+
+        If option is specified, returns the value of that option.
+
+        Otherwise, sets the options to the corresponding values."""
+        return ttk.Notebook.tab(self, tab_id, option, **kw)
+    def tabs(self) -> List[BaseTkinterWidget]:
+        """Returns a list of windows managed by the notebook."""
+        return ttk.Notebook.tabs(self)
+
+    def enable_traversal(self):
+        """Enable keyboard traversal for a toplevel window containing this notebook.
+
+        This will extend the bindings for the toplevel window containing this notebook as follows:
+
+            Control-Tab: selects the tab following the currently selected one
+
+            Shift-Control-Tab: selects the tab preceding the currently selected one
+
+            Alt-K: where K is the mnemonic (underlined) character of any tab, will select that tab.
+
+
+        Multiple notebooks in a single toplevel may be enabled for traversal, including nested notebooks.
+        However, notebook traversal only works properly if all panes are direct children of the notebook.
+
+
+        The only, and good, difference I see is about mnemonics, which works after calling this method.
+        Control-Tab and Shift-Control-Tab always works (here at least).
+        """
+        return ttk.Notebook.enable_traversal(self)
+
+
+    @property
+    def ActiveTab(self) -> Union[int, str]: return self.select()
+    @ActiveTab.setter
+    def ActiveTab(self, tab_id: Union[int, str]): self.select(tab_id)
+
+
+    @property
+    def txt(self) -> str: return self.tab(self.ActiveTab, option='text')
+    @txt.setter
+    def txt(self, value: str): self.tab(self.ActiveTab, text=value)
+
+
+    @property
+    def wrap(self) -> int: return self.tab(self.ActiveTab, option='wraplength')
+    @wrap.setter
+    def wrap(self, value: int):
+        assert (isinstance(value, int))
+        self.tab(self.ActiveTab, wraplength=self._wrap)
