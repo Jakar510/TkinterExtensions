@@ -3,7 +3,7 @@
 #  Copyright (c) 2020.
 #
 # ------------------------------------------------------------------------------
-from enum import Enum
+from enum import Enum, IntEnum
 
 from ..Widgets.Style import *
 from ..Widgets.base import *
@@ -11,7 +11,13 @@ from ..Widgets.base import *
 
 
 
-__all__ = ['tkRoot', 'tkTopLevel']
+__all__ = [
+        'tkRoot', 'tkTopLevel', 'Orientation',
+        ]
+
+class Orientation(IntEnum):
+    Landscape = 0
+    Portrait = 1
 
 # noinspection PyUnresolvedReferences
 class _rootMixin:
@@ -62,6 +68,8 @@ class _rootMixin:
     @property
     def height(self) -> int: return self.winfo_height()
 
+    @property
+    def Orientation(self) -> Orientation: return Orientation.Landscape if self.Screen_Width > self.Screen_Height else Orientation.Portrait
 
 # noinspection DuplicatedCode
 class tkRoot(tk.Tk, _rootMixin):
