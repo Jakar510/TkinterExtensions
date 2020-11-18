@@ -15,8 +15,7 @@ __all__ = ['BaseApp']
 class BaseApp(object):
     """ Override to extend functionallity. Intented to be the base class for the Application level class, which is passed to all child windows and frames. """
     logger: Logger
-    def __init__(self):
-        self.root = tkRoot()
+    root: tkRoot
 
     @property
     def DEBUG(self) -> bool: return __debug__
