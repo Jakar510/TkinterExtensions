@@ -4,7 +4,7 @@
 #
 # ------------------------------------------------------------------------------
 from enum import Enum
-from typing import List, Union
+from typing import Iterable, List, Tuple, Union
 
 from .BaseWidgets import *
 from ..Events import Bindings, TkinterEvent
@@ -16,7 +16,7 @@ from ..Widgets.base import *
 
 
 __all__ = [
-        'TreeViewThemed', 'TreeViewHolderThemed', 'ComboBoxThemed', 'ButtonThemed', 'EntryThemed', 'LabelThemed', 'NotebookThemed', 'ListItem',
+        'TreeViewThemed', 'TreeViewHolderThemed', 'ComboBoxThemed', 'ButtonThemed', 'EntryThemed', 'LabelThemed', 'NotebookThemed', 'ListItem', 'ItemCollection',
         ]
 
 """
@@ -96,6 +96,7 @@ class ScrollbarThemed(ttk.Scrollbar, BaseTkinterWidget):
         return super()._options(cnf, kw)
 
 
+class DelimiterError(Exception): pass
 class ListItem(dict):
     @property
     def ID(self) -> str: return self.get("ID", None)
@@ -105,7 +106,7 @@ class ListItem(dict):
     def Children(self):
         """
         :return:
-        :rtype: List[ListItem3] or None
+        :rtype: ItemCollection or None
         """
         return self.get("Children", None)
 
@@ -114,7 +115,7 @@ class ListItem(dict):
         if isinstance(d, dict):
             if "Children" in d:
                 if not isinstance(d["Children"], list): raise TypeError(f"""Expecting {list} got type {type(d["Children"])}""")
-                d["Children"] = list(map(ListItem.Parse, d["Children"]))
+                d["Children"] = ItemCollection.Parse(d["Children"])
 
             return ListItem(d)
 
@@ -133,7 +134,29 @@ class ListItem(dict):
         :rtype: ListItem
         """
         return ListItem.Parse(dict(ID=ID, Name=Name, Children=Children))
-class DelimiterError(Exception): pass
+class ItemCollection(list):
+    def __init__(self, d: Union[List[ListItem], Iterable[ListItem]]):
+        super().__init__(d)
+
+    def __setitem__(self, key: int, value: ListItem): return super().__setitem__(key, value)
+    def __getitem__(self, key: int) -> ListItem: return super().__getitem__(key)
+    def Slice(self, key: slice): return ItemCollection(super().__getitem__(key))
+
+    def __iter__(self) -> Iterable[ListItem]: return super().__iter__()
+    def enumerate(self) -> Iterable[Tuple[int, ListItem]]: return enumerate(self)
+    def Iter(self) -> Iterable[int]: return range(len(self))
+
+    def Names(self) -> Iterable[str]: return map(lambda o: getattr(o, 'Name'), self)
+    def IDs(self) -> Iterable[str]: return map(lambda o: getattr(o, 'ID'), self)
+
+
+
+    @classmethod
+    def Parse(cls, d):
+        if isinstance(d, list):
+            return cls(map(ListItem.Parse, d))
+
+        raise TypeError(f"""Expecting {list} got type {type(d)}""")
 class TreeViewThemed(ttk.Treeview, BaseTkinterWidget, CommandMixin):
     last_focus: int or str
     focus_tags: List[str] = []
@@ -149,12 +172,17 @@ class TreeViewThemed(ttk.Treeview, BaseTkinterWidget, CommandMixin):
         if tags:
             for tag, kwargs in tags.items():
                 self.tag_configure(tag, **kwargs)
+    def SetTagsIter(self, tags: dict) -> Iterable:
+        if tags:
+            for tag, kwargs in tags.items():
+                yield self.tag_configure(tag, **kwargs)
+
     def Clear(self): self.delete(*self.get_children())
-    def SetItems(self, items: Union[ListItem, List[ListItem]], *, clear: bool = True):
-        assert (isinstance(items, (list, tuple, dict)))
+
+    def SetItems(self, items: Union[ListItem, ItemCollection], *, clear: bool = True):
         if clear: self.Clear()
-        self._json_tree(d=items)
-    def _json_tree(self, d: Union[ListItem, List[ListItem]], *, parent: str = ''):
+        self._json_tree(items)
+    def _json_tree(self, d: Union[ListItem, ItemCollection], *, parent: str = ''):
         if not d: return
         if not isinstance(parent, str): return
 
@@ -162,14 +190,13 @@ class TreeViewThemed(ttk.Treeview, BaseTkinterWidget, CommandMixin):
             self.insert(parent, index=tk.END, iid=d.ID, text=d.Name)
             self._json_tree(d.Children, parent=d.ID)
 
-        elif isinstance(d, list):
+        elif isinstance(d, ItemCollection):
             for item in d:
                 if not isinstance(item, ListItem): raise TypeError(type(item), (ListItem,))
                 self.insert(parent, index=tk.END, iid=item.ID, text=item.Name)
                 self._json_tree(item.Children, parent=item.ID)
 
-        else: raise TypeError(type(d), (ListItem, list))
-
+        else: raise TypeError(type(d), (ListItem, ItemCollection))
 
 
 
