@@ -150,7 +150,7 @@ class TreeViewThemed(ttk.Treeview, BaseTkinterWidget, CommandMixin):
             for tag, kwargs in tags.items():
                 self.tag_configure(tag, **kwargs)
     def Clear(self): self.delete(*self.get_children())
-    def SetItems(self, items: list or tuple or dict, *, clear: bool = True):
+    def SetItems(self, items: Union[ListItem, List[ListItem]], *, clear: bool = True):
         assert (isinstance(items, (list, tuple, dict)))
         if clear: self.Clear()
         self._json_tree(d=items)
