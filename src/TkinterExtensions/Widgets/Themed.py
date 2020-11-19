@@ -4,9 +4,7 @@
 #
 # ------------------------------------------------------------------------------
 from enum import Enum
-from typing import Dict, List, Tuple, Union
-
-from PythonDebugTools import PRINT
+from typing import List, Union
 
 from .BaseWidgets import *
 from ..Events import Bindings, TkinterEvent
@@ -18,7 +16,7 @@ from ..Widgets.base import *
 
 
 __all__ = [
-        'TreeViewThemed', 'TreeViewHolderThemed', 'ComboBoxThemed', 'ButtonThemed', 'EntryThemed', 'LabelThemed', 'NotebookThemed',
+        'TreeViewThemed', 'TreeViewHolderThemed', 'ComboBoxThemed', 'ButtonThemed', 'EntryThemed', 'LabelThemed', 'NotebookThemed', 'ListItem',
         ]
 
 """
@@ -98,6 +96,43 @@ class ScrollbarThemed(ttk.Scrollbar, BaseTkinterWidget):
         return super()._options(cnf, kw)
 
 
+class ListItem(dict):
+    @property
+    def ID(self) -> str: return self.get("ID", None)
+    @property
+    def Name(self) -> str: return self.get("Name", None)
+    @property
+    def Children(self):
+        """
+        :return:
+        :rtype: List[ListItem3] or None
+        """
+        return self.get("Children", None)
+
+    @classmethod
+    def Parse(cls, d):
+        if isinstance(d, dict):
+            if "Children" in d:
+                if not isinstance(d["Children"], list): raise TypeError(f"""Expecting {list} got type {type(d["Children"])}""")
+                d["Children"] = list(map(ListItem.Parse, d["Children"]))
+
+            return ListItem(d)
+
+        raise TypeError(f"""Expecting {dict} got type {type(d)}""")
+
+    @staticmethod
+    def Create(ID: str, Name: str, Children: List = None):
+        """
+        :param ID: Unique Identifier
+        :type ID: str
+        :param Name: Display Name
+        :type Name: str
+        :param Children: Nested ListItems
+        :type Children: List[ListItem]
+        :return:
+        :rtype: ListItem
+        """
+        return ListItem.Parse(dict(ID=ID, Name=Name, Children=Children))
 class DelimiterError(Exception): pass
 class TreeViewThemed(ttk.Treeview, BaseTkinterWidget, CommandMixin):
     last_focus: int or str
@@ -118,60 +153,22 @@ class TreeViewThemed(ttk.Treeview, BaseTkinterWidget, CommandMixin):
     def SetItems(self, items: list or tuple or dict, *, clear: bool = True):
         assert (isinstance(items, (list, tuple, dict)))
         if clear: self.Clear()
-        self._json_tree(tree=self, parent='', d=items)
-    def _json_tree(self, tree: ttk.Treeview, parent: str,
-                   d: Union[List, Tuple, Dict[str, Union[List, Tuple, Dict[str, Union[List, Tuple, Dict[str, Union[List, Tuple, Dict, str]], str]], str]]]):
-        GroupName = ''
-        if isinstance(d, dict):
-            for key, value in d.items():
-                try:
-                    uid, GroupName = key.split('=')
-                except (AttributeError, ValueError):
-                    uid = key
-                if isinstance(value, dict):
-                    tree.insert(parent, tk.END, uid, text=key)
-                    self._json_tree(tree, uid, value)
+        self._json_tree(d=items)
+    def _json_tree(self, d: Union[ListItem, List[ListItem]], *, parent: str = ''):
+        if not d: return
+        if not isinstance(parent, str): return
 
-                elif isinstance(value, (list, tuple)):
-                    tree.insert(parent, tk.END, uid, text=GroupName)
-                    result = { }
-                    for x in value:
-                        if isinstance(x, str): k, v = x.split('=')
-                        else:
-                            k = x.ID  # Key Property
-                            v = x.Name  # Value Property
+        if isinstance(d, ListItem):
+            self.insert(parent, index=tk.END, iid=d.ID, text=d.Name)
+            self._json_tree(d.Children, parent=d.ID)
 
-                        result[k] = v
-
-                    self._json_tree(tree, uid, result)
-
-                else:
-                    if value is None: value = 'None'
-                    tree.insert(parent, tk.END, uid, text=value)  # text=key, value=value)
-        elif isinstance(d, (list, tuple)):
+        elif isinstance(d, list):
             for item in d:
-                if isinstance(item, str):
-                    try:
-                        GroupName, children = item.split(':')
-                    except (AttributeError, ValueError) as e:
-                        raise DelimiterError('GroupName must be delimited by a :') from e
+                if not isinstance(item, ListItem): raise TypeError(type(item), (ListItem,))
+                self.insert(parent, index=tk.END, iid=item.ID, text=item.Name)
+                self._json_tree(item.Children, parent=item.ID)
 
-                    tree.insert(parent, tk.END, GroupName, text=GroupName)
-                    result = { }
-                    try:
-                        for x in children.split(','):
-                            try:
-                                k, v = x.split('=')
-                                result[k] = v
-                            except (AttributeError, ValueError) as e:
-                                raise DelimiterError('Key Value Pair must be delimited by a =') from e
-                    except (AttributeError, ValueError) as e:
-                        raise DelimiterError('Key Value Pairs must be delimited by a ,') from e
-
-                    self._json_tree(tree, GroupName, result)
-
-                else: self._json_tree(tree, parent, item)
-
+        else: raise TypeError(type(d), (ListItem, list))
 
 
 
@@ -196,8 +193,6 @@ class TreeViewThemed(ttk.Treeview, BaseTkinterWidget, CommandMixin):
                 kw[k] = v
 
         return super()._options(cnf, kw)
-
-
 class TreeViewHolderThemed(Frame):
     """Construct a Ttk Treeview with master scale.
 
