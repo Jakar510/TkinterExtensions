@@ -4,7 +4,7 @@
 #
 # ------------------------------------------------------------------------------
 from enum import Enum
-from typing import Iterable, List, Tuple, Union
+from typing import Any, Dict, Iterable, List, Tuple, Union
 
 from .BaseWidgets import *
 from ..Events import Bindings, TkinterEvent
@@ -158,43 +158,60 @@ class ItemCollection(list):
 
         raise TypeError(f"""Expecting {list} got type {type(d)}""")
 class TreeViewThemed(ttk.Treeview, BaseTkinterWidget, CommandMixin):
+    """Construct a Ttk Treeview with parent master.
+
+    STANDARD OPTIONS
+
+        class, cursor, style, takefocus, xscrollcommand,
+        yscrollcommand
+
+    WIDGET-SPECIFIC OPTIONS
+
+        columns, displaycolumns, height, padding, selectmode, show
+
+    ITEM OPTIONS
+
+        text, image, values, open, tags
+
+    TAG OPTIONS
+
+        foreground, background, font, image
+    """
     last_focus: int or str
     focus_tags: List[str] = []
-    def __init__(self, master: tk.Frame, Color: dict = None, **kwargs):
-        ttk.Treeview.__init__(self, master=master, **kwargs)
+    def __init__(self, master: tk.Frame, Color: dict = None, selectmode: SelectionMode = SelectionMode.Browse, **kwargs):
+        ttk.Treeview.__init__(self, master=master, selectmode=selectmode.value, **kwargs)
         BaseTkinterWidget.__init__(self, Color)
 
     def _setCommand(self):
         self.bind(Bindings.TreeViewSelect.value, self._cmd)
         return self
 
-    def SetTags(self, tags: dict):
-        if tags:
-            for tag, kwargs in tags.items():
-                self.tag_configure(tag, **kwargs)
-    def SetTagsIter(self, tags: dict) -> Iterable:
+    def SetTags(self, **tags: Dict[str, Dict[str, Any]]):
+        for _ in self.SetTagsIter(tags): pass
+    def SetTagsIter(self, tags: Dict[str, Dict[str, Any]]) -> Iterable:
         if tags:
             for tag, kwargs in tags.items():
                 yield self.tag_configure(tag, **kwargs)
 
     def Clear(self): self.delete(*self.get_children())
 
-    def SetItems(self, items: Union[ListItem, ItemCollection], *, clear: bool = True):
+    def SetItems(self, items: Union[ListItem, ItemCollection], *, clear: bool = True, Open: bool = True):
         if clear: self.Clear()
-        self._json_tree(items)
-    def _json_tree(self, d: Union[ListItem, ItemCollection], *, parent: str = ''):
+        self._json_tree(items, Open=Open)
+    def _json_tree(self, d: Union[ListItem, ItemCollection], *, parent: str = '', Open: bool):
         if not d: return
         if not isinstance(parent, str): return
 
         if isinstance(d, ListItem):
-            self.insert(parent, index=tk.END, iid=d.ID, text=d.Name)
-            self._json_tree(d.Children, parent=d.ID)
+            self.insert(parent, index=tk.END, iid=d.ID, text=d.Name, open=Open)
+            self._json_tree(d.Children, parent=d.ID, Open=Open)
 
         elif isinstance(d, ItemCollection):
             for item in d:
                 if not isinstance(item, ListItem): raise TypeError(type(item), (ListItem,))
-                self.insert(parent, index=tk.END, iid=item.ID, text=item.Name)
-                self._json_tree(item.Children, parent=item.ID)
+                self.insert(parent, index=tk.END, iid=item.ID, text=item.Name, open=Open)
+                self._json_tree(item.Children, parent=item.ID, Open=Open)
 
         else: raise TypeError(type(d), (ListItem, ItemCollection))
 

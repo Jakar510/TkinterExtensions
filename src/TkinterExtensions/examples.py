@@ -123,6 +123,7 @@ d = ItemCollection.Parse([
         ])
 
 class Root(tkRoot):
+    SelectedItems: List = []
     # sets up Tkinter and creates the other windows and places them accordingly.
     def __init__(self):
         super().__init__(Screen_Width=800, Screen_Height=480, x=100, y=100)
@@ -145,13 +146,30 @@ class Root(tkRoot):
 
         self.nb = NotebookThemed(master=self).PlaceFull()
 
-        self.p1 = Label(master=self.nb, text='page 1').PlaceFull()
-        self.nb.Add(self.p1, title='page 1')
-
         self.p2 = TreeViewHolderThemed(master=self.nb, backgroundColor='white').PlaceFull()
-        self.nb.Add(self.p2, title='page 2')
-        self.p2.TreeView.SetItems(d)
+        self.nb.Add(self.p2, title='page 1')
+        self.TreeView = self.p2.TreeView
+
+        self.TreeView.SetItems(d)
+        self.TreeView.SetCommand(self.OnClick)
+        bold_font = "-family {Segoe UI Black} -size 12 -weight bold -slant roman -underline 0 -overstrike 0"
+        font = "-family {Segoe UI Black} -size 12 -slant roman -underline 0 -overstrike 0"
+        self.TreeView.SetTags(sel=dict(foreground='green', font=bold_font), none=dict(foreground='black'))
+
+        self.p1 = Label(master=self.nb, text='page 1').PlaceFull()
+        self.nb.Add(self.p1, title='page 2')
+
         # AutoStartTargetedThread(target=self.__run__)
+
+
+    # noinspection PyUnusedLocal
+    def OnClick(self, event: tk.Event = None):
+        IDs = self.TreeView.selection()
+        for _id in IDs:
+            if _id in self.SelectedItems: self.TreeView.item(_id, tags='none')
+            else: self.TreeView.item(_id, tags='sel')
+
+        self.SelectedItems = self.TreeView.tag_has('sel')
 
     @staticmethod
     def HandlePress(event: tkEvent): TkinterEvent.Debug(event)
