@@ -3,8 +3,11 @@
 #  Copyright (c) 2020.
 #
 # ------------------------------------------------------------------------------
+import random
 from enum import Enum
 from typing import Any, Dict, Iterable, List, Tuple, Union
+
+from PythonDebugTools import PRINT
 
 from .BaseWidgets import *
 from ..Events import Bindings, TkinterEvent
@@ -181,10 +184,35 @@ class TreeViewThemed(ttk.Treeview, BaseTkinterWidget, CommandMixin):
     focus_tags: List[str] = []
     SelectedItems: List = []
     items: Union[ListItem, ItemCollection] = None
+
     def __init__(self, master: tk.Frame, Color: dict = None, selectmode: SelectionMode = SelectionMode.Extended, **kwargs):
         ttk.Treeview.__init__(self, master=master, selectmode=selectmode.value, **kwargs)
         BaseTkinterWidget.__init__(self, Color)
         self.SetCommand(self.OnSelectRow)
+
+        self.foreground = self.CreateForegroundColorTags()
+        self.background = self.CreateBackgroundColorTags()
+        for color, kw in self.foreground.items(): self.tag_configure(color, **kw)
+        for color, kw in self.background.items(): self.tag_configure(color, **kw)
+
+    @staticmethod
+    def CreateForegroundColorTags(*colors) -> dict: return TreeViewThemed.CreateColorTags(*colors, kw='foreground')
+    @staticmethod
+    def CreateBackgroundColorTags(*colors) -> dict: return TreeViewThemed.CreateColorTags(*colors, kw='background')
+    @staticmethod
+    def CreateColorTags(*colors, kw: str) -> dict:
+        """
+            https://stackoverflow.com/questions/48358084/how-to-change-the-foreground-or-background-colour-of-a-selected-cell-in-tkinter/48361639
+
+        :param colors: a list of strings passed as arguments to be converted into tag dictionaries
+        :type colors: str
+        :param kw: the keyword to change in the tag dictionary
+        :type kw: str
+        :return: tag dictionary
+        :rtype: dict
+        """
+        if not colors: colors = ("red", "green", "black", "blue", "white", "yellow", "orange", "pink", "grey", "purple", "brown")
+        return { f'{kw}_{c}': { kw: c } for c in colors }
 
     def _setCommand(self, add: bool):
         self.command_cb = self.Bind(Bindings.TreeViewSelect, self._cmd, add=add)
@@ -220,6 +248,7 @@ class TreeViewThemed(ttk.Treeview, BaseTkinterWidget, CommandMixin):
         else: raise TypeError(type(d), (ListItem, ItemCollection))
 
 
+    def selection(self) -> Tuple[str]: return super(TreeViewThemed, self).selection()
 
     # noinspection PyUnusedLocal
     def OnSelect(self, event: tkEvent = None):
@@ -234,11 +263,14 @@ class TreeViewThemed(ttk.Treeview, BaseTkinterWidget, CommandMixin):
     # noinspection PyUnusedLocal
     def OnSelectRow(self, event: tkEvent = None):
         for _id in self.selection():
-            print('_id', _id, self.tag_has('sel', _id))
-            if self.tag_has('sel', _id): self.item(_id, tags='')
-            else: self.item(_id, tags='sel')
+            fg = random.choice(tuple(self.foreground.values()))
+            bg = random.choice(tuple(self.background.values()))
+            if self.tag_has('sel', _id): self.item(_id, tags=[''])
+            else: self.item(_id, tags=['sel', fg, bg])
 
         self.SelectedItems = self.tag_has('sel')
+        PRINT('TreeView_SelectedItems', _id=_id, fg=fg, bg=bg, SelectedItems=self.SelectedItems)
+
     def _options(self, cnf, kwargs=None) -> dict:
         kw = { }
         if isinstance(kwargs, dict):

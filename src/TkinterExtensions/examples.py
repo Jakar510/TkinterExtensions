@@ -124,7 +124,6 @@ d = ItemCollection.Parse([
         ])
 
 class Root(tkRoot):
-    SelectedItems: List = []
     # sets up Tkinter and creates the other windows and places them accordingly.
     def __init__(self):
         super().__init__(Screen_Width=800, Screen_Height=480, x=100, y=100)
@@ -164,13 +163,7 @@ class Root(tkRoot):
 
     # noinspection PyUnusedLocal
     def OnClick(self, event: tk.Event = None):
-        for _id in self.TreeView.selection():
-            print('_id', _id, self.TreeView.tag_has('sel', _id))
-            if self.TreeView.tag_has('sel', _id): self.TreeView.item(_id, tags='')
-            else: self.TreeView.item(_id, tags='sel')
-
-        self.SelectedItems = self.TreeView.tag_has('sel')
-        PRINT('SelectedItems', SelectedItems=self.SelectedItems)
+        self.TreeView.OnSelectRow(event)
 
     @staticmethod
     def HandlePress(event: tkEvent): TkinterEvent.Debug(event)

@@ -15,7 +15,7 @@ Please read [CONTRIBUTING.md](.github/CONTRIBUTING.md) for details on our code o
 * **Tyler Stegmaier** - *Initial work* - [Jakar510](https://github.com/Jakar510)
 * **Paolo Gurisatti** - *tk_html_widgets* - [paolo-gurisatti](https://github.com/paolo-gurisatti)
 * **Ole Jakob Skjelten** - *AnimatedGIF* - [olesk75](https://github.com/olesk75)
-* **Pete Mojeiko** - *tkinter-keyboard* - [petemojeiko](https://ghttps://github.com/petemojeiko)
+* **Pete Mojeiko** - *tkinter-keyboard* - [petemojeiko](https://github.com/petemojeiko)
 
 ## License
 
