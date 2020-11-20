@@ -16,6 +16,7 @@ from urllib.request import urlopen
 
 from PIL import Image, ImageTk
 
+from types import FunctionType, MethodType
 from ..Misc.Enumerations import *
 from ..Misc.Helpers import *
 from ..Widgets.base import *
@@ -337,8 +338,7 @@ class BaseTextTkinterWidget(BaseTkinterWidget):
 
 
 class CallWrapper(tk.CallWrapper):
-    """Internal class. Stores function to call when some user
-    defined Tcl function is called e.g. after an event occurred."""
+    """ Internal class. Stores function to call when some user defined Tcl function is called e.g. after an event occurred. """
 
     _func: callable
     _widget: Union[BaseTextTkinterWidget, BaseTkinterWidget] = None
@@ -380,6 +380,7 @@ class CallWrapper(tk.CallWrapper):
 
         return None
 class CurrentValue(CallWrapper):
+    """ Stores function to call when some user defined Tcl function is called e.g. after an event occurred. Passes the current value of the widget to the funciton. """
     def __call__(self, *args, **kwargs): return self._func(self._widget.txt, *args, **kwargs)
     def SetWidget(self, w):
         """
@@ -399,19 +400,31 @@ class CurrentValue(CallWrapper):
 class CommandMixin:
     _cmd: CallWrapper
     configure: callable
+    command_cb: str
     def __call__(self, *args, **kwargs):
         """ Execute the Command """
         if callable(self._cmd): self._cmd(*args, **kwargs)
-    def SetCommand(self, func: Union[callable, CurrentValue], z: Union[int, float, str, Enum] = None, **kwargs):
+    def SetCommand(self, func: Union[callable, FunctionType, MethodType, CurrentValue], z: Union[int, float, str, Enum] = None, add: bool = False, **kwargs):
+        """
+        :param func: function or method being called.
+        :type func: Union[callable, FunctionType, MethodType, CurrentValue]
+        :param z: arg passed to the fucntion.
+        :type z: Union[int, float, str, Enum]
+        :param add: if False, replaces the current function.
+        :type add: bool
+        :param kwargs: keyword args passed to the function.
+        :type kwargs: Dict[str, Any]
+        :return: returns self to enable chaining.
+        """
         if not callable(func):
             raise ValueError(f'func is not callable. got {type(func)}')
 
         if isinstance(func, CurrentValue): self._cmd = func.SetWidget(self)
         else: self._cmd = CallWrapper.Create(func, z, **kwargs)
 
-        return self._setCommand()
-    def _setCommand(self):
-        self.configure(command=self._cmd)
+        return self._setCommand(add)
+    def _setCommand(self, add: bool):
+        self.configure(command=self._cmd, add=add)
         return self
 class ImageMixin:
     width: int

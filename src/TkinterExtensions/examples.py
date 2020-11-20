@@ -9,6 +9,7 @@ import random
 from time import sleep
 from typing import Union
 
+from PythonDebugTools import *
 from TkinterExtensions.Widgets.KeyBoard import *
 from . import *
 from .Events import *
@@ -143,18 +144,17 @@ class Root(tkRoot):
         # self.Bind(Bindings.ButtonPress, self.HandlePress)
         # self.Bind(Bindings.ButtonRelease, self.HandlePress)
 
+        self.nb = NotebookThemed(master=self, height=30).PlaceFull()
 
-        self.nb = NotebookThemed(master=self).PlaceFull()
-
+        self.style.configure('Treeview', rowheight=40, font="-family {Segoe UI Black} -size 12 -slant roman -underline 0 -overstrike 0")
         self.p2 = TreeViewHolderThemed(master=self.nb, backgroundColor='white').PlaceFull()
         self.nb.Add(self.p2, title='page 1')
         self.TreeView = self.p2.TreeView
 
         self.TreeView.SetItems(d)
         self.TreeView.SetCommand(self.OnClick)
-        bold_font = "-family {Segoe UI Black} -size 12 -weight bold -slant roman -underline 0 -overstrike 0"
-        font = "-family {Segoe UI Black} -size 12 -slant roman -underline 0 -overstrike 0"
-        self.TreeView.SetTags(sel=dict(foreground='green', font=bold_font), none=dict(foreground='black'))
+        bold_font = "-family {Segoe UI Black} -size 16 -weight bold -slant roman -underline 0 -overstrike 0"
+        self.TreeView.SetTags(sel=dict(foreground='green', font=bold_font))
 
         self.p1 = Label(master=self.nb, text='page 1').PlaceFull()
         self.nb.Add(self.p1, title='page 2')
@@ -164,12 +164,13 @@ class Root(tkRoot):
 
     # noinspection PyUnusedLocal
     def OnClick(self, event: tk.Event = None):
-        IDs = self.TreeView.selection()
-        for _id in IDs:
-            if _id in self.SelectedItems: self.TreeView.item(_id, tags='none')
+        for _id in self.TreeView.selection():
+            print('_id', _id, self.TreeView.tag_has('sel', _id))
+            if self.TreeView.tag_has('sel', _id): self.TreeView.item(_id, tags='')
             else: self.TreeView.item(_id, tags='sel')
 
         self.SelectedItems = self.TreeView.tag_has('sel')
+        PRINT('SelectedItems', SelectedItems=self.SelectedItems)
 
     @staticmethod
     def HandlePress(event: tkEvent): TkinterEvent.Debug(event)

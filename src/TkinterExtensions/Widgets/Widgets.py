@@ -112,8 +112,8 @@ class Label(tk.Label, BaseTextTkinterWidget, ImageMixin, CommandMixin):
 
         return super()._options(cnf, kw)
 
-    def _setCommand(self):
-        self.bind(Bindings.ButtonPress, func=self._cmd)
+    def _setCommand(self, add: bool):
+        self.command_cb = self.Bind(Bindings.ButtonPress, func=self._cmd, add=add)
         return self
 
 
@@ -138,8 +138,8 @@ class Entry(tk.Entry, BaseTextTkinterWidget, CommandMixin):
     def Clear(self):
         self.delete(0, Tags.End.value)
 
-    def _setCommand(self):
-        self.bind(Bindings.ButtonPress.value, self._cmd)
+    def _setCommand(self, add: bool):
+        self.command_cb = self.Bind(Bindings.ButtonPress.value, self._cmd, add=add)
         return self
 
     @property
@@ -349,8 +349,8 @@ class Listbox(tk.Listbox, BaseTextTkinterWidget, CommandMixin):
     def Append(self, value: str): self.insert(Tags.End.value, value)
 
 
-    def _setCommand(self):
-        self.bind(Bindings.ListboxSelect.value, self._cmd)
+    def _setCommand(self, add: bool):
+        self.command_cb = self.Bind(Bindings.ListboxSelect, self._cmd, add=add)
         return self
     def ResetColors(self, color: str):
         for i in range(self.size()):
@@ -545,8 +545,8 @@ class Text(tk.Text, BaseTextTkinterWidget, CommandMixin):
                 kw[k] = v
 
         return super()._options(cnf, kw)
-    def _setCommand(self):
-        self.bind(Bindings.ButtonPress, func=self._cmd)
+    def _setCommand(self, add: bool):
+        self.command_cb = self.Bind(Bindings.ButtonPress, func=self._cmd, add=add)
         return self
 
 
@@ -579,6 +579,6 @@ class ScrolledText(Frame, BaseTextTkinterWidget, CommandMixin):
 
         return super()._options(cnf, kw)
 
-    def _setCommand(self):
-        self.tb.bind(Bindings.ButtonPress, func=self._cmd)
+    def _setCommand(self, add: bool):
+        self.command_cb = self.tb.Bind(Bindings.ButtonPress, func=self._cmd, add=add)
         return self

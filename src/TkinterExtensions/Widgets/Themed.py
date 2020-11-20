@@ -67,8 +67,8 @@ class ComboBoxThemed(ttk.Combobox, BaseTextTkinterWidget, CommandMixin):
     @value.setter
     def value(self, v: str): self._txt.set(v)
 
-    def _setCommand(self):
-        self.bind(Bindings.ComboboxSelected.value, self._cmd)
+    def _setCommand(self, add: bool):
+        self.command_cb = self.Bind(Bindings.ComboboxSelected, self._cmd, add=add)
         return self
 
     def SetValues(self, values: list or tuple):
@@ -179,29 +179,33 @@ class TreeViewThemed(ttk.Treeview, BaseTkinterWidget, CommandMixin):
     """
     last_focus: int or str
     focus_tags: List[str] = []
-    def __init__(self, master: tk.Frame, Color: dict = None, selectmode: SelectionMode = SelectionMode.Browse, **kwargs):
+    SelectedItems: List = []
+    items: Union[ListItem, ItemCollection] = None
+    def __init__(self, master: tk.Frame, Color: dict = None, selectmode: SelectionMode = SelectionMode.Extended, **kwargs):
         ttk.Treeview.__init__(self, master=master, selectmode=selectmode.value, **kwargs)
         BaseTkinterWidget.__init__(self, Color)
+        self.SetCommand(self.OnSelectRow)
 
-    def _setCommand(self):
-        self.bind(Bindings.TreeViewSelect.value, self._cmd)
+    def _setCommand(self, add: bool):
+        self.command_cb = self.Bind(Bindings.TreeViewSelect, self._cmd, add=add)
         return self
 
     def SetTags(self, **tags: Dict[str, Dict[str, Any]]):
-        for _ in self.SetTagsIter(tags): pass
-    def SetTagsIter(self, tags: Dict[str, Dict[str, Any]]) -> Iterable:
+        for _ in self.SetTagsIter(**tags): pass
+    def SetTagsIter(self, **tags: Dict[str, Dict[str, Any]]) -> Iterable[Tuple[str, Union[Dict[str, Any], str]]]:
         if tags:
             for tag, kwargs in tags.items():
-                yield self.tag_configure(tag, **kwargs)
+                yield tag, self.tag_configure(tag, **kwargs)
 
     def Clear(self): self.delete(*self.get_children())
 
     def SetItems(self, items: Union[ListItem, ItemCollection], *, clear: bool = True, Open: bool = True):
         if clear: self.Clear()
-        self._json_tree(items, Open=Open)
+        self.items = items
+        self._json_tree(self.items, Open=Open)
     def _json_tree(self, d: Union[ListItem, ItemCollection], *, parent: str = '', Open: bool):
         if not d: return
-        if not isinstance(parent, str): return
+        if not isinstance(parent, str): raise TypeError(type(parent), (str,))
 
         if isinstance(d, ListItem):
             self.insert(parent, index=tk.END, iid=d.ID, text=d.Name, open=Open)
@@ -217,18 +221,24 @@ class TreeViewThemed(ttk.Treeview, BaseTkinterWidget, CommandMixin):
 
 
 
-    def OnSelectRow(self, event: tkEvent):
-        if not isinstance(event, TkinterEvent): event = TkinterEvent(event)
-
+    # noinspection PyUnusedLocal
+    def OnSelect(self, event: tkEvent = None):
+        if not isinstance(event, TkinterEvent):
+            event = TkinterEvent(event)
         _iid = self.identify_row(event.y)
-
         if _iid != self.last_focus:
             if self.last_focus:
                 self.item(self.last_focus, tags=[])
             self.item(_iid, tags=self.focus_tags)
             self.last_focus = _iid
-            print(event, _iid)
+    # noinspection PyUnusedLocal
+    def OnSelectRow(self, event: tkEvent = None):
+        for _id in self.selection():
+            print('_id', _id, self.tag_has('sel', _id))
+            if self.tag_has('sel', _id): self.item(_id, tags='')
+            else: self.item(_id, tags='sel')
 
+        self.SelectedItems = self.tag_has('sel')
     def _options(self, cnf, kwargs=None) -> dict:
         kw = { }
         if isinstance(kwargs, dict):
@@ -369,11 +379,10 @@ class EntryThemed(ttk.Entry, BaseTextTkinterWidget, CommandMixin):
         ttk.Entry.__init__(self, master=master, **kwargs)
         BaseTextTkinterWidget.__init__(self, Override_var=Override_var, text=text, Color=Color)
 
-
     def Clear(self): self.delete(0, Tags.End.value)
 
-    def _setCommand(self):
-        self.bind(Bindings.ButtonPress.value, self._cmd)
+    def _setCommand(self, add: bool):
+        self.command_cb = self.Bind(Bindings.ButtonPress, self._cmd, add=add)
         return self
 
     @property

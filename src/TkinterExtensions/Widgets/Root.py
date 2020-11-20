@@ -24,6 +24,7 @@ class _rootMixin:
     Style: Style = None
     Screen_Width: int = None
     Screen_Height: int = None
+
     def SetDimmensions(self, Screen_Width: int = None, Screen_Height: int = None, x: int = 0, y: int = 0):
         self.Screen_Width = Screen_Width or int(self.winfo_screenwidth())
         self.Screen_Height = Screen_Height or int(self.winfo_screenheight())
@@ -77,8 +78,7 @@ class tkRoot(tk.Tk, _rootMixin):
         super().__init__(**kwargs)
         self.SetDimmensions(Screen_Width, Screen_Height, x, y)
         if fullscreen is not None: self.SetFullScreen(fullscreen)
-
-        self.Style = Style(master=self)
+        self.style = Style(master=self)
 
     def _options(self, cnf, kwargs=None) -> dict:
         kw = { }
@@ -98,7 +98,7 @@ class tkTopLevel(tk.Toplevel, _rootMixin):
         self.SetDimmensions(Screen_Width, Screen_Height, x, y)
         if fullscreen is not None: self.SetFullScreen(fullscreen)
 
-        self.Style = master.Style
+        self.style = master.style
 
     def _options(self, cnf, kwargs=None) -> dict:
         kw = { }
