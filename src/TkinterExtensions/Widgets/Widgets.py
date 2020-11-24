@@ -1,13 +1,14 @@
 # ------------------------------------------------------------------------------
-#  Created by Tyler Stegmaier
+#  Created by Tyler Stegmaier.
+#  Property of TrueLogic Company.
 #  Copyright (c) 2020.
+# ------------------------------------------------------------------------------
 #
 # ------------------------------------------------------------------------------
 
 import base64
 import io
 import os
-from enum import Enum
 from typing import Tuple, Union
 from urllib.request import urlopen
 
@@ -24,21 +25,22 @@ __all__ = [
         'Entry', 'Label', 'Button', 'Listbox', 'CheckBox', 'Canvas', 'Text', 'CheckButton', 'ScrolledText', 'Scrollbar',
         ]
 
-"""
+TODO = """
 --Button
-Canvas
-CheckButton
+--Canvas
+--CheckButton
 --Entry
 --Frame
 --LabelFrame
 --Label
 --ListBox
-Message
+--Message
 Popupmenu
 RadioButton
 Scale
 Spinbox
-text
+Scrollbar
+--text
 """
 
 # noinspection DuplicatedCode
@@ -69,14 +71,7 @@ class Button(tk.Button, BaseTextTkinterWidget, ImageMixin, CommandMixin):
         if Command: self.SetCommand(Command)
         BaseTextTkinterWidget.__init__(self, Override_var=Override_var, text=text, Color=Color)
 
-    def _options(self, cnf, kwargs=None) -> dict:
-        kw = { }
-        if isinstance(kwargs, dict):
-            for k, v in kwargs.items():
-                if isinstance(v, Enum): v = v.value
-                kw[k] = v
-
-        return super()._options(cnf, kw)
+    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
 
 
 
@@ -103,15 +98,16 @@ class Label(tk.Label, BaseTextTkinterWidget, ImageMixin, CommandMixin):
         tk.Label.__init__(self, master=master, **kwargs)
         BaseTextTkinterWidget.__init__(self, Override_var=Override_var, text=text, Color=Color)
 
-    def _options(self, cnf, kwargs=None) -> dict:
-        kw = { }
-        if isinstance(kwargs, dict):
-            for k, v in kwargs.items():
-                if isinstance(v, Enum): v = v.value
-                kw[k] = v
+    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
 
-        return super()._options(cnf, kw)
+    def _setCommand(self, add: bool):
+        self.command_cb = self.Bind(Bindings.ButtonPress, func=self._cmd, add=add)
+        return self
 
+
+
+class Message(tk.Message, BaseTextTkinterWidget, CommandMixin):
+    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
     def _setCommand(self, add: bool):
         self.command_cb = self.Bind(Bindings.ButtonPress, func=self._cmd, add=add)
         return self
@@ -152,14 +148,7 @@ class Entry(tk.Entry, BaseTextTkinterWidget, CommandMixin):
     def Append(self, value: str):
         self.insert(Tags.End.value, value)
 
-    def _options(self, cnf, kwargs=None) -> dict:
-        kw = { }
-        if isinstance(kwargs, dict):
-            for k, v in kwargs.items():
-                if isinstance(v, Enum): v = v.value
-                kw[k] = v
-
-        return super()._options(cnf, kw)
+    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
 
 
 
@@ -231,14 +220,7 @@ class CheckBox(tk.Checkbutton, BaseTextTkinterWidget, ImageMixin, CommandMixin):
         else:
             self.deselect()
 
-    def _options(self, cnf, kwargs=None) -> dict:
-        kw = { }
-        if isinstance(kwargs, dict):
-            for k, v in kwargs.items():
-                if isinstance(v, Enum): v = v.value
-                kw[k] = v
-
-        return super()._options(cnf, kw)
+    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
 
 
 
@@ -385,14 +367,7 @@ class Listbox(tk.Listbox, BaseTextTkinterWidget, CommandMixin):
     @txt.setter
     def txt(self, value: str): self.ReplaceAtIndex(self._Current_ListBox_Index, value)
 
-    def _options(self, cnf, kwargs=None) -> dict:
-        kw = { }
-        if isinstance(kwargs, dict):
-            for k, v in kwargs.items():
-                if isinstance(v, Enum): v = v.value
-                kw[k] = v
-
-        return super()._options(cnf, kw)
+    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
 
 
 
@@ -428,14 +403,7 @@ class Canvas(tk.Canvas, BaseTkinterWidget):
         img_tk = ImageTk.PhotoImage(image)
         return img_tk, image.size, self.create_image(x, y, anchor=anchor, image=img_tk)
 
-    def _options(self, cnf, kwargs=None) -> dict:
-        kw = { }
-        if isinstance(kwargs, dict):
-            for k, v in kwargs.items():
-                if isinstance(v, Enum): v = v.value
-                kw[k] = v
-
-        return super()._options(cnf, kw)
+    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
 
     def HandlePress(self, event: tkEvent):
         """
@@ -503,26 +471,12 @@ class Canvas(tk.Canvas, BaseTkinterWidget):
 
 class CheckButton(tk.Checkbutton, BaseTextTkinterWidget, CommandMixin):
 
-    def _options(self, cnf, kwargs=None) -> dict:
-        kw = { }
-        if isinstance(kwargs, dict):
-            for k, v in kwargs.items():
-                if isinstance(v, Enum): v = v.value
-                kw[k] = v
-
-        return super()._options(cnf, kw)
+    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
 
 
 
 class Scrollbar(tk.Scrollbar, BaseTkinterWidget, CommandMixin):
-    def _options(self, cnf, kwargs=None) -> dict:
-        kw = { }
-        if isinstance(kwargs, dict):
-            for k, v in kwargs.items():
-                if isinstance(v, Enum): v = v.value
-                kw[k] = v
-
-        return super()._options(cnf, kw)
+    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
 
 
 
@@ -537,17 +491,11 @@ class Text(tk.Text, BaseTextTkinterWidget, CommandMixin):
     @txt.setter
     def txt(self, value: str): self.insert(self.GetIndex(1, 0), value)
 
-    def _options(self, cnf, kwargs=None) -> dict:
-        kw = { }
-        if isinstance(kwargs, dict):
-            for k, v in kwargs.items():
-                if isinstance(v, Enum): v = v.value
-                kw[k] = v
-
-        return super()._options(cnf, kw)
+    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
     def _setCommand(self, add: bool):
         self.command_cb = self.Bind(Bindings.ButtonPress, func=self._cmd, add=add)
         return self
+
 
 
 
@@ -570,15 +518,10 @@ class ScrolledText(Frame, BaseTextTkinterWidget, CommandMixin):
     @txt.setter
     def txt(self, value: str): self.tb.txt = value
 
-    def _options(self, cnf, kwargs=None) -> dict:
-        kw = { }
-        if isinstance(kwargs, dict):
-            for k, v in kwargs.items():
-                if isinstance(v, Enum): v = v.value
-                kw[k] = v
-
-        return super()._options(cnf, kw)
+    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
 
     def _setCommand(self, add: bool):
         self.command_cb = self.tb.Bind(Bindings.ButtonPress, func=self._cmd, add=add)
         return self
+
+

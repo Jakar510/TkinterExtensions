@@ -1,6 +1,8 @@
 # ------------------------------------------------------------------------------
-#  Created by Tyler Stegmaier
+#  Created by Tyler Stegmaier.
+#  Property of TrueLogic Company.
 #  Copyright (c) 2020.
+# ------------------------------------------------------------------------------
 #
 # ------------------------------------------------------------------------------
 
@@ -26,24 +28,45 @@ class Bindings(Enum):
     Map = '<Map>'
     Motion = '<Motion>'
     MouseWheel = '<MouseWheel>'
+    ShiftMouseWheel = '<Shift-MouseWheel>'
     Unmap = '<Unmap>'
     Visibility = '<Visibility>'
     WM_DELETE_WINDOW = 'WM_DELETE_WINDOW'
 
+
     # class Mouse(Enum):
     B1_Motion = '<B1-Motion>'
     B2_Motion = '<B2-Motion>'
+    B3_Motion = '<B3-Motion>'
+    B4_Motion = '<B4-Motion>'
+    B5_Motion = '<B5-Motion>'
+
     ButtonPress = '<Button>'
     ButtonPress1 = '<Button-1>'
     ButtonPress2 = '<Button-2>'
     ButtonPress3 = '<Button-3>'
+    ButtonPress4 = '<Button-4>'
+    ButtonPress5 = '<Button-5>'
+
+    ShiftButtonPress = '<Shift-Button>'
+    ShiftButtonPress1 = '<Shift-Button-1>'
+    ShiftButtonPress2 = '<Shift-Button-2>'
+    ShiftButtonPress3 = '<Shift-Button-3>'
+    ShiftButtonPress4 = '<Shift-Button-4>'
+    ShiftButtonPress5 = '<Shift-Button-5>'
+
     ButtonRelease = '<ButtonRelease>'
     ButtonRelease1 = '<ButtonRelease-1>'
     ButtonRelease2 = '<ButtonRelease-2>'
     ButtonRelease3 = '<ButtonRelease-3>'
+    ButtonRelease4 = '<ButtonRelease-4>'
+    ButtonRelease5 = '<ButtonRelease-5>'
+
     Double_Button = '<Double-Button>'
     Double_Button2 = '<Double-Button-2>'
     Double_Button3 = '<Double-Button-3>'
+    Double_Button4 = '<Double-Button-4>'
+    Double_Button5 = '<Double-Button-5>'
 
     # class UpperCase(Enum):
     A = 'A'
@@ -124,8 +147,8 @@ class Bindings(Enum):
     Prior = 'Prior'
     FocusIn = '<FocusIn>'
     FocusOut = '<FocusOut>'
-    Enter_Boundary = '<Enter>'
-    Leave_Boundary = '<Leave>'
+    Enter = '<Enter>'
+    Leave = '<Leave>'
     NextWindow = '<<NextWindow>>'
     PrevWindow = '<<PrevWindow>>'
 
@@ -147,7 +170,7 @@ class Bindings(Enum):
     Delete = 'Delete'
     Down = 'Down'
     End = 'End'
-    Enter = 'Enter'
+    EnterKey = 'Enter'
     Equal = 'equal'
     Escape = 'Escape'
     Home = 'Home'
@@ -203,6 +226,8 @@ class Bindings(Enum):
 
     # class ThemedTreeView(Enum):
     TreeViewSelect = '<<TreeviewSelect>>'
+    TreeviewOpen = '<<TreeviewOpen>>'
+    TreeviewClose = '<<TreeviewClose>>'
 
     # media controls XF86Audio
     XF86AudioPlay = 'XF86AudioPlay'
@@ -247,7 +272,7 @@ class Bindings(Enum):
         """
         if isinstance(keysym, str): keysym = Bindings.FromKeysym(keysym)
 
-        return keysym == Bindings.Enter or keysym == Bindings.KP_Enter or keysym == Bindings.Return
+        return keysym == Bindings.EnterKey or keysym == Bindings.KP_Enter or keysym == Bindings.Return
 
     @staticmethod
     def FromKeysym(keysym: str):

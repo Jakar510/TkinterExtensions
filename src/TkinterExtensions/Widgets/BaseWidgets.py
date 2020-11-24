@@ -1,6 +1,8 @@
 # ------------------------------------------------------------------------------
-#  Created by Tyler Stegmaier
+#  Created by Tyler Stegmaier.
+#  Property of TrueLogic Company.
 #  Copyright (c) 2020.
+# ------------------------------------------------------------------------------
 #
 # ------------------------------------------------------------------------------
 
@@ -11,12 +13,12 @@ import os
 from abc import ABC
 from enum import Enum
 from pprint import PrettyPrinter
+from types import FunctionType, MethodType
 from typing import Union
 from urllib.request import urlopen
 
 from PIL import Image, ImageTk
 
-from types import FunctionType, MethodType
 from ..Misc.Enumerations import *
 from ..Misc.Helpers import *
 from ..Widgets.base import *
@@ -88,7 +90,6 @@ class BaseTkinterWidget(tk.Widget, ABC):
     @property
     def height(self) -> int: return self.winfo_height()
 
-    # noinspection PyUnresolvedReferences
     def show(self, **kwargs) -> bool:
         """
         Shows the current widget or _root_frame, based on the current geometry manager.
@@ -118,7 +119,6 @@ class BaseTkinterWidget(tk.Widget, ABC):
         self._cb = self.after(10, self.OnAppearing)
         return True
 
-    # noinspection PyUnresolvedReferences
     def hide(self) -> bool:
         """
         Hides the current widget or _root_frame, based on the current geometry manager.
@@ -145,10 +145,13 @@ class BaseTkinterWidget(tk.Widget, ABC):
         return True
 
     @staticmethod
-    def convert_kwargs(kwargs: dict) -> dict:
-        d = {}
-        for k, v in kwargs.items():
-            d[str(k).lower()] = v
+    def convert_kwargs(kwargs: dict, lower: bool = True) -> dict:
+        d = { }
+        if isinstance(kwargs, dict):
+            for k, v in kwargs.items():
+                if isinstance(v, Enum): v = v.value
+                if lower: d[k] = v
+                else: d[str(k).lower()] = v
 
         return d
 
@@ -168,9 +171,26 @@ class BaseTkinterWidget(tk.Widget, ABC):
         if color: self.configure(disabledforeground=color)
         return self
 
+
+
     def Bind(self, sequence: str or Enum = None, func: callable = None, add: bool = None) -> str:
         if isinstance(sequence, Enum): sequence = sequence.value
         return self.bind(sequence, func, add)
+
+    def BindAll(self, sequence: str or Enum = None, func: callable = None, add: bool = None) -> str:
+        if isinstance(sequence, Enum): sequence = sequence.value
+        return self.bind_all(sequence, func, add)
+    def UnBindAll(self, sequence: str or Enum = None) -> str:
+        if isinstance(sequence, Enum): sequence = sequence.value
+        return self.unbind_all(sequence)
+
+    def BindClass(self, className, sequence: str or Enum = None, func: callable = None, add: bool = None) -> str:
+        if isinstance(sequence, Enum): sequence = sequence.value
+        return self.bind_class(className, sequence, func, add)
+    def UnBindClass(self, className, sequence: str or Enum = None) -> str:
+        if isinstance(sequence, Enum): sequence = sequence.value
+        return self.unbind_class(className, sequence)
+
 
 
     def Pack(self, cnf: dict = { }, **kwargs):
@@ -313,6 +333,8 @@ class BaseTkinterWidget(tk.Widget, ABC):
     def OnDisppearing(self):
         """ this is called just before widget disappears. override to implement desired effects """
         pass
+
+
 class BaseTextTkinterWidget(BaseTkinterWidget):
     _txt: tk.StringVar
     # noinspection PyMissingConstructor
@@ -424,7 +446,7 @@ class CommandMixin:
 
         return self._setCommand(add)
     def _setCommand(self, add: bool):
-        self.configure(command=self._cmd, add=add)
+        self.configure(command=self._cmd)
         return self
 class ImageMixin:
     width: int

@@ -1,42 +1,45 @@
 # ------------------------------------------------------------------------------
-#  Created by Tyler Stegmaier
+#  Created by Tyler Stegmaier.
+#  Property of TrueLogic Company.
 #  Copyright (c) 2020.
+# ------------------------------------------------------------------------------
 #
 # ------------------------------------------------------------------------------
 import random
-from enum import Enum
 from typing import Any, Dict, Iterable, List, Tuple, Union
 
 from PythonDebugTools import PRINT
 
 from .BaseWidgets import *
-from ..Events import Bindings, TkinterEvent
+from .Frames import *
+from .base import *
+from ..Events import *
 from ..Misc.Enumerations import *
-from ..Widgets.Frames import *
-from ..Widgets.base import *
 
 
 
 
 __all__ = [
-        'TreeViewThemed', 'TreeViewHolderThemed', 'ComboBoxThemed', 'ButtonThemed', 'EntryThemed', 'LabelThemed', 'NotebookThemed', 'ListItem', 'ItemCollection',
+        'TreeViewThemed', 'TreeViewHolderThemed', 'ListItem', 'ItemCollection', 'DelimiterError',
+        'ComboBoxThemed', 'ButtonThemed', 'EntryThemed', 'LabelThemed', 'NotebookThemed', 'SeparatorThemed', 'ScrollbarThemed',
         ]
 
-"""
-Button
+TODO = """
+--Button
 CheckButton
 --ComoboBox
-Entry
-Frame
-LabelFrame
-Label
-Notebook
+--Entry
+--Frame
+--LabelFrame
+--Label
+--Notebook
 PanedWidnow
 ProgressBar
 RadioButton
 Scale
 Separator
 SizeGrip
+Scrollbar
 --ThemedTreeView
 """
 
@@ -77,26 +80,16 @@ class ComboBoxThemed(ttk.Combobox, BaseTextTkinterWidget, CommandMixin):
     def SetValues(self, values: list or tuple):
         self.configure(values=values)
 
-    def _options(self, cnf, kwargs=None) -> dict:
-        kw = { }
-        if isinstance(kwargs, dict):
-            for k, v in kwargs.items():
-                if isinstance(v, Enum): v = v.value
-                kw[k] = v
-
-        return super()._options(cnf, kw)
+    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
 
 
 
 class ScrollbarThemed(ttk.Scrollbar, BaseTkinterWidget):
-    def _options(self, cnf, kwargs=None) -> dict:
-        kw = { }
-        if isinstance(kwargs, dict):
-            for k, v in kwargs.items():
-                if isinstance(v, Enum): v = v.value
-                kw[k] = v
+    def __init__(self, master, orientation: Orient, **kwargs):
+        super().__init__(master, orient=orientation.value, **kwargs)
 
-        return super()._options(cnf, kw)
+    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
+
 
 
 class DelimiterError(Exception): pass
@@ -185,7 +178,7 @@ class TreeViewThemed(ttk.Treeview, BaseTkinterWidget, CommandMixin):
     SelectedItems: List = []
     items: Union[ListItem, ItemCollection] = None
 
-    def __init__(self, master: tk.Frame, Color: dict = None, selectmode: SelectionMode = SelectionMode.Extended, **kwargs):
+    def __init__(self, master: FrameTypes, Color: dict = None, selectmode: SelectionMode = SelectionMode.Extended, **kwargs):
         ttk.Treeview.__init__(self, master=master, selectmode=selectmode.value, **kwargs)
         BaseTkinterWidget.__init__(self, Color)
         self.SetCommand(self.OnSelectRow)
@@ -248,6 +241,11 @@ class TreeViewThemed(ttk.Treeview, BaseTkinterWidget, CommandMixin):
         else: raise TypeError(type(d), (ListItem, ItemCollection))
 
 
+    def column(self, column, option=None, **kw):
+        return super(TreeViewThemed, self).column(column, option, **self.convert_kwargs(kw))
+    def heading(self, column, option=None, **kw):
+        return super(TreeViewThemed, self).heading(column, option, **self.convert_kwargs(kw))
+
     def selection(self) -> Tuple[str]: return super(TreeViewThemed, self).selection()
 
     # noinspection PyUnusedLocal
@@ -271,14 +269,7 @@ class TreeViewThemed(ttk.Treeview, BaseTkinterWidget, CommandMixin):
         self.SelectedItems = self.tag_has('sel')
         PRINT('TreeView_SelectedItems', _id=_id, fg=fg, bg=bg, SelectedItems=self.SelectedItems)
 
-    def _options(self, cnf, kwargs=None) -> dict:
-        kw = { }
-        if isinstance(kwargs, dict):
-            for k, v in kwargs.items():
-                if isinstance(v, Enum): v = v.value
-                kw[k] = v
-
-        return super()._options(cnf, kw)
+    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
 class TreeViewHolderThemed(Frame):
     """Construct a Ttk Treeview with master scale.
 
@@ -301,23 +292,30 @@ class TreeViewHolderThemed(Frame):
     """
     TreeView: TreeViewThemed
     vsb: ScrollbarThemed
-    def __init__(self, master, backgroundColor: str, **kwargs):
+    hsb: ScrollbarThemed
+    def __init__(self, master, backgroundColor: str, showScrollBars: ShowScrollBars = ShowScrollBars.Always, **kwargs):
         Frame.__init__(self, master=master, bg=backgroundColor, **kwargs)
 
-        self.TreeView = TreeViewThemed(master=self, **kwargs)
-        self.TreeView.pack(side='left', fill=tk.BOTH, expand=1)
+        for i in range(1): self.Grid_RowConfigure(i, weight=1)
+        for i in range(1): self.Grid_ColumnConfigure(i, weight=1)
 
-        self.vsb = ScrollbarThemed(master=self, orient="vertical", command=self).Pack(side='right', fill=Fill.y)
+        self.TreeView = TreeViewThemed(master=self, **kwargs).Grid(row=0, column=0)
+
+        self.vsb = ScrollbarThemed(master=self, orientation=Orient.Vertical, command=self.TreeView.yview).Grid(row=0, column=1, rowspan=2)
+        self.hsb = ScrollbarThemed(master=self, orientation=Orient.Horizonal, command=self.TreeView.xview).Grid(row=1, column=0)
+
         self.TreeView.configure(yscrollcommand=self.vsb.set)
+        self.TreeView.configure(xscrollcommand=self.hsb.set)
 
-    def _options(self, cnf, kwargs=None) -> dict:
-        kw = { }
-        if isinstance(kwargs, dict):
-            for k, v in kwargs.items():
-                if isinstance(v, Enum): v = v.value
-                kw[k] = v
+        if showScrollBars == ShowScrollBars.Never:
+            self.vsb.hide()
+            self.hsb.hide()
 
-        return super()._options(cnf, kw)
+        elif showScrollBars == ShowScrollBars.Always:
+            self.vsb.show()
+            self.hsb.show()
+
+    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
 
 
 
@@ -349,14 +347,7 @@ class ButtonThemed(ttk.Button, BaseTextTkinterWidget, ImageMixin, CommandMixin):
         if Command: self.SetCommand(Command)
         BaseTextTkinterWidget.__init__(self, Override_var=Override_var, text=text, Color=Color)
 
-    def _options(self, cnf, kwargs=None) -> dict:
-        kw = { }
-        if isinstance(kwargs, dict):
-            for k, v in kwargs.items():
-                if isinstance(v, Enum): v = v.value
-                kw[k] = v
-
-        return super()._options(cnf, kw)
+    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
 
 
 
@@ -383,14 +374,7 @@ class LabelThemed(ttk.Label, BaseTextTkinterWidget, ImageMixin):
         ttk.Label.__init__(self, master=master, **kwargs)
         BaseTextTkinterWidget.__init__(self, Override_var=Override_var, text=text, Color=Color)
 
-    def _options(self, cnf, kwargs=None) -> dict:
-        kw = { }
-        if isinstance(kwargs, dict):
-            for k, v in kwargs.items():
-                if isinstance(v, Enum): v = v.value
-                kw[k] = v
-
-        return super()._options(cnf, kw)
+    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
 
 
 
@@ -427,14 +411,7 @@ class EntryThemed(ttk.Entry, BaseTextTkinterWidget, CommandMixin):
     def Append(self, value: str):
         self.insert(Tags.End.value, value)
 
-    def _options(self, cnf, kwargs=None) -> dict:
-        kw = { }
-        if isinstance(kwargs, dict):
-            for k, v in kwargs.items():
-                if isinstance(v, Enum): v = v.value
-                kw[k] = v
-
-        return super()._options(cnf, kw)
+    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
 
 
 
@@ -443,14 +420,7 @@ class NotebookThemed(BaseTextTkinterWidget, ttk.Notebook):
         ttk.Notebook.__init__(self, master=master, **kwargs)
         BaseTkinterWidget.__init__(self, Color=Color)
 
-    def _options(self, cnf, kwargs=None) -> dict:
-        kw = { }
-        if isinstance(kwargs, dict):
-            for k, v in kwargs.items():
-                if isinstance(v, Enum): v = v.value
-                kw[k] = v
-
-        return super()._options(cnf, kw)
+    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
 
     def Add(self, w: BaseTkinterWidget, add: dict = dict(padding=2), *, title: str, **kwargs) -> int:
         """Adds a new tab to the notebook.
@@ -560,3 +530,9 @@ class NotebookThemed(BaseTextTkinterWidget, ttk.Notebook):
     def wrap(self, value: int):
         assert (isinstance(value, int))
         self.tab(self.ActiveTab, wraplength=self._wrap)
+
+
+
+class SeparatorThemed(ttk.Separator, BaseTkinterWidget):
+    def __init__(self, master, orientation: Orient = Orient.Horizonal):
+        super().__init__(master, orient=orientation.value)

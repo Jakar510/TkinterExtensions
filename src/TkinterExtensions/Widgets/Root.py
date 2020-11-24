@@ -1,6 +1,8 @@
 # ------------------------------------------------------------------------------
-#  Created by Tyler Stegmaier
+#  Created by Tyler Stegmaier.
+#  Property of TrueLogic Company.
 #  Copyright (c) 2020.
+# ------------------------------------------------------------------------------
 #
 # ------------------------------------------------------------------------------
 from enum import Enum, IntEnum
@@ -19,7 +21,7 @@ class Orientation(IntEnum):
     Landscape = 0
     Portrait = 1
 
-# noinspection PyUnresolvedReferences
+
 class _rootMixin:
     Style: Style = None
     Screen_Width: int = None
@@ -72,6 +74,7 @@ class _rootMixin:
     @property
     def Orientation(self) -> Orientation: return Orientation.Landscape if self.Screen_Width > self.Screen_Height else Orientation.Portrait
 
+
 # noinspection DuplicatedCode
 class tkRoot(tk.Tk, _rootMixin):
     def __init__(self, Screen_Width: int = None, Screen_Height: int = None, x: int = 0, y: int = 0, fullscreen: bool = None, **kwargs):
@@ -80,14 +83,7 @@ class tkRoot(tk.Tk, _rootMixin):
         if fullscreen is not None: self.SetFullScreen(fullscreen)
         self.style = Style(master=self)
 
-    def _options(self, cnf, kwargs=None) -> dict:
-        kw = { }
-        if isinstance(kwargs, dict):
-            for k, v in kwargs.items():
-                if isinstance(v, Enum): v = v.value
-                kw[k] = v
-
-        return super()._options(cnf, kw)
+    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
 
 
 # noinspection DuplicatedCode
@@ -100,11 +96,4 @@ class tkTopLevel(tk.Toplevel, _rootMixin):
 
         self.style = master.style
 
-    def _options(self, cnf, kwargs=None) -> dict:
-        kw = { }
-        if isinstance(kwargs, dict):
-            for k, v in kwargs.items():
-                if isinstance(v, Enum): v = v.value
-                kw[k] = v
-
-        return super()._options(cnf, kw)
+    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))

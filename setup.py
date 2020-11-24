@@ -1,13 +1,16 @@
 # ------------------------------------------------------------------------------
-#  Created by Tyler Stegmaier
+#  Created by Tyler Stegmaier.
+#  Property of TrueLogic Company.
 #  Copyright (c) 2020.
+# ------------------------------------------------------------------------------
 #
 # ------------------------------------------------------------------------------
+import importlib
 import os
 
 from setuptools import setup
 
-from src.TkinterExtensions import __author__, __classifiers__, __email__, __license__, __name__, __short_description__, __url__, __version__, __maintainer_email__, __maintainer__
+from src.TkinterExtensions import __author__, __classifiers__, __email__, __license__, __maintainer__, __maintainer_email__, __name__, __short_description__, __url__, __version__
 
 
 
@@ -15,8 +18,25 @@ from src.TkinterExtensions import __author__, __classifiers__, __email__, __lice
 with open(os.path.abspath("PyPiReadme.md"), "r") as f:
     long_description = f.read()
 
-with open(os.path.abspath("requirements.txt"), "r") as f:
-    install_requires = f.readlines()
+def getVersion(o):
+    if hasattr(o, '__version__'): return o.__version__
+    elif hasattr(o, 'version'): return o.version
+    elif hasattr(o, 'Version'): return o.Version
+    elif hasattr(o, 'VERSION'): return o.VERSION
+    else: raise AttributeError("can't get version")
+
+
+with open(os.path.abspath(r"D:\WorkSpace\TkinterExtensions\requirements.txt"), "r") as f:
+    install_requires = []
+    for line in f.readlines():
+        line = line.strip('\n')
+        if line == 'pillow': package = importlib.import_module('PIL')
+        else: package = importlib.import_module(line)
+        VERSION = getVersion(package)
+        if VERSION.__class__.__name__ == 'module': VERSION = getVersion(VERSION)
+
+        install_requires.append(f'{line}>={VERSION}')
+print('install_requires', install_requires)
 
 setup(name=__name__,
       version=__version__,

@@ -1,6 +1,8 @@
 # ------------------------------------------------------------------------------
 #  Created by Tyler Stegmaier.
+#  Property of TrueLogic Company.
 #  Copyright (c) 2020.
+# ------------------------------------------------------------------------------
 #
 # ------------------------------------------------------------------------------
 
@@ -43,7 +45,7 @@ __classifiers__ = [
         'Topic :: Software Development :: Build Tools',
 
         # Pick your license as you wish
-        'License :: MIT -- Free To Use But Restricted',
+        'License :: Free To Use But Restricted',
 
         # Support platforms
         'Operating System :: MacOS',

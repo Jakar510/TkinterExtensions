@@ -1,6 +1,8 @@
 # ------------------------------------------------------------------------------
-#  Created by Tyler Stegmaier
+#  Created by Tyler Stegmaier.
+#  Property of TrueLogic Company.
 #  Copyright (c) 2020.
+# ------------------------------------------------------------------------------
 #
 # ------------------------------------------------------------------------------
 
@@ -12,8 +14,13 @@ from tkinter.constants import *
 
 __all__ = [
         'ActiveStyle', 'AnchorAndSticky', 'Fill', 'Side', 'Relief', 'Orient', 'Wrap', 'BorderMode', 'Tags', 'ViewState', 'MenuItemTypes', 'SelectionMode', 'CanvasStyles', 'Layout',
-        'ViewArguments'
+        'ViewArguments', 'ShowScrollBars', 'Bools',
         ]
+
+class ShowScrollBars(IntEnum):
+    Never = 0
+    Always = 1
+    Auto = 2
 
 class Layout(IntEnum):
     place = 1
@@ -26,6 +33,12 @@ class ViewState(Enum):  # v _widget and button states
     Active = ACTIVE
     Hidden = HIDDEN  # Canvas state
 
+class Bools(IntEnum):
+    # NO = NO
+    # YES = YES
+
+    NO=FALSE=OFF=0
+    YES=TRUE=ON=1
 class AnchorAndSticky(Enum):
     North = N
     South = S
