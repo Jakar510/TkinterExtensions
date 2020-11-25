@@ -74,7 +74,7 @@ def _WidgetData(w) -> dict:
             'str(w)':                   str(w),
             'repr(w)':                  repr(w),
             'PI (position info)':       w.pi,
-            'master.children':          w.master.children,
+            'master.children':          w.root.children,
             'children':                 w.children,
             'winfo_id':                 w.winfo_id(),
             'winfo_name':               w.winfo_name(),

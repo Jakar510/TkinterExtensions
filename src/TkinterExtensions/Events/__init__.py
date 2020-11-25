@@ -13,7 +13,7 @@ from tkinter import Event as tkEvent, EventType as tkEventType
 
 
 
-__all__ = ['TkinterEvent', 'lazy_property', 'Bindings']
+__all__ = ['TkinterEvent', 'lazy_property', 'Bindings', 'tkEvent']
 
 class Bindings(Enum):
     """ https://www.tcl.tk/man/tcl8.6/TkCmd/event.htm """

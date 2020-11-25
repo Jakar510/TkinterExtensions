@@ -38,7 +38,7 @@ class HTMLScrolledText(ScrolledText):
         """ Fit widget height to wrapped lines """
         for h in range(1, 4):
             self.tb.config(height=h)
-            self.master.update()
+            self.root.update()
             if self.tb.yview()[1] >= 1:
                 break
         else:

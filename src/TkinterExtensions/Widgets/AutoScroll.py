@@ -12,7 +12,6 @@ import platform
 from .BaseWidgets import *
 from .Frames import *
 from .Themed import ScrollbarThemed
-from .base import *
 from ..Events import *
 from ..Misc.Enumerations import *
 
@@ -40,6 +39,7 @@ class AutoScroll(BaseTkinterWidget):
     hsb: ScrollbarThemed
     def __init__(self, master: BaseTkinterWidget, Color: dict = None):
         super().__init__(Color)
+        self.master = master
 
         if hasattr(self, 'xview') and callable(self.xview):
             self.hsb = ScrollbarThemed(master, orientation=Orient.Horizonal, command=self.xview).Grid(column=0, row=1, sticky=AnchorAndSticky.EastWest)
@@ -53,7 +53,6 @@ class AutoScroll(BaseTkinterWidget):
 
         master.Grid_RowConfigure(0, weight=1)
         master.Grid_ColumnConfigure(0, weight=1)
-
 
     @staticmethod
     def _autoscroll(sbar):
@@ -127,6 +126,3 @@ class AutoScroll(BaseTkinterWidget):
                 widget.xview_scroll(-1, 'units')
             elif event.num == 5:
                 widget.xview_scroll(1, 'units')
-
-
-

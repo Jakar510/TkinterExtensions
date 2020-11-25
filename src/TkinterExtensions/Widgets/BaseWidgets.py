@@ -90,6 +90,12 @@ class BaseTkinterWidget(tk.Widget, ABC):
     @property
     def height(self) -> int: return self.winfo_height()
 
+    @property
+    def x(self) -> int: return self.winfo_rootx()
+    @property
+    def y(self) -> int: return self.winfo_rooty()
+
+
     def show(self, **kwargs) -> bool:
         """
         Shows the current widget or _root_frame, based on the current geometry manager.
