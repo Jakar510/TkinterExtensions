@@ -148,6 +148,8 @@ class Entry(tk.Entry, BaseTextTkinterWidget, CommandMixin):
     def Append(self, value: str):
         self.insert(Tags.End.value, value)
 
+    def __iadd__(self, other: str): self.Append(other)
+
     def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
 
 

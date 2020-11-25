@@ -363,6 +363,10 @@ class BaseTextTkinterWidget(BaseTkinterWidget):
         self._wrap = value
         self.configure(wraplength=self._wrap)
 
+    def Append(self, v: str):
+        t = self.txt
+        t += v
+        self.txt = t
 
 
 class CallWrapper(tk.CallWrapper):
