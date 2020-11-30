@@ -8,8 +8,6 @@ import string
 from enum import IntEnum, IntFlag
 from typing import Dict, List, Union
 
-from PythonDebugTools import *
-
 from .BaseWidgets import *
 from .Frames import *
 from .Root import *
@@ -59,7 +57,6 @@ class PlacementSet(object):
 
     def __repr__(self): return repr(self._state)
 
-# PRINT('__Placement__', list(combinations(Placement, r=2)))
 
 
 class PopupKeyboard(tkTopLevel):
@@ -360,6 +357,40 @@ class KeyboardMixin:
 
     Usage:
     KeyboardEntry(master, keysize=6, keycolor='white').pack()
+
+    Example Class:
+
+        class KeyboardEntry(Entry, KeyboardMixin):
+            def __init__(self, master, *,
+                         root: tkRoot,
+                         placement: PlacementSet = PlacementSet(Placement.Auto),
+                         keysize: int = None,
+                         keycolor: str = None,
+                         insertbackground: str = 'red',
+                         insertborderwidth: int = 3,
+                         insertofftime: int = 1,
+                         insertontime: int = 1,
+                         insertwidth: int = 3,
+                         text: str = '',
+                         Override_var: tk.StringVar = None,
+                         Color: dict = None, **kwargs):
+                Entry.__init__(self, master,
+                               text=text,
+                               Override_var=Override_var,
+                               Color=Color,
+                               insertbackground=insertbackground,
+                               insertborderwidth=insertborderwidth,
+                               insertofftime=insertofftime,
+                               insertontime=insertontime,
+                               insertwidth=insertwidth,
+                               **kwargs)
+                KeyboardMixin.__init__(self,
+                                       master,
+                                       root=root,
+                                       placement=placement,
+                                       keysize=keysize,
+                                       keycolor=keycolor)
+
     """
     kb: Union[PopupKeyboard, None]
     Bind: callable
