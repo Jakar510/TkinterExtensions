@@ -22,7 +22,7 @@ from ..Widgets.base import *
 
 
 __all__ = [
-        'Entry', 'Label', 'Button', 'Listbox', 'CheckBox', 'Canvas', 'Text', 'CheckButton', 'ScrolledText', 'Scrollbar',
+        'Entry', 'Label', 'Button', 'Listbox', 'CheckButton', 'Canvas', 'Text', 'CheckButton', 'ScrolledText', 'Scrollbar',
         ]
 
 TODO = """
@@ -154,7 +154,7 @@ class Entry(tk.Entry, BaseTextTkinterWidget, CommandMixin):
 
 
 
-class CheckBox(tk.Checkbutton, BaseTextTkinterWidget, ImageMixin, CommandMixin):
+class CheckButton(tk.Checkbutton, BaseTextTkinterWidget, ImageMixin, CommandMixin):
     """Construct a checkbutton _widget with the master MASTER.
 
         Valid resource names:
@@ -468,12 +468,6 @@ class Canvas(tk.Canvas, BaseTkinterWidget):
         :rtype:
         """
         pass
-
-
-
-class CheckButton(tk.Checkbutton, BaseTextTkinterWidget, CommandMixin):
-
-    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
 
 
 
