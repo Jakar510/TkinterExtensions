@@ -359,7 +359,7 @@ class BaseTextTkinterWidget(BaseTkinterWidget):
     def wrap(self) -> int: return self._wrap
     @wrap.setter
     def wrap(self, value: int):
-        assert (isinstance(value, int))
+        if not isinstance(value, int): value = int(value)
         self._wrap = value
         self.configure(wraplength=self._wrap)
 
