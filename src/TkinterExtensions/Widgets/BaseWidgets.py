@@ -349,10 +349,10 @@ class BaseTextTkinterWidget(BaseTkinterWidget):
     _txt: tk.StringVar
     # noinspection PyMissingConstructor
     def __init__(self, *, Override_var: tk.StringVar = None, text: str, Color: dict = None, configure: bool = True):
-        if configure:
-            if Override_var is not None: self._txt = Override_var
-            else: self._txt = tk.StringVar(master=self, value=text)
-            self.configure(textvariable=self._txt)
+        if Override_var is not None: self._txt = Override_var
+        else: self._txt = tk.StringVar(master=self, value=text)
+
+        if configure: self.configure(textvariable=self._txt)
         BaseTkinterWidget.__init__(self, Color)
     @property
     def txt(self) -> str: return self._txt.get()
