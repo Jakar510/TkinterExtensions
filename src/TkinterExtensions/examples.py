@@ -272,7 +272,10 @@ def test():
     style = Style(root)
     style.configure("Treeview", foreground="yellow", background="black", fieldbackground="green")
 
-    frame = Frame(root).PlaceFull()
+    frame = Frame(root).PlaceFull().SetID(1234)
+    print(frame.__name__)
+    print(str(frame))
+    print(repr(frame))
     tree = TreeViewHolderThemed(frame, backgroundColor='white')
 
     tree.TreeView["columns"] = ("one", "two", "three")
@@ -296,8 +299,8 @@ def test1():
 
 def run_all():
     KeyboardEntry.test()
-    # test()
-    # test1()
+    test()
+    test1()
 
 if __name__ == '__main__':
     run_all()

@@ -22,7 +22,7 @@ from ..Widgets.base import *
 
 
 __all__ = [
-        'Entry', 'Label', 'Button', 'Listbox', 'CheckButton', 'Canvas', 'Text', 'CheckButton', 'ScrolledText', 'Scrollbar',
+        'Entry', 'Label', 'Button', 'Listbox', 'CheckButton', 'Canvas', 'Text', 'CheckButton', 'ScrolledText', 'Scrollbar', 'Scale',
         ]
 
 TODO = """
@@ -37,7 +37,7 @@ TODO = """
 --Message
 Popupmenu
 RadioButton
-Scale
+--Scale
 Spinbox
 Scrollbar
 --text
@@ -520,4 +520,7 @@ class ScrolledText(Frame, BaseTextTkinterWidget, CommandMixin):
         self.command_cb = self.tb.Bind(Bindings.ButtonPress, func=self._cmd, add=add)
         return self
 
+
+class Scale(tk.Scale, BaseTkinterWidget):
+    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
 

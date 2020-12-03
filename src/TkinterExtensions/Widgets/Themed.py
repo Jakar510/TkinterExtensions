@@ -536,3 +536,37 @@ class NotebookThemed(BaseTextTkinterWidget, ttk.Notebook):
 class SeparatorThemed(ttk.Separator, BaseTkinterWidget):
     def __init__(self, master, orientation: Orient = Orient.Horizonal):
         super().__init__(master, orient=orientation.value)
+
+
+
+class CheckButtonThemed(ttk.Checkbutton, BaseTextTkinterWidget, ImageMixin, CommandMixin):
+    """Ttk Checkbutton widget which is either in on- or off-state.
+
+    Construct a Ttk Checkbutton widget with the parent master.
+
+    STANDARD OPTIONS
+
+        class, compound, cursor, image, state, style, takefocus,
+        text, textvariable, underline, width
+
+    WIDGET-SPECIFIC OPTIONS
+
+        command, offvalue, onvalue, variable
+    """
+    _value: tk.BooleanVar
+    def __init__(self, master, text: str = '', Override_var: tk.StringVar = None, Color: dict = None, **kwargs):
+        ttk.Checkbutton.__init__(self, master=master, **kwargs)
+        BaseTextTkinterWidget.__init__(self, Override_var=Override_var, text=text, Color=Color)
+        self._value = tk.BooleanVar(master=self, value=False)
+        self.configure(variable=self._value)
+
+
+    @property
+    def value(self) -> bool: return self._value.get()
+    @value.setter
+    def value(self, b: bool): # FIXME: ignores value passed. only toggles true/false.
+        self._value.set(b)
+
+        self.invoke()
+
+    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))

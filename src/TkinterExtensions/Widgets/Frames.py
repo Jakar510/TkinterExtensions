@@ -22,10 +22,24 @@ __all__ = [
         ]
 
 class BaseFrameMixin:
-    def __name__(self, InstanceID: Union[str, int, Enum]):
-        if isinstance(InstanceID, Enum): InstanceID = InstanceID.value
+    InstanceID: Union[str, int, Enum] = None
 
-        return f'{self.__class__.__name__}_{InstanceID}'.lower()
+    def SetID(self, InstanceID: Union[str, int, Enum]):
+        self.InstanceID = InstanceID
+        return self
+
+    @property
+    def __name__(self):
+        try: base = super().__name__()
+        except AttributeError: base = self.__class__.__name__
+
+        if self.InstanceID:
+            if isinstance(self.InstanceID, Enum): InstanceID = self.InstanceID.value
+            else: InstanceID = self.InstanceID
+
+            return f'{base}_{InstanceID}'.lower()
+
+        return base
 
 
 # noinspection DuplicatedCode
