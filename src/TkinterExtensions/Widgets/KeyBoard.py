@@ -495,6 +495,8 @@ class KeyboardEntry(Entry, KeyboardMixin):
 
     def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
 
+
+
 class TitledEntry(Frame):
     def __init__(self, master, *, RowPadding: int = 1, factor: int = 3, entry: dict, title: dict, **kwargs):
         Frame.__init__(self, master, **kwargs)
@@ -504,6 +506,18 @@ class TitledEntry(Frame):
         self.Entry = Entry(master=self, **entry).Grid(row=1, column=0, padx=RowPadding, pady=RowPadding)
 
     def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
+
+    @property
+    def title(self) -> str: return self.Title.txt
+    @title.setter
+    def title(self, value: str): self.Title.txt = value
+
+    @property
+    def value(self) -> str: return self.Entry.txt
+    @value.setter
+    def value(self, value: str): self.Entry.txt = value
+
+
 
 class TitledKeyboardEntry(Frame):
     def __init__(self, master, *, root: tkRoot, RowPadding: int = 1, factor: int = 3, entry: dict, title: dict, **kwargs):
@@ -515,6 +529,18 @@ class TitledKeyboardEntry(Frame):
 
     def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
 
+    @property
+    def title(self) -> str: return self.Title.txt
+    @title.setter
+    def title(self, value: str): self.Title.txt = value
+
+    @property
+    def value(self) -> str: return self.Entry.txt
+    @value.setter
+    def value(self, value: str): self.Entry.txt = value
+
+
+
 class FramedKeyboardEntry(LabelFrame):
     def __init__(self, master, *, root: tkRoot, entry: dict, **kwargs):
         LabelFrame.__init__(self, master, **kwargs)
@@ -523,6 +549,17 @@ class FramedKeyboardEntry(LabelFrame):
 
     def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
 
+    @property
+    def title(self) -> str: return self.txt
+    @title.setter
+    def title(self, value: str): self.txt = value
+
+    @property
+    def value(self) -> str: return self.Entry.txt
+    @value.setter
+    def value(self, value: str): self.Entry.txt = value
+
+
 class FramedEntry(LabelFrame):
     def __init__(self, master, *, entry: dict, **kwargs):
         LabelFrame.__init__(self, master, **kwargs)
@@ -530,3 +567,13 @@ class FramedEntry(LabelFrame):
         self.Entry = Entry(master=self, **entry).PlaceFull()
 
     def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
+
+    @property
+    def title(self) -> str: return self.txt
+    @title.setter
+    def title(self, value: str): self.txt = value
+
+    @property
+    def value(self) -> str: return self.Entry.txt
+    @value.setter
+    def value(self, value: str): self.Entry.txt = value
