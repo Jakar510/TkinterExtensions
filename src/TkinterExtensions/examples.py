@@ -12,7 +12,7 @@ from time import sleep
 from typing import List, Union
 
 from TkinterExtensions import *
-from TkinterExtensions.Widgets.KeyBoard import KeyboardEntry
+from TkinterExtensions.Widgets.KeyboardEntry import KeyboardEntry
 
 
 

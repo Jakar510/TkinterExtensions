@@ -21,7 +21,6 @@ from ..Events import *
 __all__ = [
         'KeyboardMixin', 'KeyBoardState',
         'PopupKeyboard', 'Placement', 'PlacementSet',
-        'TitledEntry', 'TitledKeyboardEntry', 'FramedKeyboardEntry', 'KeyboardEntry', 'FramedEntry',
         ]
 
 
@@ -466,9 +465,9 @@ class KeyboardMixin:
 
 
     @staticmethod
-    def test():
-        root = tkRoot(Screen_Width=800, Screen_Height=480, x=200, y=200)
-        frame = Frame(root, background='light blue').PlaceRelative(rely=0, relx=0.33, relwidth=0.66, relheight=1)
+    def test_entry_placements(root: tkRoot) -> LabelFrame:
+        from .KeyboardEntry import TitledKeyboardEntry # circular import
+        frame = LabelFrame(root, background='light blue', text='ENTRY')
 
         TitledKeyboardEntry(frame, root=root, title=dict(text='Center Below'), entry=dict(keysize=7, placement=PlacementSet(Placement.Center, Placement.Bottom))).Pack()
         TitledKeyboardEntry(frame, root=root, title=dict(text='Left Below'), entry=dict(keysize=6, placement=PlacementSet(Placement.Left, Placement.Bottom))).Pack()
@@ -481,99 +480,27 @@ class KeyboardMixin:
         TitledKeyboardEntry(frame, root=root, title=dict(text='Left Above'), entry=dict(placement=PlacementSet(Placement.Left, Placement.Top))).Pack()
         TitledKeyboardEntry(frame, root=root, title=dict(text='Right Above'), entry=dict(placement=PlacementSet(Placement.Right, Placement.Top))).Pack()
         TitledKeyboardEntry(frame, root=root, title=dict(text='Auto Above'), entry=dict(placement=PlacementSet(Placement.Auto, Placement.Top))).Pack()
+        return frame
+    @staticmethod
+    def test_comobobox_placements(root: tkRoot) -> LabelFrame:
+        from .KeyboardComboBoxThemed import TitledKeyboardComboBoxThemed # circular import
+        frame = LabelFrame(root, background='light blue', text='COMBO_BOX')
+
+        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Center Below'), entry=dict(keysize=7, placement=PlacementSet(Placement.Center, Placement.Bottom))).Pack()
+        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Left Below'), entry=dict(keysize=6, placement=PlacementSet(Placement.Left, Placement.Bottom))).Pack()
+        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Right Below'), entry=dict(keysize=5, placement=PlacementSet(Placement.Right, Placement.Bottom))).Pack()
+        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Auto Below'), entry=dict(keysize=4, placement=PlacementSet(Placement.Auto, Placement.Bottom))).Pack()
+
+        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='FULL Auto'), entry=dict()).Pack()
+
+        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Center Above'), entry=dict(placement=PlacementSet(Placement.Center, Placement.Top))).Pack()
+        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Left Above'), entry=dict(placement=PlacementSet(Placement.Left, Placement.Top))).Pack()
+        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Right Above'), entry=dict(placement=PlacementSet(Placement.Right, Placement.Top))).Pack()
+        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Auto Above'), entry=dict(placement=PlacementSet(Placement.Auto, Placement.Top))).Pack()
+        return frame
+    @staticmethod
+    def test():
+        root = tkRoot(Screen_Width=800, Screen_Height=480, x=200, y=200)
+        KeyboardMixin.test_entry_placements(root).Grid(0, 0)
+        KeyboardMixin.test_comobobox_placements(root).Grid(0, 1)
         root.mainloop()
-
-
-class KeyboardEntry(Entry, KeyboardMixin):
-    def __init__(self, master, *, root: tkRoot, placement: PlacementSet = PlacementSet(Placement.Auto), keysize: int = None, keycolor: str = None,
-                 insertbackground: str = 'red', insertborderwidth: int = 3, insertofftime: int = 1, insertontime: int = 1, insertwidth: int = 3,
-                 text: str = '', Override_var: tk.StringVar = None, Color: dict = None, **kwargs):
-        Entry.__init__(self, master, text=text, Override_var=Override_var, Color=Color,
-                       insertbackground=insertbackground, insertborderwidth=insertborderwidth, insertofftime=insertofftime, insertontime=insertontime, insertwidth=insertwidth,
-                       **kwargs)
-        KeyboardMixin.__init__(self, master, root=root, placement=placement, keysize=keysize, keycolor=keycolor)
-
-    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
-
-
-
-class TitledEntry(Frame):
-    def __init__(self, master, *, RowPadding: int = 1, factor: int = 3, entry: dict, title: dict, **kwargs):
-        Frame.__init__(self, master, **kwargs)
-        self.Grid_RowConfigure(0, weight=1).Grid_RowConfigure(1, weight=factor).Grid_ColumnConfigure(0, weight=1)
-
-        self.Title = Label(self, **title).Grid(row=0, column=0, padx=RowPadding, pady=RowPadding)
-        self.Entry = Entry(master=self, **entry).Grid(row=1, column=0, padx=RowPadding, pady=RowPadding)
-
-    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
-
-    @property
-    def title(self) -> str: return self.Title.txt
-    @title.setter
-    def title(self, value: str): self.Title.txt = value
-
-    @property
-    def value(self) -> str: return self.Entry.txt
-    @value.setter
-    def value(self, value: str): self.Entry.txt = value
-
-
-
-class TitledKeyboardEntry(Frame):
-    def __init__(self, master, *, root: tkRoot, RowPadding: int = 1, factor: int = 3, entry: dict, title: dict, **kwargs):
-        Frame.__init__(self, master, **kwargs)
-        self.Grid_RowConfigure(0, weight=1).Grid_RowConfigure(1, weight=factor).Grid_ColumnConfigure(0, weight=1)
-
-        self.Title = Label(self, **title).Grid(row=0, column=0, padx=RowPadding, pady=RowPadding)
-        self.Entry = KeyboardEntry(master=self, root=root, **entry).Grid(row=1, column=0, padx=RowPadding, pady=RowPadding)
-
-    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
-
-    @property
-    def title(self) -> str: return self.Title.txt
-    @title.setter
-    def title(self, value: str): self.Title.txt = value
-
-    @property
-    def value(self) -> str: return self.Entry.txt
-    @value.setter
-    def value(self, value: str): self.Entry.txt = value
-
-
-
-class FramedKeyboardEntry(LabelFrame):
-    def __init__(self, master, *, root: tkRoot, entry: dict, **kwargs):
-        LabelFrame.__init__(self, master, **kwargs)
-
-        self.Entry = KeyboardEntry(master=self, root=root, **entry).PlaceFull()
-
-    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
-
-    @property
-    def title(self) -> str: return self.txt
-    @title.setter
-    def title(self, value: str): self.txt = value
-
-    @property
-    def value(self) -> str: return self.Entry.txt
-    @value.setter
-    def value(self, value: str): self.Entry.txt = value
-
-
-class FramedEntry(LabelFrame):
-    def __init__(self, master, *, entry: dict, **kwargs):
-        LabelFrame.__init__(self, master, **kwargs)
-
-        self.Entry = Entry(master=self, **entry).PlaceFull()
-
-    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
-
-    @property
-    def title(self) -> str: return self.txt
-    @title.setter
-    def title(self, value: str): self.txt = value
-
-    @property
-    def value(self) -> str: return self.Entry.txt
-    @value.setter
-    def value(self, value: str): self.Entry.txt = value
