@@ -14,7 +14,7 @@ from .Widgets import *
 
 
 __all__ = [
-        'ButtonGrid', 'TitledEntry',
+        'ButtonGrid',
         ]
 
 class ButtonGrid(Frame, ABC):
@@ -85,10 +85,3 @@ class ButtonGrid(Frame, ABC):
     def ButtonCommands(self) -> Dict[int, callable]: raise NotImplementedError()
 
 
-class TitledEntry(Frame):
-    def __init__(self, master, *, RowPadding: int = 1, factor: int = 3, entry: dict, title: dict, **kwargs):
-        super().__init__(master, **kwargs)
-        self.Grid_RowConfigure(0, weight=1).Grid_RowConfigure(1, weight=factor).Grid_ColumnConfigure(0, weight=1)
-
-        self.Title = Label(self, **title).Grid(row=0, column=0, padx=RowPadding, pady=RowPadding)
-        self.Entry = Entry(master=self, **entry).Grid(row=1, column=0, padx=RowPadding, pady=RowPadding)

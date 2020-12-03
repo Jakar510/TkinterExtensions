@@ -20,14 +20,10 @@ from ..Events import *
 
 __all__ = [
         'KeyboardMixin', 'KeyBoardState',
-        'PopupKeyboard', 'Placement',
+        'PopupKeyboard', 'Placement', 'PlacementSet',
+        'TitledEntry', 'TitledKeyboardEntry', 'FramedKeyboardEntry', 'KeyboardEntry', 'FramedEntry',
         ]
 
-"""
-Popup Keyboard is a module to be used with Python's Tkinter library
-It subclasses the Entry widget as KeyboardEntry to make a pop-up keyboard appear when the widget gains focus. 
-Still early in development.
-"""
 
 
 
@@ -59,7 +55,7 @@ class PlacementSet(object):
 
 
 
-class PopupKeyboard(tkTopLevel):
+class PopupKeyboard(OptionsMixin, tkTopLevel):
     """
     A Toplevel instance that displays a keyboard that is attached to another widget.
     Only the Entry widget has a subclass in this version.
@@ -350,6 +346,11 @@ class PopupKeyboard(tkTopLevel):
 
 class KeyboardMixin:
     """
+    Popup Keyboard is a module to be used with Python's Tkinter library
+    It subclasses the Entry widget as KeyboardEntry to make a pop-up keyboard appear when the widget gains focus.
+    Still early in development.
+
+
     An extension/subclass of the Tkinter Entry widget, capable
     of accepting all existing args, plus a _keysize and _keycolor option.
     Will pop up an instance of _PopupKeyboard when focus moves into
@@ -483,7 +484,7 @@ class KeyboardMixin:
         root.mainloop()
 
 
-class KeyboardEntry(Entry, KeyboardMixin):
+class KeyboardEntry(OptionsMixin, Entry, KeyboardMixin):
     def __init__(self, master, *, root: tkRoot, placement: PlacementSet = PlacementSet(Placement.Auto), keysize: int = None, keycolor: str = None,
                  insertbackground: str = 'red', insertborderwidth: int = 3, insertofftime: int = 1, insertontime: int = 1, insertwidth: int = 3,
                  text: str = '', Override_var: tk.StringVar = None, Color: dict = None, **kwargs):
@@ -493,10 +494,33 @@ class KeyboardEntry(Entry, KeyboardMixin):
         KeyboardMixin.__init__(self, master, root=root, placement=placement, keysize=keysize, keycolor=keycolor)
 
 
-class TitledKeyboardEntry(Frame):
-    def __init__(self, master, *, root: tkRoot, RowPadding: int = 1, factor: int = 3, entry: dict, title: dict, **kwargs):
-        super().__init__(master, **kwargs)
+class TitledEntry(OptionsMixin, Frame):
+    def __init__(self, master, *, RowPadding: int = 1, factor: int = 3, entry: dict, title: dict, **kwargs):
+        Frame.__init__(self, master, **kwargs)
         self.Grid_RowConfigure(0, weight=1).Grid_RowConfigure(1, weight=factor).Grid_ColumnConfigure(0, weight=1)
 
         self.Title = Label(self, **title).Grid(row=0, column=0, padx=RowPadding, pady=RowPadding)
-        self.Entry = KeyboardEntry(master=self, root=root, **entry).Grid(row=1, column=0, padx=RowPadding, pady=RowPadding)
+        self.Entry = Entry(master=self, **entry).Grid(row=1, column=0, padx=RowPadding, pady=RowPadding)
+
+
+class TitledKeyboardEntry(OptionsMixin, Frame):
+    def __init__(self, master, *, RowPadding: int = 1, factor: int = 3, entry: dict, title: dict, **kwargs):
+        Frame.__init__(self, master, **kwargs)
+        self.Grid_RowConfigure(0, weight=1).Grid_RowConfigure(1, weight=factor).Grid_ColumnConfigure(0, weight=1)
+
+        self.Title = Label(self, **title).Grid(row=0, column=0, padx=RowPadding, pady=RowPadding)
+        self.Entry = KeyboardEntry(master=self, **entry).Grid(row=1, column=0, padx=RowPadding, pady=RowPadding)
+
+
+class FramedKeyboardEntry(OptionsMixin, LabelFrame):
+    def __init__(self, master, *, root: tkRoot, entry: dict, **kwargs):
+        LabelFrame.__init__(self, master, **kwargs)
+
+        self.Entry = KeyboardEntry(master=self, root=root, **entry).PlaceFull()
+
+
+class FramedEntry(OptionsMixin, LabelFrame):
+    def __init__(self, master, *, entry: dict, **kwargs):
+        LabelFrame.__init__(self, master, **kwargs)
+
+        self.Entry = Entry(master=self, **entry).PlaceFull()

@@ -43,7 +43,7 @@ Scrollbar
 --ThemedTreeView
 """
 
-class ComboBoxThemed(ttk.Combobox, BaseTextTkinterWidget, CommandMixin):
+class ComboBoxThemed(OptionsMixin, ttk.Combobox, BaseTextTkinterWidget, CommandMixin):
     """Construct a Ttk Combobox _widget with the master master.
 
     STANDARD OPTIONS
@@ -80,15 +80,15 @@ class ComboBoxThemed(ttk.Combobox, BaseTextTkinterWidget, CommandMixin):
     def SetValues(self, values: list or tuple):
         self.configure(values=values)
 
-    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
 
 
 
-class ScrollbarThemed(ttk.Scrollbar, BaseTkinterWidget):
+
+class ScrollbarThemed(OptionsMixin, ttk.Scrollbar, BaseTkinterWidget):
     def __init__(self, master, orientation: Orient, **kwargs):
-        super().__init__(master, orient=orientation.value, **kwargs)
+        ttk.Scrollbar.__init__(self, master, orient=orientation.value, **kwargs)
 
-    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
+
 
 
 
@@ -132,7 +132,7 @@ class ListItem(dict):
         return ListItem.Parse(dict(ID=ID, Name=Name, Children=Children))
 class ItemCollection(list):
     def __init__(self, d: Union[List[ListItem], Iterable[ListItem]]):
-        super().__init__(d)
+        list.__init__(self, d)
 
     def __setitem__(self, key: int, value: ListItem): return super().__setitem__(key, value)
     def __getitem__(self, key: int) -> ListItem: return super().__getitem__(key)
@@ -153,7 +153,7 @@ class ItemCollection(list):
             return cls(map(ListItem.Parse, d))
 
         raise TypeError(f"""Expecting {list} got type {type(d)}""")
-class TreeViewThemed(ttk.Treeview, BaseTkinterWidget, CommandMixin):
+class TreeViewThemed(OptionsMixin, ttk.Treeview, BaseTkinterWidget, CommandMixin):
     """Construct a Ttk Treeview with parent master.
 
     STANDARD OPTIONS
@@ -268,9 +268,7 @@ class TreeViewThemed(ttk.Treeview, BaseTkinterWidget, CommandMixin):
 
         self.SelectedItems = self.tag_has('sel')
         PRINT('TreeView_SelectedItems', _id=_id, fg=fg, bg=bg, SelectedItems=self.SelectedItems)
-
-    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
-class TreeViewHolderThemed(Frame):
+class TreeViewHolderThemed(OptionsMixin, Frame):
     """Construct a Ttk Treeview with master scale.
 
     STANDARD OPTIONS
@@ -315,12 +313,12 @@ class TreeViewHolderThemed(Frame):
             self.vsb.show()
             self.hsb.show()
 
-    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
+
 
 
 
 # noinspection DuplicatedCode
-class ButtonThemed(ttk.Button, BaseTextTkinterWidget, ImageMixin, CommandMixin):
+class ButtonThemed(OptionsMixin, ttk.Button, BaseTextTkinterWidget, ImageMixin, CommandMixin):
     """Construct a button _widget with the master MASTER.
 
         STANDARD OPTIONS
@@ -347,12 +345,12 @@ class ButtonThemed(ttk.Button, BaseTextTkinterWidget, ImageMixin, CommandMixin):
         if Command: self.SetCommand(Command)
         BaseTextTkinterWidget.__init__(self, Override_var=Override_var, text=text, Color=Color)
 
-    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
+
 
 
 
 # noinspection DuplicatedCode
-class LabelThemed(ttk.Label, BaseTextTkinterWidget, ImageMixin):
+class LabelThemed(OptionsMixin, ttk.Label, BaseTextTkinterWidget, ImageMixin):
     __doc__ = """Construct a label _widget with the master MASTER.
 
     STANDARD OPTIONS
@@ -374,12 +372,12 @@ class LabelThemed(ttk.Label, BaseTextTkinterWidget, ImageMixin):
         ttk.Label.__init__(self, master=master, **kwargs)
         BaseTextTkinterWidget.__init__(self, Override_var=Override_var, text=text, Color=Color)
 
-    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
+
 
 
 
 # noinspection DuplicatedCode
-class EntryThemed(ttk.Entry, BaseTextTkinterWidget, CommandMixin):
+class EntryThemed(OptionsMixin, ttk.Entry, BaseTextTkinterWidget, CommandMixin):
     __doc__ = """Construct an entry _widget with the master MASTER.
 
     Valid resource names: background, bd, bg, borderwidth, cursor,
@@ -411,16 +409,16 @@ class EntryThemed(ttk.Entry, BaseTextTkinterWidget, CommandMixin):
     def Append(self, value: str):
         self.insert(Tags.End.value, value)
 
-    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
 
 
 
-class NotebookThemed(BaseTextTkinterWidget, ttk.Notebook):
+
+class NotebookThemed(OptionsMixin, ttk.Notebook, BaseTextTkinterWidget):
     def __init__(self, master, Color: dict = None, **kwargs):
         ttk.Notebook.__init__(self, master=master, **kwargs)
         BaseTkinterWidget.__init__(self, Color=Color)
 
-    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
+
 
     def Add(self, w: BaseTkinterWidget, add: dict = dict(padding=2), *, title: str, **kwargs) -> int:
         """Adds a new tab to the notebook.
@@ -533,13 +531,13 @@ class NotebookThemed(BaseTextTkinterWidget, ttk.Notebook):
 
 
 
-class SeparatorThemed(ttk.Separator, BaseTkinterWidget):
+class SeparatorThemed(OptionsMixin, ttk.Separator, BaseTkinterWidget):
     def __init__(self, master, orientation: Orient = Orient.Horizonal):
-        super().__init__(master, orient=orientation.value)
+        ttk.Separator.__init__(self, master, orient=orientation.value)
 
 
 
-class CheckButtonThemed(ttk.Checkbutton, BaseTextTkinterWidget, ImageMixin, CommandMixin):
+class CheckButtonThemed(OptionsMixin, ttk.Checkbutton, BaseTextTkinterWidget, ImageMixin, CommandMixin):
     """Ttk Checkbutton widget which is either in on- or off-state.
 
     Construct a Ttk Checkbutton widget with the parent master.
@@ -569,4 +567,4 @@ class CheckButtonThemed(ttk.Checkbutton, BaseTextTkinterWidget, ImageMixin, Comm
 
         self.invoke()
 
-    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
+

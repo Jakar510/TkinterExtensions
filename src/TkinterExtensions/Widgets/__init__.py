@@ -10,8 +10,10 @@ from .BaseWidgets import CurrentValue
 from .Custom import *
 from .Frames import *
 from .HTML import *
+from .KeyBoard import *
 from .Root import *
 from .Style import *
 from .Themed import *
 from .Widgets import *
 from .base import *
+from .tkMessageBox import *

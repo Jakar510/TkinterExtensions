@@ -43,15 +43,15 @@ class BaseFrameMixin:
 
 
 # noinspection DuplicatedCode
-class Frame(tk.Frame, BaseTkinterWidget, BaseFrameMixin):
+class Frame(OptionsMixin, tk.Frame, BaseTkinterWidget, BaseFrameMixin):
     def __init__(self, master, **kwargs):
         tk.Frame.__init__(self, master=master, **kwargs)
 
-    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
 
 
 
-class LabelFrame(tk.LabelFrame, BaseTextTkinterWidget, BaseFrameMixin):
+
+class LabelFrame(OptionsMixin, tk.LabelFrame, BaseTextTkinterWidget, BaseFrameMixin):
     """Construct a labelframe _widget with the master MASTER.
 
     STANDARD OPTIONS
@@ -79,20 +79,20 @@ class LabelFrame(tk.LabelFrame, BaseTextTkinterWidget, BaseFrameMixin):
         self.configure(text=value)
 
 
-    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
+
 
 
 
 # noinspection DuplicatedCode
-class FrameThemed(ttk.Frame, BaseTkinterWidget, BaseFrameMixin):
+class FrameThemed(OptionsMixin, ttk.Frame, BaseTkinterWidget, BaseFrameMixin):
     def __init__(self, master, **kwargs):
         ttk.Frame.__init__(self, master=master, **kwargs)
 
-    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
 
 
 
-class LabelFrameThemed(ttk.LabelFrame, BaseTextTkinterWidget, BaseFrameMixin):
+
+class LabelFrameThemed(OptionsMixin, ttk.LabelFrame, BaseTextTkinterWidget, BaseFrameMixin):
     """Construct a labelframe _widget with the master MASTER.
 
     STANDARD OPTIONS
@@ -120,7 +120,7 @@ class LabelFrameThemed(ttk.LabelFrame, BaseTextTkinterWidget, BaseFrameMixin):
         self.configure(text=value)
 
 
-    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
+
 
 
 FrameTypes = Union[Frame, LabelFrame, FrameThemed, LabelFrameThemed]

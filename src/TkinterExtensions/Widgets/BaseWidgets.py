@@ -28,8 +28,12 @@ from ..Widgets.base import *
 
 pp = PrettyPrinter(indent=4)
 
-__all__ = ['BaseTkinterWidget', 'BaseTextTkinterWidget', 'Image', 'ImageTk',
-           'CurrentValue', 'CallWrapper', 'CurrentValue', 'CommandMixin', 'ImageMixin']
+__all__ = [
+        'BaseTkinterWidget', 'BaseTextTkinterWidget',
+        'Image', 'ImageTk',
+        'CurrentValue', 'CallWrapper', 'CurrentValue',
+        'OptionsMixin', 'CommandMixin', 'ImageMixin',
+        ]
 
 class BaseTkinterWidget(tk.Widget, ABC):
     # noinspection PyMissingConstructor
@@ -488,3 +492,6 @@ class ImageMixin:
             self.configure(image=self._IMG)
 
         return self
+class OptionsMixin:
+    # noinspection PyProtectedMember
+    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
