@@ -486,17 +486,17 @@ class KeyboardMixin:
         from .KeyboardComboBoxThemed import TitledKeyboardComboBoxThemed # circular import
         frame = LabelFrame(root, background='light blue', text='COMBO_BOX')
 
-        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Center Below'), entry=dict(keysize=7, placement=PlacementSet(Placement.Center, Placement.Bottom))).Pack()
-        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Left Below'), entry=dict(keysize=6, placement=PlacementSet(Placement.Left, Placement.Bottom))).Pack()
-        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Right Below'), entry=dict(keysize=5, placement=PlacementSet(Placement.Right, Placement.Bottom))).Pack()
-        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Auto Below'), entry=dict(keysize=4, placement=PlacementSet(Placement.Auto, Placement.Bottom))).Pack()
+        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Center Below'), comobobox=dict(keysize=7, placement=PlacementSet(Placement.Center, Placement.Bottom))).Pack()
+        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Left Below'), comobobox=dict(keysize=6, placement=PlacementSet(Placement.Left, Placement.Bottom))).Pack()
+        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Right Below'), comobobox=dict(keysize=5, placement=PlacementSet(Placement.Right, Placement.Bottom))).Pack()
+        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Auto Below'), comobobox=dict(keysize=4, placement=PlacementSet(Placement.Auto, Placement.Bottom))).Pack()
 
-        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='FULL Auto'), entry=dict()).Pack()
+        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='FULL Auto'), comobobox=dict()).Pack()
 
-        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Center Above'), entry=dict(placement=PlacementSet(Placement.Center, Placement.Top))).Pack()
-        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Left Above'), entry=dict(placement=PlacementSet(Placement.Left, Placement.Top))).Pack()
-        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Right Above'), entry=dict(placement=PlacementSet(Placement.Right, Placement.Top))).Pack()
-        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Auto Above'), entry=dict(placement=PlacementSet(Placement.Auto, Placement.Top))).Pack()
+        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Center Above'), comobobox=dict(placement=PlacementSet(Placement.Center, Placement.Top))).Pack()
+        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Left Above'), comobobox=dict(placement=PlacementSet(Placement.Left, Placement.Top))).Pack()
+        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Right Above'), comobobox=dict(placement=PlacementSet(Placement.Right, Placement.Top))).Pack()
+        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Auto Above'), comobobox=dict(placement=PlacementSet(Placement.Auto, Placement.Top))).Pack()
         return frame
     @staticmethod
     def test():

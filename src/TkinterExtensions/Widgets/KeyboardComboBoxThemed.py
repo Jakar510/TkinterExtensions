@@ -77,10 +77,10 @@ class TitledKeyboardComboBoxThemed(Frame):
 
 
 class FramedComboBoxThemed(LabelFrame):
-    def __init__(self, master, *, root: tkRoot, comobobox: dict = {}, **kwargs):
+    def __init__(self, master, *, comobobox: dict = {}, **kwargs):
         LabelFrame.__init__(self, master, **kwargs)
 
-        self.cb = ComboBoxThemed(master=self,root=root, **comobobox).PlaceFull()
+        self.cb = ComboBoxThemed(master=self, **comobobox).PlaceFull()
 
     def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
 

@@ -32,7 +32,7 @@ class KeyboardEntry(Entry, KeyboardMixin):
 
 
 class TitledEntry(Frame):
-    def __init__(self, master, *, RowPadding: int = 1, factor: int = 3, entry: dict, title: dict, **kwargs):
+    def __init__(self, master, *, RowPadding: int = 1, factor: int = 3, entry: dict = {}, title: dict = {}, **kwargs):
         Frame.__init__(self, master, **kwargs)
         self.Grid_RowConfigure(0, weight=1).Grid_RowConfigure(1, weight=factor).Grid_ColumnConfigure(0, weight=1)
 
@@ -54,7 +54,7 @@ class TitledEntry(Frame):
 
 
 class TitledKeyboardEntry(Frame):
-    def __init__(self, master, *, root: tkRoot, RowPadding: int = 1, factor: int = 3, entry: dict, title: dict, **kwargs):
+    def __init__(self, master, *, root: tkRoot, entry: dict = {}, title: dict = {}, RowPadding: int = 1, factor: int = 3, **kwargs):
         Frame.__init__(self, master, **kwargs)
         self.Grid_RowConfigure(0, weight=1).Grid_RowConfigure(1, weight=factor).Grid_ColumnConfigure(0, weight=1)
 
@@ -76,7 +76,7 @@ class TitledKeyboardEntry(Frame):
 
 
 class FramedKeyboardEntry(LabelFrame):
-    def __init__(self, master, *, root: tkRoot, entry: dict, **kwargs):
+    def __init__(self, master, *, root: tkRoot, entry: dict = {}, **kwargs):
         LabelFrame.__init__(self, master, **kwargs)
 
         self.Entry = KeyboardEntry(master=self, root=root, **entry).PlaceFull()
@@ -95,7 +95,7 @@ class FramedKeyboardEntry(LabelFrame):
 
 
 class FramedEntry(LabelFrame):
-    def __init__(self, master, *, entry: dict, **kwargs):
+    def __init__(self, master, *, entry: dict = {}, **kwargs):
         LabelFrame.__init__(self, master, **kwargs)
 
         self.Entry = Entry(master=self, **entry).PlaceFull()
