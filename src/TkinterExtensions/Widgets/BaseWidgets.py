@@ -32,7 +32,7 @@ __all__ = [
         'BaseTkinterWidget', 'BaseTextTkinterWidget',
         'Image', 'ImageTk',
         'CurrentValue', 'CallWrapper', 'CurrentValue',
-        'OptionsMixin', 'CommandMixin', 'ImageMixin',
+        'CommandMixin', 'ImageMixin',
         ]
 
 class BaseTkinterWidget(tk.Widget, ABC):
@@ -492,6 +492,3 @@ class ImageMixin:
             self.configure(image=self._IMG)
 
         return self
-class OptionsMixin:
-    # noinspection PyProtectedMember
-    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))

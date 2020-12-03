@@ -44,7 +44,7 @@ Scrollbar
 """
 
 # noinspection DuplicatedCode
-class Button(OptionsMixin, tk.Button, BaseTextTkinterWidget, ImageMixin, CommandMixin):
+class Button(tk.Button, BaseTextTkinterWidget, ImageMixin, CommandMixin):
     """Construct a button _widget with the master MASTER.
 
         STANDARD OPTIONS
@@ -71,12 +71,13 @@ class Button(OptionsMixin, tk.Button, BaseTextTkinterWidget, ImageMixin, Command
         if Command: self.SetCommand(Command)
         BaseTextTkinterWidget.__init__(self, Override_var=Override_var, text=text, Color=Color)
 
+    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
 
 
 
 
 # noinspection DuplicatedCode
-class Label(OptionsMixin, tk.Label, BaseTextTkinterWidget, ImageMixin, CommandMixin):
+class Label(tk.Label, BaseTextTkinterWidget, ImageMixin, CommandMixin):
     __doc__ = """Construct a label _widget with the master MASTER.
 
     STANDARD OPTIONS
@@ -104,9 +105,10 @@ class Label(OptionsMixin, tk.Label, BaseTextTkinterWidget, ImageMixin, CommandMi
         self.command_cb = self.Bind(Bindings.ButtonPress, func=self._cmd, add=add)
         return self
 
+    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
 
 
-class Message(OptionsMixin, tk.Message, BaseTextTkinterWidget, CommandMixin):
+class Message(tk.Message, BaseTextTkinterWidget, CommandMixin):
     def __init__(self, master, **kwargs):
         tk.Message.__init__(self, master, **kwargs)
 
@@ -114,10 +116,11 @@ class Message(OptionsMixin, tk.Message, BaseTextTkinterWidget, CommandMixin):
         self.command_cb = self.Bind(Bindings.ButtonPress, func=self._cmd, add=add)
         return self
 
+    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
 
 
 # noinspection DuplicatedCode
-class Entry(OptionsMixin, tk.Entry, BaseTextTkinterWidget, CommandMixin):
+class Entry(tk.Entry, BaseTextTkinterWidget, CommandMixin):
     __doc__ = """Construct an entry _widget with the master MASTER.
 
     Valid resource names: background, bd, bg, borderwidth, cursor,
@@ -152,11 +155,12 @@ class Entry(OptionsMixin, tk.Entry, BaseTextTkinterWidget, CommandMixin):
 
     def __iadd__(self, other: str): self.Append(other)
 
+    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
 
 
 
 
-class CheckButton(OptionsMixin, tk.Checkbutton, BaseTextTkinterWidget, ImageMixin, CommandMixin):
+class CheckButton(tk.Checkbutton, BaseTextTkinterWidget, ImageMixin, CommandMixin):
     """Construct a checkbutton _widget with the master MASTER.
 
         Valid resource names:
@@ -224,11 +228,11 @@ class CheckButton(OptionsMixin, tk.Checkbutton, BaseTextTkinterWidget, ImageMixi
         else:
             self.deselect()
 
+    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
 
 
 
-
-class Listbox(OptionsMixin, tk.Listbox, BaseTextTkinterWidget, CommandMixin):
+class Listbox(tk.Listbox, BaseTextTkinterWidget, CommandMixin):
     """Construct a listbox _widget with the master MASTER.
 
     Valid resource names: background, bd, bg, borderwidth, cursor,
@@ -371,11 +375,12 @@ class Listbox(OptionsMixin, tk.Listbox, BaseTextTkinterWidget, CommandMixin):
     @txt.setter
     def txt(self, value: str): self.ReplaceAtIndex(self._Current_ListBox_Index, value)
 
+    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
 
 
 
 
-class Canvas(OptionsMixin, tk.Canvas, BaseTkinterWidget):
+class Canvas(tk.Canvas, BaseTkinterWidget):
     def __init__(self, master, *args, Color: dict = None, **kwargs):
         tk.Canvas.__init__(self, master, *args, **kwargs)
         self._setupBindings()
@@ -471,16 +476,18 @@ class Canvas(OptionsMixin, tk.Canvas, BaseTkinterWidget):
         """
         pass
 
+    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
 
 
-class Scrollbar(OptionsMixin, tk.Scrollbar, BaseTkinterWidget, CommandMixin):
+class Scrollbar(tk.Scrollbar, BaseTkinterWidget, CommandMixin):
     def __init__(self, master, **kwargs):
         tk.Scrollbar.__init__(self, master, **kwargs)
 
+    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
 
 
 
-class Text(OptionsMixin, tk.Text, BaseTextTkinterWidget, CommandMixin):
+class Text(tk.Text, BaseTextTkinterWidget, CommandMixin):
     def __init__(self, master, **kwargs):
         tk.Text.__init__(self, master, **kwargs)
 
@@ -499,22 +506,24 @@ class Text(OptionsMixin, tk.Text, BaseTextTkinterWidget, CommandMixin):
         self.command_cb = self.Bind(Bindings.ButtonPress, func=self._cmd, add=add)
         return self
 
+    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
 
 
 
-class ScrolledText(OptionsMixin, Frame, BaseTextTkinterWidget, CommandMixin):
+class ScrolledText(BaseTextTkinterWidget, CommandMixin):
     tb: Text
     vbar: Scrollbar
-    def __init__(self, master, **kw):
-        Frame.__init__(self, master, **kw)
-        self.tb = Text(master=self)
+    # noinspection PyMissingConstructor
+    def __init__(self, master, *, text: str, **kw):
+        # super().__init__(text=text)
+        self.frame = Frame(master, text=text, **kw)
+        self.tb = Text(master=self.frame).Pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
-        self.vbar = Scrollbar(self)
+        self.vbar = Scrollbar(self.frame)
         self.vbar.Pack(side=tk.RIGHT, fill=Fill.y)
         self.vbar.SetCommand(self.tb.yview)
         self.tb.configure(yscrollcommand=self.vbar.set)
 
-        self.tb.Pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
     @property
     def txt(self) -> str: return self.tb.txt
@@ -527,9 +536,11 @@ class ScrolledText(OptionsMixin, Frame, BaseTextTkinterWidget, CommandMixin):
         self.command_cb = self.tb.Bind(Bindings.ButtonPress, func=self._cmd, add=add)
         return self
 
+    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
 
-class Scale(OptionsMixin, tk.Scale, BaseTkinterWidget):
+class Scale(tk.Scale, BaseTkinterWidget):
     def __init__(self, master, **kwargs):
         tk.Scale.__init__(self, master, **kwargs)
 
+    def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
 

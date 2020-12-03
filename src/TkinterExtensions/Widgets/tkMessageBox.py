@@ -14,7 +14,7 @@ from .Root import *
 
 __all__ = ['tkMessageBox']
 
-class tkMessageBox(OptionsMixin, tkTopLevel, BaseTkinterWidget):
+class tkMessageBox(tkTopLevel, BaseTkinterWidget):
     """
     Not Impletemented Yet.
 

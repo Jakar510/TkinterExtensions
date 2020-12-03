@@ -125,7 +125,7 @@ d = ItemCollection.Parse([
 class Root(tkRoot):
     # sets up Tkinter and creates the other windows and places them accordingly.
     def __init__(self):
-        super().__init__(Screen_Width=800, Screen_Height=480, x=100, y=100)
+        super().__init__(Screen_Width=800, Screen_Height=480, x=200, y=200)
 
         self.w: List[tk.Widget] = []
         self.home = HomeWindow(master=self).PlaceFull()
@@ -266,7 +266,7 @@ def test():
         tree.TreeView.tag_configure("red", background="red")
 
 
-    root = tkRoot(800, 480)
+    root = tkRoot(800, 480, 200, 200)
     print('tkinter.info.patchlevel', root.tk.call('info', 'patchlevel'))
 
     style = Style(root)
