@@ -602,6 +602,12 @@ class BaseFramed(LabelFrame, value_title_mixin):
 
         # noinspection PyArgumentList
         self.Entry = cls(self, **value).PlaceFull()
+
+    @property
+    def title(self) -> str: return self.txt
+    @title.setter
+    def title(self, value: str): self.txt = value
+
 class BaseFramedKeyboard(LabelFrame, value_title_mixin):
     """
         When subclassed, pairs the class type with the title label, wrapped in a LabelFrame.
@@ -619,3 +625,7 @@ class BaseFramedKeyboard(LabelFrame, value_title_mixin):
 
         self.Entry = cls(self, root=root, **value).PlaceFull()
 
+    @property
+    def title(self) -> str: return self.txt
+    @title.setter
+    def title(self, value: str): self.txt = value
