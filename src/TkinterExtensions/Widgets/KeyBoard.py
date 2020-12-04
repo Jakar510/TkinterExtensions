@@ -6,7 +6,7 @@
 
 import string
 from enum import IntEnum, IntFlag
-from typing import Dict, List, Union
+from typing import *
 
 from .BaseWidgets import *
 from .Frames import *
@@ -22,6 +22,7 @@ from ..Misc import HID_BUFFER
 __all__ = [
         'KeyboardMixin', 'KeyBoardState',
         'PopupKeyboard', 'Placement', 'PlacementSet',
+        'value_title_mixin', 'BaseFramed', 'BaseFramedKeyboard', 'BaseTitled', 'BaseTitledKeyboard',
         ]
 
 
@@ -97,13 +98,11 @@ class PopupKeyboard(tkTopLevel):
 
         self._root_frame = Frame(self).Grid(row=0, column=0).Grid_ColumnConfigure(0, weight=1).Grid_RowConfigure(0, weight=1)
 
-
         Row0: List[str] = [self._backspace] + [str(i) for i in range(10)] + [self._delete]
         Row1: List[str] = ['|', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '/']
         Row2: List[str] = [self._shift, 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ':', '^']
         Row3: List[str] = ['', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '?', self._enter]
         Row4: List[str] = ['@', '#', '!', '*', self._space, '-', '_', '+', '=']
-
 
         offset = 0
         for r, row in enumerate([Row0, Row1, Row2, Row3, Row4]):
@@ -215,15 +214,12 @@ class PopupKeyboard(tkTopLevel):
         try:
             if Placement.Auto in placement:
                 if x_minus_frame_width < root_x:
-                    print('right')
                     return middle()
 
                 if x_plus_frame_width > root_width:
-                    print('left')
                     return middle()
 
                 if x_plus_frame_width < root_width and x_minus_frame_width > root_x:
-                    print('center')
                     return center()
 
                 return center()
@@ -484,34 +480,34 @@ class KeyboardMixin:
         from .KeyboardEntry import TitledKeyboardEntry  # circular import
         frame = LabelFrame(root, background='light blue', text='ENTRY')
 
-        TitledKeyboardEntry(frame, root=root, title=dict(text='Center Below'), entry=dict(keysize=7, placement=PlacementSet(Placement.Center, Placement.Bottom))).Pack()
-        TitledKeyboardEntry(frame, root=root, title=dict(text='Left Below'), entry=dict(keysize=6, placement=PlacementSet(Placement.Left, Placement.Bottom))).Pack()
-        TitledKeyboardEntry(frame, root=root, title=dict(text='Right Below'), entry=dict(keysize=5, placement=PlacementSet(Placement.Right, Placement.Bottom))).Pack()
-        TitledKeyboardEntry(frame, root=root, title=dict(text='Auto Below'), entry=dict(keysize=4, placement=PlacementSet(Placement.Auto, Placement.Bottom))).Pack()
+        TitledKeyboardEntry(frame, root=root, title=dict(text='Center Below'), value=dict(keysize=7, placement=PlacementSet(Placement.Center, Placement.Bottom))).Pack()
+        TitledKeyboardEntry(frame, root=root, title=dict(text='Left Below'), value=dict(keysize=6, placement=PlacementSet(Placement.Left, Placement.Bottom))).Pack()
+        TitledKeyboardEntry(frame, root=root, title=dict(text='Right Below'), value=dict(keysize=5, placement=PlacementSet(Placement.Right, Placement.Bottom))).Pack()
+        TitledKeyboardEntry(frame, root=root, title=dict(text='Auto Below'), value=dict(keysize=4, placement=PlacementSet(Placement.Auto, Placement.Bottom))).Pack()
 
-        TitledKeyboardEntry(frame, root=root, title=dict(text='FULL Auto'), entry=dict()).Pack()
+        TitledKeyboardEntry(frame, root=root, title=dict(text='FULL Auto'), value=dict()).Pack()
 
-        TitledKeyboardEntry(frame, root=root, title=dict(text='Center Above'), entry=dict(placement=PlacementSet(Placement.Center, Placement.Top))).Pack()
-        TitledKeyboardEntry(frame, root=root, title=dict(text='Left Above'), entry=dict(placement=PlacementSet(Placement.Left, Placement.Top))).Pack()
-        TitledKeyboardEntry(frame, root=root, title=dict(text='Right Above'), entry=dict(placement=PlacementSet(Placement.Right, Placement.Top))).Pack()
-        TitledKeyboardEntry(frame, root=root, title=dict(text='Auto Above'), entry=dict(placement=PlacementSet(Placement.Auto, Placement.Top))).Pack()
+        TitledKeyboardEntry(frame, root=root, title=dict(text='Center Above'), value=dict(placement=PlacementSet(Placement.Center, Placement.Top))).Pack()
+        TitledKeyboardEntry(frame, root=root, title=dict(text='Left Above'), value=dict(placement=PlacementSet(Placement.Left, Placement.Top))).Pack()
+        TitledKeyboardEntry(frame, root=root, title=dict(text='Right Above'), value=dict(placement=PlacementSet(Placement.Right, Placement.Top))).Pack()
+        TitledKeyboardEntry(frame, root=root, title=dict(text='Auto Above'), value=dict(placement=PlacementSet(Placement.Auto, Placement.Top))).Pack()
         return frame
     @staticmethod
     def test_comobobox_placements(root: tkRoot) -> LabelFrame:
         from .KeyboardComboBoxThemed import TitledKeyboardComboBoxThemed  # circular import
         frame = LabelFrame(root, background='light blue', text='COMBO_BOX')
 
-        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Center Below'), comobobox=dict(keysize=7, placement=PlacementSet(Placement.Center, Placement.Bottom))).Pack()
-        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Left Below'), comobobox=dict(keysize=6, placement=PlacementSet(Placement.Left, Placement.Bottom))).Pack()
-        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Right Below'), comobobox=dict(keysize=5, placement=PlacementSet(Placement.Right, Placement.Bottom))).Pack()
-        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Auto Below'), comobobox=dict(keysize=4, placement=PlacementSet(Placement.Auto, Placement.Bottom))).Pack()
+        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Center Below'), value=dict(keysize=7, placement=PlacementSet(Placement.Center, Placement.Bottom))).Pack()
+        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Left Below'), value=dict(keysize=6, placement=PlacementSet(Placement.Left, Placement.Bottom))).Pack()
+        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Right Below'), value=dict(keysize=5, placement=PlacementSet(Placement.Right, Placement.Bottom))).Pack()
+        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Auto Below'), value=dict(keysize=4, placement=PlacementSet(Placement.Auto, Placement.Bottom))).Pack()
 
-        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='FULL Auto'), comobobox=dict()).Pack()
+        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='FULL Auto'), value=dict()).Pack()
 
-        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Center Above'), comobobox=dict(placement=PlacementSet(Placement.Center, Placement.Top))).Pack()
-        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Left Above'), comobobox=dict(placement=PlacementSet(Placement.Left, Placement.Top))).Pack()
-        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Right Above'), comobobox=dict(placement=PlacementSet(Placement.Right, Placement.Top))).Pack()
-        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Auto Above'), comobobox=dict(placement=PlacementSet(Placement.Auto, Placement.Top))).Pack()
+        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Center Above'), value=dict(placement=PlacementSet(Placement.Center, Placement.Top))).Pack()
+        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Left Above'), value=dict(placement=PlacementSet(Placement.Left, Placement.Top))).Pack()
+        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Right Above'), value=dict(placement=PlacementSet(Placement.Right, Placement.Top))).Pack()
+        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Auto Above'), value=dict(placement=PlacementSet(Placement.Auto, Placement.Top))).Pack()
         return frame
     @staticmethod
     def test():
@@ -519,3 +515,107 @@ class KeyboardMixin:
         KeyboardMixin.test_entry_placements(root).Grid(0, 0)
         KeyboardMixin.test_comobobox_placements(root).Grid(0, 1)
         root.mainloop()
+
+
+
+
+
+class value_title_mixin:
+    Title: Label
+    Entry: BaseTextTkinterWidget
+
+    @property
+    def title(self) -> str: return self.Title.txt
+    @title.setter
+    def title(self, value: str): self.Title.txt = value
+
+    @property
+    def value(self) -> str: return self.Entry.txt
+    @value.setter
+    def value(self, value: str): self.Entry.txt = value
+
+    @staticmethod
+    def AssertKeyBoardType(cls):
+        if not (issubclass(cls, BaseTextTkinterWidget) and issubclass(cls, KeyboardMixin)): raise TypeError(type(cls), (BaseTextTkinterWidget, KeyboardMixin))
+
+    @staticmethod
+    def AssertType(cls):
+        if not (issubclass(cls, BaseTextTkinterWidget)): raise TypeError(type(cls), (BaseTextTkinterWidget,))
+
+
+
+class BaseTitled(Frame, value_title_mixin):
+    """
+        When subclassed, pairs the class type with the title label, wrapped in a grid.
+
+        Example:
+            class TitledEntry(BaseTitled):
+                def __init__(self, master, *, RowPadding: int = 1, factor: int = 3, value: Dict = { }, title: Dict = { }, cls: Type[Entry] = Entry, **kwargs):
+                    assert (issubclass(cls, Entry))
+                    BaseTitled.__init__(self, master, cls=cls, value=value, RowPadding=RowPadding, title=title, factor=factor, **kwargs)
+
+    """
+    def __init__(self, master, *, cls, RowPadding: int, factor: int, value: Dict, title: Dict, **kwargs):
+        value_title_mixin.AssertType(cls)
+        Frame.__init__(self, master, **kwargs)
+        self.Grid_RowConfigure(0, weight=1).Grid_RowConfigure(1, weight=factor).Grid_ColumnConfigure(0, weight=1)
+
+        self.Title = Label(self, **title).Grid(row=0, column=0, padx=RowPadding, pady=RowPadding)
+        # noinspection PyArgumentList
+        self.Entry = cls(self, **value).Grid(row=1, column=0, padx=RowPadding, pady=RowPadding)
+class BaseTitledKeyboard(Frame, value_title_mixin):
+    """
+        When subclassed, pairs the class type with the title label, wrapped in a grid.
+
+        Example:
+            class TitledKeyboardEntry(BaseTitledKeyboard):
+                def __init__(self, master, *, root: tkRoot, RowPadding: int = 1, factor: int = 3, value: Dict = { }, title: Dict = { }, cls: Type[KeyboardEntry] = KeyboardEntry, **kwargs):
+                    assert (issubclass(cls, KeyboardEntry))
+                    BaseTitledKeyboard.__init__(self, master, cls=cls, root=root, value=value, RowPadding=RowPadding, title=title, factor=factor, **kwargs)
+
+    """
+    def __init__(self, master, *, cls, root: tkRoot, RowPadding: int, factor: int, value: Dict, title: Dict, **kwargs):
+        value_title_mixin.AssertKeyBoardType(cls)
+        Frame.__init__(self, master, **kwargs)
+        self.Grid_RowConfigure(0, weight=1).Grid_RowConfigure(1, weight=factor).Grid_ColumnConfigure(0, weight=1)
+
+        self.Title = Label(self, **title).Grid(row=0, column=0, padx=RowPadding, pady=RowPadding)
+        self.Entry = cls(self, root=root, **value).Grid(row=1, column=0, padx=RowPadding, pady=RowPadding)
+
+
+
+
+class BaseFramed(LabelFrame, value_title_mixin):
+    """
+        When subclassed, pairs the class type with the title label, wrapped in a LabelFrame.
+
+        Example:
+            class FramedEntry(BaseFramed):
+                def __init__(self, master, *, value: Dict = { }, cls: Type[Entry] = Entry, **kwargs):
+                    assert (issubclass(cls, Entry))
+                    BaseFramed.__init__(self, master, cls=cls, value=value, **kwargs)
+
+    """
+    def __init__(self, master, *, cls, value: Dict, **kwargs):
+        value_title_mixin.AssertType(cls)
+        LabelFrame.__init__(self, master, **kwargs)
+
+        # noinspection PyArgumentList
+        self.Entry = cls(self, **value).PlaceFull()
+class BaseFramedKeyboard(LabelFrame, value_title_mixin):
+    """
+        When subclassed, pairs the class type with the title label, wrapped in a LabelFrame.
+
+        Example:
+            class FramedKeyboardEntry(BaseFramedKeyboard):
+                def __init__(self, master, *, root: tkRoot, value: Dict = { }, cls: Type[KeyboardEntry] = KeyboardEntry, **kwargs):
+                    assert (issubclass(cls, KeyboardEntry))
+                    BaseFramedKeyboard.__init__(self, master, cls=cls, root=root, value=value, **kwargs)
+
+    """
+    def __init__(self, master, *, cls, root: tkRoot, value: Dict, **kwargs):
+        value_title_mixin.AssertKeyBoardType(cls)
+        LabelFrame.__init__(self, master, **kwargs)
+
+        self.Entry = cls(self, root=root, **value).PlaceFull()
+

@@ -13,11 +13,6 @@ from typing import *
 
 __all__ = ['HID_BUFFER', 'TimeKeeperMixin']
 
-from PythonDebugTools import PRINT
-
-
-
-
 class TimeKeeperMixin(object):
     _LastTime = time.time()
     def UpdateTime(self): self._LastTime = time.time()
@@ -27,7 +22,6 @@ class TimeKeeperMixin(object):
 
     @property
     def CurrentTime(self) -> float: return time.time()
-
 
 
 # class str(object):
