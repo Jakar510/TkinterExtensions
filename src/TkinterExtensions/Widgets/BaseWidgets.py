@@ -416,13 +416,25 @@ class CallWrapper(tk.CallWrapper):
 
         return None
 class CurrentValue(CallWrapper):
-    """ Stores function to call when some user defined Tcl function is called e.g. after an event occurred. Passes the current value of the widget to the funciton. """
-    def __call__(self, *args, **kwargs): return self._func(self._widget.txt, *args, **kwargs)
+    """
+        Stores function to call when some user defined Tcl function is called e.g. after an event occurred.
+        Passes the current value of the widget to the funciton.
+
+        example:
+            widget.SetCommand(CurrentValue(passed_function))
+    """
+    def __init__(self, func: callable, *args, widget: BaseTkinterWidget = None, **kwargs):
+        """ Store FUNC, SUBST and WIDGET as members. """
+        self._args = args
+        self._kwargs = kwargs
+        super(CurrentValue, self).__init__(func, widget)
+
+    def __call__(self, *args, **kwargs): return self._func(self._widget.txt, *(self._args or args), **(self._kwargs or kwargs))
     def SetWidget(self, w):
         """
             Internal Method
 
-        :param w:
+        :param w: widget being assigned to this wrapper
         :type w: BaseTextTkinterWidget, CommandMixin
         :return: CurrentValue
         :rtype: CurrentValue

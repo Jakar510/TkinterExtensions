@@ -63,32 +63,31 @@ class PopupKeyboard(tkTopLevel):
     """
     # _number = '[1,2,3]'
     _space = '[ space ]'
-    _shift = 'shift'
+    _shift = 'Aa'
     _next = '>>>' or '→'  # &#x2192
     _previous = '<<<' or '←'  # &#x2190
     _enter = '↲'  # &#x21B2
     _backspace = '<-'
-    _delete = '->'
+    _delete = 'Clr'
     _sign = '±'
     # _close = '[abc]'
 
     _is_number: bool = False
-
+    _root_frame: Frame
     _Frames: Dict[int, Frame] = { }
     _letters: Dict[int, Dict[int, Button]] = { }
     _numbers: Dict[int, Dict[int, Button]] = { }
     _hid = HID_BUFFER()
-    def __init__(self, root: tkRoot, *, attach, x: int, y: int,
-                 keycolor: str = 'white', keysize: int = -1, font: str = '-family {Segoe UI Black} -size 12 -underline 0 -overstrike 0', takefocus: bool = False):
-        # PRINT('__PopupKeyboard__', root=root, entry=attach, x=x, y=y, keysize=keysize, keycolor=keycolor, takefocus=takefocus)
+    def __init__(self, root: tkRoot, *, attach, x: int, y: int, keysize: int = -1,
+                 keycolor: str = 'white', transparency: float = 0.85, takefocus: bool = False, font: str = '-family {Segoe UI Black} -size 13'):
         assert (isinstance(root, tkRoot))
         self.root = root
-        super().__init__(master=root, fullscreen=False, Screen_Width=root.Screen_Width, Screen_Height=root.Screen_Height, takefocus=takefocus)
+        tkTopLevel.__init__(self, master=root, fullscreen=False, Screen_Width=root.Screen_Width, Screen_Height=root.Screen_Height, takefocus=takefocus)
         self.overrideredirect(True)
-        self.SetTransparency(0.85)
+        self.SetTransparency(transparency)
 
         if not isinstance(attach, KeyboardMixin) and isinstance(attach, BaseTextTkinterWidget): raise TypeError(type(attach), (KeyboardMixin, BaseTextTkinterWidget))
-        self.attach: KeyboardMixin = attach
+        self.attach = attach
 
         self._keysize = keysize
         self._keycolor = keycolor
@@ -96,16 +95,42 @@ class PopupKeyboard(tkTopLevel):
         self._x = x
         self._y = y
 
-        self._init_keys()
+        self._root_frame = Frame(self).Grid(row=0, column=0).Grid_ColumnConfigure(0, weight=1).Grid_RowConfigure(0, weight=1)
+
+
+        Row0: List[str] = [self._backspace] + [str(i) for i in range(10)] + [self._delete]
+        Row1: List[str] = ['|', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '/']
+        Row2: List[str] = [self._shift, 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ':', '^']
+        Row3: List[str] = ['', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '?', self._enter]
+        Row4: List[str] = ['@', '#', '!', '*', self._space, '-', '_', '+', '=']
+
+
+        offset = 0
+        for r, row in enumerate([Row0, Row1, Row2, Row3, Row4]):
+            if r not in self._letters: self._letters[r] = { }
+            self._root_frame.Grid_RowConfigure(r, weight=1)
+            for c, text in enumerate(row):
+                self._root_frame.Grid_ColumnConfigure(c, weight=1)
+
+                if text == '': continue
+                w = Button(master=self._root_frame, text=text, bg=self._keycolor, takefocus=takefocus).SetCommand(CurrentValue(self._handle_key_press))
+
+                if self._shift == text: w.Grid(row=r, column=c, rowspan=2)
+
+                elif 'space' in text:
+                    w.Grid(row=r, column=c, columnspan=3)
+                    offset = 2
+
+                elif self._enter == text: w.Grid(row=r, column=c, rowspan=2)
+
+                else: w.Grid(row=r, column=c + offset)
+
+                self._letters[r][c] = w
         if keysize > 0: self.SetSize(keysize)
         if font: self.SetFont(font)
 
         self.Bind(Bindings.Key, lambda e: self.attach.destroy_popup())  # destroy _PopupKeyboard on keyboard interrupt
 
-    def _init_keys(self):
-        self._root_frame = Frame(self).Grid(row=0, column=0).Grid_ColumnConfigure(0, weight=1).Grid_RowConfigure(0, weight=1)
-        self._create_letters()
-        # self._create_numbers()
 
     # def _create_numbers(self):
     #     self._numbers_frame = Frame(self._root_frame).Grid(row=0, column=0).Grid_ColumnConfigure(0, weight=1).Grid_RowConfigure(0, weight=1)
@@ -139,32 +164,6 @@ class PopupKeyboard(tkTopLevel):
     #                 w.Grid(row=r, column=c + offset)
     #
     #     self._numbers_frame.hide()
-    def _create_letters(self):
-        self._letters_frame = Frame(self._root_frame).Grid(row=0, column=0).Grid_ColumnConfigure(0, weight=1).Grid_RowConfigure(0, weight=1)
-
-        Row0: List[str] = [self._previous] + [str(i) for i in range(10)] + [self._next]
-        Row1: List[str] = [self._backspace, 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '/']
-        Row2: List[str] = ['|', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ':', ';']
-        Row3: List[str] = [self._shift, 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '?', self._enter]  # self._number
-        Row4: List[str] = ['@', '#', '%', '*', self._space, '+', '-', '_', '=']
-
-        offset = 0
-        for r, row in enumerate([Row0, Row1, Row2, Row3, Row4]):
-            if r not in self._letters: self._letters[r] = { }
-            self._root_frame.Grid_RowConfigure(r, weight=1)
-            for c, text in enumerate(row):
-                self._root_frame.Grid_ColumnConfigure(c, weight=1)
-                self._letters[r][c] = w = Button(master=self._letters_frame, text=text, bg=self._keycolor).SetCommand(self._attach_key_press, z=text)
-
-                if 'space' in text:
-                    w.Grid(row=r, column=c, columnspan=3)
-                    offset = 2
-                elif self._enter == text:
-                    w.Grid(row=r, column=c, rowspan=2)
-                # elif self._backspace == text:
-                #     w.Grid(row=r, column=c, columnspan=2)
-                else: w.Grid(row=r, column=c + offset)
-
 
 
     def SetSize(self, size: int):
@@ -177,16 +176,16 @@ class PopupKeyboard(tkTopLevel):
         for row in self._numbers.values():
             for w in row.values():
                 w.configure(width=size)
+
         return self._resize()
 
     def SetFont(self, font: str):
         for row in self._letters.values():
-            for w in row.values():
-                w.configure(font=font)
+            for w in row.values(): w.configure(font=font)
 
         for row in self._numbers.values():
-            for w in row.values():
-                w.configure(font=font)
+            for w in row.values(): w.configure(font=font)
+
         return self._resize()
 
     def _resize(self):
@@ -202,8 +201,6 @@ class PopupKeyboard(tkTopLevel):
         y = self._get_y(y=self._y, frame_height=frame_height, entry_height=entry_height, placement=self.attach.placement)
         x = self._get_x(x=self._x, frame_width=frame_width, entry_width=entry_width, placement=self.attach.placement)
         self.SetDimmensions(frame_width, frame_height, x, y)
-
-
     def _get_x(self, *, x: int, frame_width: int, entry_width: int, placement: PlacementSet):
         def left(): return int(x - frame_width + entry_width)
         def right(): return int(x)
@@ -282,17 +279,6 @@ class PopupKeyboard(tkTopLevel):
 
 
 
-    # def _switchModes(self):
-    #     if self._is_number:
-    #         self._numbers_frame.hide()
-    #         self._letters_frame.show()
-    #         self._is_number = False
-    #     else:
-    #         self._numbers_frame.show()
-    #         self._letters_frame.hide()
-    #         self._is_number = True
-    #
-    #     return self._resize()
     def SwitchCase(self):
         for row in self._letters.values():
             for w in row.values():
@@ -304,7 +290,7 @@ class PopupKeyboard(tkTopLevel):
 
         return self._resize()
 
-    def _attach_key_press(self, value: str):
+    def _handle_key_press(self, value: str):
         if value == self._shift: self.SwitchCase()
 
         elif value == self._space: self._append_space(self.attach)
@@ -327,6 +313,7 @@ class PopupKeyboard(tkTopLevel):
             self._hid += ' '
             w.txt = self._hid.Value
     def _handle_backspace(self):
+        print('_handle_backspace_', self.attach)
         if isinstance(self.attach, Entry):
             index = self.attach.index(tk.INSERT)
             del self._hid[index]
@@ -370,7 +357,7 @@ class PopupKeyboard(tkTopLevel):
             self.attach.destroy_popup()
             return True
 
-        else: raise AttributeError('self.attach.destroy_popup() not found')
+        raise AttributeError('self.attach.destroy_popup() not found')
 
 class KeyboardMixin:
     """
@@ -421,7 +408,7 @@ class KeyboardMixin:
                                        keycolor=keycolor)
 
     """
-    kb: Union[PopupKeyboard, None]
+    kb: Union[PopupKeyboard, None] = None
     Bind: callable
     tk_focusNext: callable
     tk_focusPrev: callable
@@ -456,13 +443,12 @@ class KeyboardMixin:
 
     def _check_state(self, e: tkEvent): return self._handle_event_(TkinterEvent(e))
     def _handle_event_(self, event: TkinterEvent):
-        print(event)
         if self.state == KeyBoardState.Virtual:
-            if event == EventType.FocusOut:
-                self.destroy_popup()
+            if event.type == EventType.FocusOut:
                 self.state = KeyBoardState.Typing
+                # self.destroy_popup()
 
-            elif event == EventType.KeyPress:
+            elif event.type == EventType.KeyPress:
                 self.destroy_popup()
                 self.state = KeyBoardState.Typing
                 self.Append(event.char)
@@ -477,7 +463,7 @@ class KeyboardMixin:
                 self.state = KeyBoardState.Virtual
 
         elif self.state == KeyBoardState.Typing:
-            if event == EventType.FocusOut:
+            if event.type == EventType.FocusOut:
                 self.state = KeyBoardState.Idle
 
     def _call_popup(self):
@@ -488,9 +474,9 @@ class KeyboardMixin:
         self.kb = PopupKeyboard(self.root, attach=self, x=self.x, y=self.y, keycolor=self.keycolor, keysize=self.keysize)
 
     def destroy_popup(self):
-        self.kb.destroy()
-        self.kb = None
-        # self.state = KeyBoardState.Idle
+        if self.kb:
+            self.kb.destroy()
+            self.kb = None
 
 
     @staticmethod

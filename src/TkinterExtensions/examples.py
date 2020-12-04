@@ -299,8 +299,8 @@ def test1():
 
 def run_all():
     KeyboardEntry.test()
-    test()
-    test1()
+    # test()
+    # test1()
 
 if __name__ == '__main__':
     run_all()

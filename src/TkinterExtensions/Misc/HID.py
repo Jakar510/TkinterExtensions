@@ -13,6 +13,11 @@ from typing import *
 
 __all__ = ['HID_BUFFER', 'TimeKeeperMixin']
 
+from PythonDebugTools import PRINT
+
+
+
+
 class TimeKeeperMixin(object):
     _LastTime = time.time()
     def UpdateTime(self): self._LastTime = time.time()
@@ -602,7 +607,6 @@ class TimeKeeperMixin(object):
 #         pass
 
 
-
 class HID_BUFFER(TimeKeeperMixin):
     __all__ = []
     _text: str = ''
@@ -692,7 +696,21 @@ class HID_BUFFER(TimeKeeperMixin):
 
     def __delitem__(self, key: int):
         """ https://www.geeksforgeeks.org/ways-to-remove-ith-character-from-string-in-python/ """
-        self._text = self._text[:key] + self._text[key + 1:]
+        # if key != len(self):
+        #     print('before __delitem__', self)
+        #     b = self._text[:key]
+        #     a = self._text[key + 1:]
+        #     self._text = b + a
+        #     PRINT('__delitem__', b=b, a=a, index=key, length=len(self))
+        #     print('after __delitem__', self)
+        #     return
+
+        try:
+            _ = float(self._text)
+            self.Backspace_Number()
+        except (ValueError, TypeError):
+            self.Backspace()
+
     def __setitem__(self, key: int, value: str):
         """ https://stackoverflow.com/a/41753022/9530917 """
         l = tuple(self._text)
