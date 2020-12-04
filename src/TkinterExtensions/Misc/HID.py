@@ -6,6 +6,7 @@
 
 
 import time
+from typing import *
 
 
 
@@ -62,6 +63,7 @@ class HID_BUFFER(TimeKeeperMixin):
 
 
 
+
     def TryReturnAsNumber(self) -> float or str or None:
         """
             tries to convert to number, if fails returns None.
@@ -100,3 +102,6 @@ class HID_BUFFER(TimeKeeperMixin):
     def __sub__(self, char: str): return self.Sub(char)
 
     def __len__(self) -> int: return len(self._text)
+
+    def __setitem__(self, key: int, value: str): self._text[key] = value
+    def __getitem__(self, key: Union[int, slice]) -> str: return self._text[key]

@@ -14,6 +14,7 @@ from .Root import *
 from .Widgets import *
 from .base import *
 from ..Events import *
+from ..Misc import HID_BUFFER
 
 
 
@@ -76,7 +77,7 @@ class PopupKeyboard(tkTopLevel):
     _Frames: Dict[int, Frame] = { }
     _letters: Dict[int, Dict[int, Button]] = { }
     _numbers: Dict[int, Dict[int, Button]] = { }
-
+    _hid = HID_BUFFER()
     def __init__(self, root: tkRoot, *, attach, x: int, y: int,
                  keycolor: str = 'white', keysize: int = -1, font: str = '-family {Segoe UI Black} -size 12 -underline 0 -overstrike 0', takefocus: bool = False):
         # PRINT('__PopupKeyboard__', root=root, entry=attach, x=x, y=y, keysize=keysize, keycolor=keycolor, takefocus=takefocus)
@@ -304,44 +305,72 @@ class PopupKeyboard(tkTopLevel):
         return self._resize()
 
     def _attach_key_press(self, value: str):
-        if isinstance(self.attach, Entry):
-            index = self.attach.index(tk.INSERT)
-            if value == self._next:
-                self.attach.icursor(index + 1)
+        if value == self._shift: self.SwitchCase()
 
-            elif value == self._previous:
-                self.attach.icursor(index - 1)
+        elif value == self._space: self._append_space(self.attach)
 
-            elif value == self._space: self.attach.insert(index, ' ')
+        elif value == self._enter: self._handle_enter()
 
-            elif value == self._shift: self.SwitchCase()
+        elif value == self._backspace: self._handle_backspace()
 
-            elif value == self._enter:
-                if isinstance(self.attach, KeyboardMixin):
-                    self.attach.destroy_popup()
-                else:
-                    raise AttributeError('self.attach.destroy_popup() not found')
+        elif value == self._delete:
+            self._hid.Value = self.attach.txt = ''
 
-            else: self.attach.insert(index, value)
+        elif self._handle_navigation(value): pass
 
         else:
-            if value == self._next:
-                self.attach.tk_focusNext().focus_set()
-                self.attach.destroy_popup()
+            self._hid += value
+            self.attach.txt = self._hid.Value
+    def _append_space(self, w):
+        if isinstance(w, BaseTextTkinterWidget):
+            self._hid.Value = w.txt
+            self._hid += ' '
+            w.txt = self._hid.Value
+    def _handle_backspace(self):
+        if isinstance(self.attach, Entry):
+            index = self.attach.index(tk.INSERT)
+            del self._hid[index]
+            self.attach.txt = self._hid.Value
 
-            elif value == self._previous:
-                self.attach.tk_focusPrev().focus_set()
-                self.attach.destroy_popup()
+        else:
+            self._hid.Value = self.attach.txt
+            self._hid.Backspace()
+            self.attach.txt = self._hid.Value
 
-            elif value == self._space: self.attach.Append(' ')
+    def _handle_navigation(self, value: str) -> bool:
+        if value == self._next or value == self._previous:
+            if isinstance(self.attach, Entry):
+                index = self.attach.index(tk.INSERT)
+                if value == self._next:
+                    self.attach.icursor(index + 1)
+                    return True
 
-            elif value == self._shift: self.SwitchCase()
+                elif value == self._previous:
+                    self.attach.icursor(index - 1)
+                    return True
 
-            elif value == self._enter: self.attach.destroy_popup()
+                else:
+                    self.attach.insert(index, value)
+                    return True
 
-            else: self.attach.Append(value)
+            elif isinstance(self.attach, BaseTextTkinterWidget):
+                return self._navagate(value)
 
+        return False
+    def _navagate(self, value: str) -> bool:
+        if value == self._next:
+            self.attach.tk_focusNext().focus_set()
+            return self._handle_enter()
 
+        elif value == self._previous:
+            self.attach.tk_focusPrev().focus_set()
+            return self._handle_enter()
+    def _handle_enter(self) -> True:
+        if isinstance(self.attach, KeyboardMixin):
+            self.attach.destroy_popup()
+            return True
+
+        else: raise AttributeError('self.attach.destroy_popup() not found')
 
 class KeyboardMixin:
     """
@@ -466,7 +495,7 @@ class KeyboardMixin:
 
     @staticmethod
     def test_entry_placements(root: tkRoot) -> LabelFrame:
-        from .KeyboardEntry import TitledKeyboardEntry # circular import
+        from .KeyboardEntry import TitledKeyboardEntry  # circular import
         frame = LabelFrame(root, background='light blue', text='ENTRY')
 
         TitledKeyboardEntry(frame, root=root, title=dict(text='Center Below'), entry=dict(keysize=7, placement=PlacementSet(Placement.Center, Placement.Bottom))).Pack()
@@ -483,7 +512,7 @@ class KeyboardMixin:
         return frame
     @staticmethod
     def test_comobobox_placements(root: tkRoot) -> LabelFrame:
-        from .KeyboardComboBoxThemed import TitledKeyboardComboBoxThemed # circular import
+        from .KeyboardComboBoxThemed import TitledKeyboardComboBoxThemed  # circular import
         frame = LabelFrame(root, background='light blue', text='COMBO_BOX')
 
         TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Center Below'), comobobox=dict(keysize=7, placement=PlacementSet(Placement.Center, Placement.Bottom))).Pack()
