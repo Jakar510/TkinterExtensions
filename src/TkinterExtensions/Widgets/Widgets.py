@@ -538,6 +538,8 @@ class ScrolledText(BaseTextTkinterWidget, CommandMixin):
 
     def _options(self, cnf, kwargs=None) -> dict: return super()._options(cnf, BaseTkinterWidget.convert_kwargs(kwargs))
 
+
+
 class Scale(tk.Scale, BaseTkinterWidget):
     def __init__(self, master, **kwargs):
         tk.Scale.__init__(self, master, **kwargs)
