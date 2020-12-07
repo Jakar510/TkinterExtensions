@@ -420,7 +420,7 @@ class EntryThemed(ttk.Entry, BaseTextTkinterWidget, CommandMixin):
 
 
 
-class NotebookThemed(ttk.Notebook, BaseTextTkinterWidget):
+class NotebookThemed(BaseTextTkinterWidget, ttk.Notebook):
     def __init__(self, master, Color: dict = None, **kwargs):
         ttk.Notebook.__init__(self, master=master, **kwargs)
         BaseTkinterWidget.__init__(self, Color=Color)
