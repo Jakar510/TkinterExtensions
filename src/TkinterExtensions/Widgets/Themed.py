@@ -8,8 +8,6 @@
 import random
 from typing import Any, Dict, Iterable, List, Tuple, Union
 
-from PythonDebugTools import PRINT
-
 from .BaseWidgets import *
 from .Frames import *
 from .base import *
@@ -569,7 +567,7 @@ class CheckButtonThemed(ttk.Checkbutton, BaseTextTkinterWidget, ImageMixin, Comm
     @property
     def value(self) -> bool: return self._value.get()
     @value.setter
-    def value(self, b: bool): # FIXME: ignores value passed. only toggles true/false.
+    def value(self, b: bool):  # FIXME: ignores value passed. only toggles true/false.
         self._value.set(b)
 
         self.invoke()
