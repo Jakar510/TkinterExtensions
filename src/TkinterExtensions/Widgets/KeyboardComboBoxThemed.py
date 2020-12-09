@@ -33,7 +33,8 @@ class KeyboardComboBoxThemed(ComboBoxThemed, KeyboardMixin):
         """ By default, destroys the popup when the dropdown list is expanded. Override to add functionality """
         self.destroy_popup()
 
-    def _OnSelect(self):
+    # noinspection PyUnusedLocal
+    def _OnSelect(self, event: tkEvent = None):
         """ By default, destroys the popup when a item is selected. Override to add functionality """
         self.destroy_popup()
 

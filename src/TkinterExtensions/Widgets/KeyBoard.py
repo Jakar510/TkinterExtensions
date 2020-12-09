@@ -447,7 +447,6 @@ class KeyboardMixin:
             elif event.type == EventType.KeyPress:
                 self.destroy_popup()
                 self.state = KeyBoardState.Typing
-                self.Append(event.char)
 
             elif event.type == EventType.ButtonPress:
                 self._call_popup()
