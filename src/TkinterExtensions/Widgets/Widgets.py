@@ -15,7 +15,7 @@ from urllib.request import urlopen
 from .BaseWidgets import *
 from .Frames import Frame
 from ..Events import *
-from ..Misc.Enumerations import *
+from ..Enumerations import *
 from ..Widgets.base import *
 
 

@@ -13,7 +13,7 @@ from typing import *
 
 __all__ = ['HID_BUFFER', 'TimeKeeperMixin']
 
-class TimeKeeperMixin(object):
+class TimeKeeperMixin:
     _LastTime = time.time()
     def UpdateTime(self): self._LastTime = time.time()
 

@@ -6,10 +6,12 @@
 #
 # ------------------------------------------------------------------------------
 
+from .Enumerations import *
 from .Events import *
-from .Misc import *
+from .HID_BUFFER import *
 from .Widgets import *
 from .__version__ import *
+
 
 
 
@@ -54,6 +56,5 @@ __classifiers__ = [
 
         'Programming Language :: Python :: 3',
         ]
-
 
 __short_description__ = 'Strongly typed widgets and event with multiple built in helper functions to speed up development.'

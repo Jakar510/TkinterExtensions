@@ -12,7 +12,7 @@ from .BaseWidgets import *
 from .Frames import *
 from .base import *
 from ..Events import *
-from ..Misc.Enumerations import *
+from ..Enumerations import *
 
 
 

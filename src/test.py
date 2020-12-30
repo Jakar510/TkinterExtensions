@@ -4,8 +4,10 @@
 #
 # ------------------------------------------------------------------------------
 
-from .Constants import *
-from .Enumerations import *
-from .HID import *
-from .Helpers import *
-from .debug import *
+from TkinterExtensions.examples import run_all
+
+
+
+
+if __name__ == '__main__':
+    run_all()

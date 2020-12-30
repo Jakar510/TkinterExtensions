@@ -19,8 +19,8 @@ from urllib.request import urlopen
 
 from PIL import Image, ImageTk
 
-from ..Misc.Enumerations import *
-from ..Misc.Helpers import *
+from ..Enumerations import *
+from BaseExtensions.Images import *
 from ..Widgets.base import *
 
 

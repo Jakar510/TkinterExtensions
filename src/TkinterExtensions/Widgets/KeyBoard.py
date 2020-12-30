@@ -14,7 +14,7 @@ from .Root import *
 from .Widgets import *
 from .base import *
 from ..Events import *
-from ..Misc import HID_BUFFER
+from ..HID_BUFFER import HID_BUFFER
 
 
 
