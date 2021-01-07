@@ -12,7 +12,6 @@ from time import sleep
 from typing import List, Union
 
 from TkinterExtensions import *
-from TkinterExtensions.Widgets.KeyboardEntry import KeyboardEntry
 
 
 
@@ -298,9 +297,11 @@ def test1():
 
 
 def run_all():
-    KeyboardEntry.test()
+    # from TkinterExtensions.Widgets.KeyBoard import KeyBaordTestFrame
+    # KeyBaordTestFrame.test()
     # test()
     # test1()
+    pass
 
 if __name__ == '__main__':
     run_all()

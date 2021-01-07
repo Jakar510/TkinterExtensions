@@ -84,7 +84,7 @@ class PopupKeyboard(tkTopLevel):
         self.__root = root
         tkTopLevel.__init__(self, master=root, fullscreen=False, takefocus=takefocus,
                             Screen_Width=1, Screen_Height=1)
-                            # Screen_Width=root.Screen_Width, Screen_Height=root.Screen_Height)
+        # Screen_Width=root.Screen_Width, Screen_Height=root.Screen_Height)
         self.overrideredirect(True)
         self.SetTransparency(transparency)
 
@@ -354,7 +354,7 @@ class KeyboardMixin:
                                        keycolor=keycolor)
 
     """
-    kb: Union[PopupKeyboard, None] = None
+    kb: Optional[PopupKeyboard] = None
     Bind: callable
     tk_focusNext: callable
     tk_focusPrev: callable
@@ -404,13 +404,13 @@ class KeyboardMixin:
 
     # noinspection PyUnusedLocal
     def _handle_FocusIn(self, e: tkEvent):
-        self._debug_event_(EventType.FocusIn, e)
+        # self._debug_event_(EventType.FocusIn, e)
         if self.state == KeyBoardState.Idle:
             self._call_popup()
             self.state = KeyBoardState.Virtual
     # noinspection PyUnusedLocal
     def _handle_FocusOut(self, e: tkEvent):
-        self._debug_event_(EventType.FocusOut, e)
+        # self._debug_event_(EventType.FocusOut, e)
         if self.state == KeyBoardState.Typing:
             self.state = KeyBoardState.Idle
 
@@ -419,20 +419,20 @@ class KeyboardMixin:
             self.destroy_popup()
     # noinspection PyUnusedLocal
     def _handle_KeyPress(self, e: tkEvent):
-        self._debug_event_(EventType.KeyPress, e)
+        # self._debug_event_(EventType.KeyPress, e)
         if self.state == KeyBoardState.Virtual:
             self.destroy_popup()
             self.state = KeyBoardState.Typing
     # noinspection PyUnusedLocal
     def _handle_ButtonPress(self, e: tkEvent):
-        self._debug_event_(EventType.ButtonPress, e)
+        # self._debug_event_(EventType.ButtonPress, e)
         if self.state != KeyBoardState.Virtual or self.kb is None:
             self._call_popup()
             self.state = KeyBoardState.Virtual
+    # noinspection PyUnreachableCode,PyUnusedLocal
     def _debug_event_(self, tag: EventType, event: tkEvent):
-        print('__state__', self.state)
-        print(f'__{tag.name}__', TkinterEvent(event).ToString())
-        print()
+        print('__KeyboardMixin__state__', self.state)
+        print(f'__KeyboardMixin__Event__{tag.name}__', TkinterEvent(event).ToString())
         print()
 
 
@@ -466,47 +466,52 @@ class KeyboardMixin:
 
 
 
-    @staticmethod
-    def test_placements(cls, root: tkRoot, d: Dict[str, Dict[str, Placement]], title: str) -> LabelFrame:
-        frame = LabelFrame(root, background='light blue', text=title)
-        for key, value in d.items():
-            cls(frame, root=root, title=key, **value).Pack()
 
-        return frame
-    @staticmethod
-    def test_sizing(cls, root: tkRoot, d: Dict[str, Dict[str, Placement]], title: str) -> LabelFrame:
-        frame = LabelFrame(root, background='dark blue', text=title)
-        for key, value in d.items():
-            w = cls(frame, root=root, title=key, **value).Pack()
-            w.keysize = 5
-
-        return frame
-    @staticmethod
-    def test():
-        from .KeyboardEntry import TitledKeyboardEntry  # circular import
-        from .KeyboardComboBoxThemed import TitledKeyboardComboBoxThemed  # circular import
-        d = {
-                'Center Below': dict(placement=PlacementSet(Placement.Center, Placement.Bottom)),
-                'Left Below':   dict(placement=PlacementSet(Placement.Left, Placement.Bottom)),
-                'Right Below':  dict(placement=PlacementSet(Placement.Right, Placement.Bottom)),
-                'Auto Below':   dict(placement=PlacementSet(Placement.Auto, Placement.Bottom)),
-                'FULL Auto':    { },
-                'Center Above': dict(placement=PlacementSet(Placement.Center, Placement.Top)),
-                'Left Above':   dict(placement=PlacementSet(Placement.Left, Placement.Top)),
-                'Right Above':  dict(placement=PlacementSet(Placement.Right, Placement.Top)),
-                'Auto Above':   dict(placement=PlacementSet(Placement.Auto, Placement.Top)),
-                }
-        root = tkRoot(Screen_Width=800, Screen_Height=480, x=200, y=200)
-        KeyboardMixin.test_placements(TitledKeyboardEntry, root, d, 'ENTRY').Grid(0, 0)
-        KeyboardMixin.test_placements(TitledKeyboardComboBoxThemed, root, d, 'COMBO_BOX').Grid(0, 1)
-
-        KeyboardMixin.test_sizing(TitledKeyboardEntry, root, d, 'SIZES').Grid(0, 2)
-        # KeyboardMixin.test_sizing(TitledKeyboardComboBoxThemed, root, d, 'SIZES').Grid(0, 2)
-        root.mainloop()
-
-
-
-
+# _T = TypeVar('_T')
+# class KeyBaordTestFrame(Frame, Generic[_T]):
+#     @staticmethod
+#     def test():
+#         from .Themed import NotebookThemed
+#         from .KeyboardEntry import TitledKeyboardEntry, FramedKeyboardEntry  # circular import
+#         from .KeyboardComboBoxThemed import TitledKeyboardComboBoxThemed, FramedKeyboardComboBoxThemed  # circular import
+#         root = tkRoot(Screen_Width=800, Screen_Height=480, x=200, y=200)
+#         nb = NotebookThemed(root).PlaceFull()
+#         d = KeyBaordTestFrame.FrameConfig()
+#
+#         w = FramedKeyboardEntry.TEST(nb, root, d)
+#         nb.Add(w, title='Frame_Entry')
+#         w = TitledKeyboardEntry.TEST(nb, root, d)
+#         nb.Add(w, title='Titled_Entry')
+#
+#         w = FramedKeyboardComboBoxThemed.TEST(nb, root, d)
+#         nb.Add(w, title='Framed_COMBO_BOX')
+#         w = TitledKeyboardComboBoxThemed.TEST(nb, root, d)
+#         nb.Add(w, title='Titled_COMBO_BOX')
+#
+#         root.mainloop()
+#     @staticmethod
+#     def FrameConfig(): return {
+#             'Center_Below': dict(placement=PlacementSet(Placement.Center, Placement.Bottom)),
+#             'Left_Below':   dict(placement=PlacementSet(Placement.Left, Placement.Bottom)),
+#             'Right_Below':  dict(placement=PlacementSet(Placement.Right, Placement.Bottom)),
+#             'Auto_Below':   dict(placement=PlacementSet(Placement.Auto, Placement.Bottom)),
+#             'FULL_Auto':    { },
+#             'Center_Above': dict(placement=PlacementSet(Placement.Center, Placement.Top)),
+#             'Left_Above':   dict(placement=PlacementSet(Placement.Left, Placement.Top)),
+#             'Right_Above':  dict(placement=PlacementSet(Placement.Right, Placement.Top)),
+#             'Auto_Above':   dict(placement=PlacementSet(Placement.Auto, Placement.Top)),
+#             }
+#     Center_Below: _T
+#     Left_Below: _T
+#     Right_Below: _T
+#     Auto_Below: _T
+#     FULL_Auto: _T
+#     Center_Above: _T
+#     Left_Above: _T
+#     Right_Above: _T
+#     Auto_Above: _T
+#
+#     def iter(self) -> List[_T]: return [getattr(self, key) for key in self.FrameConfig().keys()]
 
 class value_title_mixin:
     Title: Label
@@ -552,11 +557,14 @@ class BaseTitled(Frame, value_title_mixin):
 
     """
     @overload
-    def __init__(self, master, cls: Type, RowPadding: int, factor: int, frame: Dict[str, Any], title: str, **value_kwargs): ...
+    def __init__(self, master, cls: Type, RowPadding: int, factor: int,
+                 frame: Dict[str, Any], title: str, **value_kwargs: Union[Placement, str, int]): ...
     @overload
-    def __init__(self, master, cls: Type, RowPadding: int, factor: int, frame: Dict[str, Any], title: Dict[str, Any], **value_kwargs): ...
+    def __init__(self, master, cls: Type, RowPadding: int, factor: int,
+                 frame: Dict[str, Any], title: Dict[str, Any], **value_kwargs: Union[Placement, str, int]): ...
 
-    def __init__(self, master, cls: Type, RowPadding: int, factor: int, frame: Dict[str, Any], title: Union[str, Dict[str, Any]], **value_kwargs):
+    def __init__(self, master, cls: Type, RowPadding: int, factor: int,
+                 frame: Dict[str, Any], title: Union[str, Dict[str, Any]], **value_kwargs: Union[Placement, str, int]):
         value_title_mixin.AssertType(cls)
         Frame.__init__(self, master, **frame)
         self.Grid_RowConfigure(0, weight=1).Grid_RowConfigure(1, weight=factor).Grid_ColumnConfigure(0, weight=1)
@@ -564,6 +572,15 @@ class BaseTitled(Frame, value_title_mixin):
         self.Title = Label(self, **self._ConvertTitle(title)).Grid(row=0, column=0, padx=RowPadding, pady=RowPadding)
         # noinspection PyArgumentList
         self.Entry = cls(self, **value_kwargs).Grid(row=1, column=0, padx=RowPadding, pady=RowPadding)
+
+    # @classmethod
+    # def TEST(cls, master, root: tkRoot, d: Dict[str, Dict[str, Union[Placement, str, int]]], frame_bg: str = 'light blue'):
+    #     frame: KeyBaordTestFrame[cls] = KeyBaordTestFrame(master, background=frame_bg)
+    #     for key, value in d.items():
+    #         w = cls(frame, title=key, **value).PackHorizontal()
+    #         setattr(frame, key, w)
+    #
+    #     return frame
 class BaseTitledKeyboard(Frame, value_title_mixin):
     """
         When subclassed, pairs the class type with the title label, wrapped in a grid.
@@ -576,17 +593,29 @@ class BaseTitledKeyboard(Frame, value_title_mixin):
 
     """
     @overload
-    def __init__(self, master, cls: Type, root: tkRoot, RowPadding: int, factor: int, title: str, value: Dict, **value_kwargs): ...
+    def __init__(self, master, cls: Type, root: tkRoot, RowPadding: int, factor: int,
+                 title: str, value: Dict, **value_kwargs: Union[Placement, str, int]): ...
     @overload
-    def __init__(self, master, cls: Type, root: tkRoot, RowPadding: int, factor: int, title: Dict[str, Any], value: Dict, **value_kwargs): ...
+    def __init__(self, master, cls: Type, root: tkRoot, RowPadding: int, factor: int,
+                 title: Dict[str, Any], value: Dict, **value_kwargs: Union[Placement, str, int]): ...
 
-    def __init__(self, master, cls: Type, root: tkRoot, RowPadding: int, factor: int, frame: Dict[str, Any], title: Union[str, Dict[str, Any]], **value_kwargs):
+    def __init__(self, master, cls: Type, root: tkRoot, RowPadding: int, factor: int,
+                 frame: Dict[str, Any], title: Union[str, Dict[str, Any]], **value_kwargs: Union[Placement, str, int]):
         value_title_mixin.AssertKeyBoardType(cls)
         Frame.__init__(self, master, **frame)
         self.Grid_RowConfigure(0, weight=1).Grid_RowConfigure(1, weight=factor).Grid_ColumnConfigure(0, weight=1)
 
         self.Title = Label(self, **self._ConvertTitle(title)).Grid(row=0, column=0, padx=RowPadding, pady=RowPadding)
         self.Entry = cls(self, root=root, **value_kwargs).Grid(row=1, column=0, padx=RowPadding, pady=RowPadding)
+
+    # @classmethod
+    # def TEST(cls, master, root: tkRoot, d: Dict[str, Dict[str, Union[Placement, str, int]]], frame_bg: str = 'light blue'):
+    #     frame: KeyBaordTestFrame[cls] = KeyBaordTestFrame(master, background=frame_bg)
+    #     for key, value in d.items():
+    #         w = cls(frame, root=root, title=key, **value).PackHorizontal()
+    #         setattr(frame, key, w)
+    #
+    #     return frame
 
 
 
@@ -602,11 +631,11 @@ class BaseFramed(LabelFrame, value_title_mixin):
 
     """
     @overload
-    def __init__(self, master, cls: Type, title: str, **value_kwargs): ...
+    def __init__(self, master, cls: Type, title: str, **value_kwargs: Union[Placement, str, int]): ...
     @overload
-    def __init__(self, master, cls: Type, title: Dict[str, Any], **value_kwargs): ...
+    def __init__(self, master, cls: Type, title: Dict[str, Any], **value_kwargs: Union[Placement, str, int]): ...
 
-    def __init__(self, master, cls: Type, title: Union[str, Dict[str, Any]], **value_kwargs):
+    def __init__(self, master, cls: Type, title: Union[str, Dict[str, Any]], **value_kwargs: Union[Placement, str, int]):
         value_title_mixin.AssertType(cls)
         LabelFrame.__init__(self, master, **self._ConvertTitle(title))
 
@@ -617,6 +646,15 @@ class BaseFramed(LabelFrame, value_title_mixin):
     def title(self) -> str: return self.txt
     @title.setter
     def title(self, value: str): self.txt = value
+
+    # @classmethod
+    # def TEST(cls, master, root: tkRoot, d: Dict[str, Dict[str, Union[Placement, str, int]]], frame_bg: str = 'light blue'):
+    #     frame: KeyBaordTestFrame[cls] = KeyBaordTestFrame(master, background=frame_bg)
+    #     for key, value in d.items():
+    #         w = cls(frame, title=key, **value).PackHorizontal()
+    #         setattr(frame, key, w)
+    #
+    #     return frame
 class BaseFramedKeyboard(LabelFrame, value_title_mixin):
     """
         When subclassed, pairs the class type with the title label, wrapped in a LabelFrame.
@@ -629,11 +667,11 @@ class BaseFramedKeyboard(LabelFrame, value_title_mixin):
 
     """
     @overload
-    def __init__(self, master, cls: Type, root: tkRoot, title: str, **value_kwargs): ...
+    def __init__(self, master, cls: Type, root: tkRoot, title: str, **value_kwargs: Union[Placement, str, int]): ...
     @overload
-    def __init__(self, master, cls: Type, root: tkRoot, title: Dict[str, Any], **value_kwargs): ...
+    def __init__(self, master, cls: Type, root: tkRoot, title: Dict[str, Any], **value_kwargs: Union[Placement, str, int]): ...
 
-    def __init__(self, master, cls: Type, root: tkRoot, title: Union[str, Dict[str, Any]], **value_kwargs):
+    def __init__(self, master, cls: Type, root: tkRoot, title: Union[str, Dict[str, Any]], **value_kwargs: Union[Placement, str, int]):
         value_title_mixin.AssertKeyBoardType(cls)
         LabelFrame.__init__(self, master, **self._ConvertTitle(title))
 
@@ -643,3 +681,12 @@ class BaseFramedKeyboard(LabelFrame, value_title_mixin):
     def title(self) -> str: return self.txt
     @title.setter
     def title(self, value: str): self.txt = value
+
+    # @classmethod
+    # def TEST(cls, master, root: tkRoot, d: Dict[str, Dict[str, Union[Placement, str, int]]], frame_bg: str = 'light blue'):
+    #     frame: KeyBaordTestFrame[cls] = KeyBaordTestFrame(master, background=frame_bg)
+    #     for key, value in d.items():
+    #         w = cls(frame, root=root, title=key, **value).PackHorizontal()
+    #         setattr(frame, key, w)
+    #
+    #     return frame

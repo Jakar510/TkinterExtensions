@@ -204,33 +204,32 @@ class BaseTkinterWidget(tk.Widget, ABC):
 
 
     def Pack(self, cnf: dict = { }, **kwargs):
-        self.pack(cnf, **kwargs)
-        self._pi = self.pack_info()
-        self._manager_ = Layout.pack
-        return self
-    def PackOptions(self, *, side: str or Side, fill: str or Fill, expand: bool, anchor: str or AnchorAndSticky = AnchorAndSticky.All, padx: int = 0, pady: int = 0, **kwargs):
-        """Pack a widget in the master widget. Use as options:
+        """Pack a widget in the parent widget. Use as options:
         after=widget - pack it after you have packed widget
         anchor=NSEW (or subset) - position widget according to
                                   given direction
         before=widget - pack it before you will pack widget
-        expand=bool - expand widget if master size grows
+        expand=bool - expand widget if parent size grows
         fill=NONE or X or Y or BOTH - fill widget if widget grows
         in=master - use master to contain this widget
         in_=master - see 'in' option description
-        ipadx=amount - add internal padding in _x direction
-        ipady=amount - add internal padding in _y direction
-        padx=amount - add padding in _x direction
-        pady=amount - add padding in _y direction
+        ipadx=amount - add internal padding in x direction
+        ipady=amount - add internal padding in y direction
+        padx=amount - add padding in x direction
+        pady=amount - add padding in y direction
         side=TOP or BOTTOM or LEFT or RIGHT -  where to add this widget.
         """
-        if 'after' in kwargs: assert (isinstance(kwargs['after'], tk.Widget))
-        if 'before' in kwargs: assert (isinstance(kwargs['before'], tk.Widget))
-
-        return self.Pack(side=side, anchor=anchor, expand=expand, fill=fill, padx=padx, pady=pady, **kwargs)
+        self.pack(cnf, **kwargs)
+        self._pi = self.pack_info()
+        self._manager_ = Layout.pack
+        return self
     def PackFull(self):
         """ Default placement in _root_frame occupying the full screen and/or space available in master. """
         return self.Pack(expand=True, fill=Fill.both, side=Side.top)
+    def PackOptions(self, *, side: Union[str, Side], fill: Union[str, Fill], expand: bool, padx: int = 0, pady: int = 0):
+        return self.Pack(side=side, expand=expand, fill=fill, padx=padx, pady=pady)
+    def PackHorizontal(self, side: Union[str, Side] = Side.top): return self.PackOptions(expand=True, fill=Fill.x, side=side)
+    def PackVertical(self, side: Union[str, Side] = Side.left): return self.PackOptions(expand=True, fill=Fill.y, side=side)
 
 
     def Place(self, cnf={ }, **kwargs):
