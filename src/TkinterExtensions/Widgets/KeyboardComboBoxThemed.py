@@ -41,36 +41,36 @@ class KeyboardComboBoxThemed(ComboBoxThemed, KeyboardMixin):
 
 
 
-
 class TitledComboBoxThemed(BaseTitled):
-    def __init__(self, master, *, RowPadding: int = 1, factor: int = 3, value: Dict = { }, title: Dict = { }, cls: Type[ComboBoxThemed] = ComboBoxThemed, **kwargs):
+    def __init__(self, master, *, RowPadding: int = 1, factor: int = 3,
+                 frame: Dict = { }, title: Dict = { }, cls: Type[ComboBoxThemed] = ComboBoxThemed, **value_kwargs):
         assert (issubclass(cls, ComboBoxThemed))
-        BaseTitled.__init__(self, master, cls=cls, value=value, RowPadding=RowPadding, title=title, factor=factor, **kwargs)
+        BaseTitled.__init__(self, master, cls, RowPadding, factor, frame, title, **value_kwargs)
 
 
 
 
 
 class TitledKeyboardComboBoxThemed(BaseTitledKeyboard):
-    def __init__(self, master, *, root: tkRoot, RowPadding: int = 1, factor: int = 3, value: Dict = { }, title: Dict = { },
-                 cls: Type[KeyboardComboBoxThemed] = KeyboardComboBoxThemed, **kwargs):
+    def __init__(self, master, *, root: tkRoot, RowPadding: int = 1, factor: int = 3,
+                 frame: Dict[str, Any] = { }, title: Union[str, Dict[str, Any]] = { }, cls: Type[KeyboardComboBoxThemed] = KeyboardComboBoxThemed, **value_kwargs):
         assert (issubclass(cls, KeyboardComboBoxThemed))
-        BaseTitledKeyboard.__init__(self, master, cls=cls, root=root, value=value, RowPadding=RowPadding, title=title, factor=factor, **kwargs)
+        BaseTitledKeyboard.__init__(self, master, cls, root, RowPadding, factor, frame, title, **value_kwargs)
 
 
 
 
 
 class FramedComboBoxThemed(BaseFramed):
-    def __init__(self, master, *, value: Dict = { }, cls: Type[ComboBoxThemed] = ComboBoxThemed, **kwargs):
+    def __init__(self, master, *, title: Dict[str, Any] = { }, cls: Type[ComboBoxThemed] = ComboBoxThemed, **value_kwargs):
         assert (issubclass(cls, ComboBoxThemed))
-        BaseFramed.__init__(self, master, cls=cls, value=value, **kwargs)
+        BaseFramed.__init__(self, master, cls, title, **value_kwargs)
 
 
 
 
 
 class FramedKeyboardComboBoxThemed(BaseFramedKeyboard):
-    def __init__(self, master, *, root: tkRoot, value: Dict = { }, cls: Type[KeyboardComboBoxThemed] = KeyboardComboBoxThemed, **kwargs):
+    def __init__(self, master, *, root: tkRoot, title: Dict[str, Any] = { }, cls: Type[KeyboardComboBoxThemed] = KeyboardComboBoxThemed, **value_kwargs):
         assert (issubclass(cls, KeyboardComboBoxThemed))
-        BaseFramedKeyboard.__init__(self, master, cls=cls, root=root, value=value, **kwargs)
+        BaseFramedKeyboard.__init__(self, master, cls, root, title, **value_kwargs)

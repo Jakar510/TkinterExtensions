@@ -31,8 +31,7 @@ __all__ = [
 class KeyBoardState(IntEnum):
     Idle = 0
     Virtual = 1
-    KeyPress = 2
-    Typing = 3
+    Typing = 2
 
 class Placement(IntFlag):
     Auto = 0x100000
@@ -62,7 +61,6 @@ class PopupKeyboard(tkTopLevel):
     Only the Entry widget has a subclass in this version.
     https://www.alt-codes.net/arrow_alt_codes.php
     """
-    # _number = '[1,2,3]'
     _space = '[ space ]'
     _shift = 'Aa'
     _next = '>>>' or '→'  # &#x2192
@@ -71,32 +69,38 @@ class PopupKeyboard(tkTopLevel):
     _backspace = '<-'
     _delete = 'Clr'
     _sign = '±'
-    # _close = '[abc]'
 
+    _keysize: int = -1
     _is_number: bool = False
     _root_frame: Frame
     _Frames: Dict[int, Frame] = { }
     _letters: Dict[int, Dict[int, Button]] = { }
     _numbers: Dict[int, Dict[int, Button]] = { }
     _hid = HID_BUFFER()
-    def __init__(self, root: tkRoot, *, attach, x: int, y: int, keysize: int = -1,
-                 keycolor: str = 'white', transparency: float = 0.85, takefocus: bool = False, font: str = '-family {Segoe UI Black} -size 13'):
+    def __init__(self, root: tkRoot, *, attach,
+                 x: int, y: int,
+                 keysize: int = -1, keycolor: str = 'white', transparency: float = 0.85, takefocus: bool = False, font: str = '-family {Segoe UI Black} -size 13'):
         assert (isinstance(root, tkRoot))
-        self.root = root
-        tkTopLevel.__init__(self, master=root, fullscreen=False, Screen_Width=root.Screen_Width, Screen_Height=root.Screen_Height, takefocus=takefocus)
+        self.__root = root
+        tkTopLevel.__init__(self, master=root, fullscreen=False, takefocus=takefocus,
+                            Screen_Width=1, Screen_Height=1)
+                            # Screen_Width=root.Screen_Width, Screen_Height=root.Screen_Height)
         self.overrideredirect(True)
         self.SetTransparency(transparency)
 
         if not isinstance(attach, KeyboardMixin) and isinstance(attach, BaseTextTkinterWidget): raise TypeError(type(attach), (KeyboardMixin, BaseTextTkinterWidget))
-        self.attach = attach
+        self._attach = attach
 
-        self._keysize = keysize
         self._keycolor = keycolor
 
         self._x = x
         self._y = y
 
         self._root_frame = Frame(self).Grid(row=0, column=0).Grid_ColumnConfigure(0, weight=1).Grid_RowConfigure(0, weight=1)
+
+        if self._attach.IsAutoSize:
+            print('____IsAutoSize____')
+            self._SetDimmensions()
 
         Row0: List[str] = [self._backspace] + [str(i) for i in range(10)] + [self._delete]
         Row1: List[str] = ['|', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '/']
@@ -128,150 +132,7 @@ class PopupKeyboard(tkTopLevel):
         if keysize > 0: self.SetSize(keysize)
         if font: self.SetFont(font)
 
-        self.Bind(Bindings.Key, lambda e: self.attach.destroy_popup())  # destroy _PopupKeyboard on keyboard interrupt
-
-
-    # def _create_numbers(self):
-    #     self._numbers_frame = Frame(self._root_frame).Grid(row=0, column=0).Grid_ColumnConfigure(0, weight=1).Grid_RowConfigure(0, weight=1)
-    #
-    #     Row1: List[str] = [self._backspace, self._close]
-    #     Row2: List[str] = ['7', '8', '9', self._sign]
-    #     Row3: List[str] = ['4', '5', '6']
-    #     Row4: List[str] = ['1', '2', '3', self._enter]
-    #     Row5: List[str] = ['0', '.']
-    #
-    #     offset = 0
-    #     for r, row in enumerate([Row1, Row2, Row3, Row4, Row5]):
-    #         if r not in self._numbers: self._numbers[r] = { }
-    #         self._numbers_frame.Grid_RowConfigure(r, weight=1)
-    #         for c, text in enumerate(row):
-    #             self._numbers_frame.Grid_ColumnConfigure(c, weight=1)
-    #             self._numbers[r][c] = w = Button(master=self._numbers_frame, text=text, bg=self._keycolor).SetCommand(self._attach_key_press, z=text)
-    #
-    #             if self._sign == text:
-    #                 w.Grid(row=r, column=c, rowspan=2)
-    #             elif self._enter == text:
-    #                 w.Grid(row=r, column=c, rowspan=2)
-    #             elif self._backspace == text:
-    #                 w.Grid(row=r, column=c, columnspan=2)
-    #             elif self._close == text:
-    #                 w.Grid(row=r, column=c + 1, columnspan=2)
-    #             elif '0' == text:
-    #                 w.Grid(row=r, column=c, columnspan=2)
-    #                 offset = 1
-    #             else:
-    #                 w.Grid(row=r, column=c + offset)
-    #
-    #     self._numbers_frame.hide()
-
-
-    def SetSize(self, size: int):
-        self._keysize = size
-
-        for row in self._letters.values():
-            for w in row.values():
-                w.configure(width=size)
-
-        for row in self._numbers.values():
-            for w in row.values():
-                w.configure(width=size)
-
-        return self._resize()
-
-    def SetFont(self, font: str):
-        for row in self._letters.values():
-            for w in row.values(): w.configure(font=font)
-
-        for row in self._numbers.values():
-            for w in row.values(): w.configure(font=font)
-
-        return self._resize()
-
-    def _resize(self):
-        # resize to fit keys
-        self.update_idletasks()
-        self.update()
-
-        self._SetDimmensions(frame_width=self._root_frame.width, frame_height=self._root_frame.height, entry_width=self.attach.width, entry_height=self.attach.height)
-
-        # PRINT('__resize__', size=self._keysize, width=self.width, root_width=self.root.width, _break=self.root.width >= self.width)
-        return self
-    def _SetDimmensions(self, frame_width: int, frame_height: int, entry_width: int, entry_height: int):
-        y = self._get_y(y=self._y, frame_height=frame_height, entry_height=entry_height, placement=self.attach.placement)
-        x = self._get_x(x=self._x, frame_width=frame_width, entry_width=entry_width, placement=self.attach.placement)
-        self.SetDimmensions(frame_width, frame_height, x, y)
-    def _get_x(self, *, x: int, frame_width: int, entry_width: int, placement: PlacementSet):
-        def left(): return int(x - frame_width + entry_width)
-        def right(): return int(x)
-        def center(): return int((x + (entry_width / 2)) - (frame_width / 2))
-        def middle(): return int((self.root.width - frame_width) / 2 + self.root.x)
-
-        root_width = self.root.width
-        root_x = self.root.x
-        x_plus_frame_width = x + frame_width
-        x_minus_frame_width = x - frame_width
-
-        try:
-            if Placement.Auto in placement:
-                if x_minus_frame_width < root_x:
-                    return middle()
-
-                if x_plus_frame_width > root_width:
-                    return middle()
-
-                if x_plus_frame_width < root_width and x_minus_frame_width > root_x:
-                    return center()
-
-                return center()
-
-            if Placement.Center in placement: return center()
-            if Placement.Left in placement: return left()
-            if Placement.Right in placement: return right()
-        finally:
-            pass
-            # PRINT('__get_x__',
-            #       x=x,
-            #       root_width=root_width,
-            #       root_x=root_x,
-            #       middle=middle(),
-            #       right=right(),
-            #       left=left(),
-            #       center=center(),
-            #       x_plus_frame_width=x_plus_frame_width,
-            #       x_minus_frame_width=x_minus_frame_width,
-            #       frame_width=frame_width,
-            #       entry_width=entry_width,
-            #       placement=placement)
-
-        raise ValueError(f'placement is unknown. {placement}')
-    def _get_y(self, *, y: int, frame_height: int, entry_height: int, placement: PlacementSet):
-        def above(): return y - frame_height
-        def below(): return y + entry_height
-
-        root_height = self.root.height
-        root_y = self.root.y
-        try:
-            if Placement.Top in placement: return above()
-            elif Placement.Bottom in placement: return below()
-            elif Placement.Auto in placement:
-                if above() < root_y: return below()
-                if below() > root_height: return above()
-
-                return below()
-        finally:
-            pass
-            # PRINT('__get_y__',
-            #       y=y,
-            #       root_height=root_height,
-            #       root_y=root_y,
-            #       above=above(),
-            #       below=below(),
-            #       frame_height=frame_height,
-            #       entry_height=entry_height,
-            #       placement=placement)
-
-        raise ValueError(f'self.entry.position is unknown. {placement}')
-
+        self.Bind(Bindings.Key, lambda e: self._attach.destroy_popup())  # destroy _PopupKeyboard on keyboard interrupt
 
 
 
@@ -285,72 +146,161 @@ class PopupKeyboard(tkTopLevel):
                     w.txt = w.txt.upper()
 
         return self._resize()
+    def SetSize(self, size: int):
+        self._keysize = size
+
+        for row in self._letters.values():
+            for w in row.values():
+                w.configure(width=size)
+
+        for row in self._numbers.values():
+            for w in row.values():
+                w.configure(width=size)
+
+        return self._resize()
+    def SetFont(self, font: str):
+        for row in self._letters.values():
+            for w in row.values(): w.configure(font=font)
+
+        for row in self._numbers.values():
+            for w in row.values(): w.configure(font=font)
+
+        return self._resize()
+
+
+    def _resize(self):
+        """ resize to fit keys """
+        self.update_idletasks()
+        self.update()
+
+        self._SetDimmensions()
+        return self
+    def _SetDimmensions(self):
+        frame_width: int = self.frame_width
+        frame_height: int = self.frame_height
+        y = self._get_y(y=self._y, frame_height=frame_height, entry_height=self._attach.height, placement=self._attach.placement)
+        x = self._get_x(x=self._x, frame_width=frame_width, entry_width=self._attach.width, placement=self._attach.placement)
+        self.SetDimmensions(frame_width, frame_height, x, y)
+    def _get_x(self, *, x: int, frame_width: int, entry_width: int, placement: PlacementSet):
+        def left(): return int(x - frame_width + entry_width)
+        def right(): return int(x)
+        def center(): return int((x + (entry_width / 2)) - (frame_width / 2))
+        def middle(): return int((self.__root.width - frame_width) / 2 + self.__root.x)
+
+        if Placement.Auto in placement:
+            root_x = self.__root.x
+            root_width = self.__root.width
+            x_plus_frame_width = x + frame_width
+            x_minus_frame_width = x - frame_width
+            if x_minus_frame_width < root_x:
+                return middle()
+
+            if x_plus_frame_width > root_width:
+                return middle()
+
+            if x_plus_frame_width < root_width and x_minus_frame_width > root_x:
+                return center()
+
+            return center()
+
+        if Placement.Center in placement: return center()
+        if Placement.Left in placement: return left()
+        if Placement.Right in placement: return right()
+
+        raise ValueError(f'placement is unknown. {placement}')
+    def _get_y(self, *, y: int, frame_height: int, entry_height: int, placement: PlacementSet):
+        def above(): return y - frame_height
+        def below(): return y + entry_height
+
+        if Placement.Top in placement: return above()
+        elif Placement.Bottom in placement: return below()
+        elif Placement.Auto in placement:
+            if above() < self.__root.height: return below()
+            if below() > self.__root.y: return above()
+
+            return below()
+
+        raise ValueError(f'self.entry.position is unknown. {placement}')
+
+
+    @property
+    def frame_width(self) -> int:
+        if self._attach.IsFixedSize: return self._attach.popup_width
+        if self._attach.IsRelativeSize: return self._attach.popup_relwidth
+        return self._root_frame.width
+    @property
+    def frame_height(self) -> int:
+        if self._attach.IsFixedSize: return self._attach.popup_height
+        if self._attach.IsRelativeSize: return self._attach.popup_relheight
+        return self._root_frame.height
+
+
 
     def _handle_key_press(self, value: str):
         if value == self._shift: self.SwitchCase()
 
-        elif value == self._space: self._append_space(self.attach)
+        elif value == self._space: self._append_space(self._attach)
 
         elif value == self._enter: self._handle_enter()
 
         elif value == self._backspace: self._handle_backspace()
 
         elif value == self._delete:
-            self._hid.Value = self.attach.txt = ''
+            self._hid.Value = self._attach.txt = ''
 
         elif self._handle_navigation(value): pass
 
         else:
             self._hid += value
-            self.attach.txt = self._hid.Value
+            self._attach.txt = self._hid.Value
     def _append_space(self, w):
         if isinstance(w, BaseTextTkinterWidget):
             self._hid.Value = w.txt
             self._hid += ' '
             w.txt = self._hid.Value
     def _handle_backspace(self):
-        print('_handle_backspace_', self.attach)
-        if isinstance(self.attach, Entry):
-            index = self.attach.index(tk.INSERT)
+        print('_handle_backspace_', self._attach)
+        if isinstance(self._attach, Entry):
+            index = self._attach.index(tk.INSERT)
             del self._hid[index]
-            self.attach.txt = self._hid.Value
+            self._attach.txt = self._hid.Value
 
         else:
-            self._hid.Value = self.attach.txt
+            self._hid.Value = self._attach.txt
             self._hid.Backspace()
-            self.attach.txt = self._hid.Value
+            self._attach.txt = self._hid.Value
 
     def _handle_navigation(self, value: str) -> bool:
         if value == self._next or value == self._previous:
-            if isinstance(self.attach, Entry):
-                index = self.attach.index(tk.INSERT)
+            if isinstance(self._attach, Entry):
+                index = self._attach.index(tk.INSERT)
                 if value == self._next:
-                    self.attach.icursor(index + 1)
+                    self._attach.icursor(index + 1)
                     return True
 
                 elif value == self._previous:
-                    self.attach.icursor(index - 1)
+                    self._attach.icursor(index - 1)
                     return True
 
                 else:
-                    self.attach.insert(index, value)
+                    self._attach.insert(index, value)
                     return True
 
-            elif isinstance(self.attach, BaseTextTkinterWidget):
+            elif isinstance(self._attach, BaseTextTkinterWidget):
                 return self._navagate(value)
 
         return False
     def _navagate(self, value: str) -> bool:
         if value == self._next:
-            self.attach.tk_focusNext().focus_set()
+            self._attach.tk_focusNext().focus_set()
             return self._handle_enter()
 
         elif value == self._previous:
-            self.attach.tk_focusPrev().focus_set()
+            self._attach.tk_focusPrev().focus_set()
             return self._handle_enter()
     def _handle_enter(self) -> True:
-        if isinstance(self.attach, KeyboardMixin):
-            self.attach.destroy_popup()
+        if isinstance(self._attach, KeyboardMixin):
+            self._attach.destroy_popup()
             return True
 
         raise AttributeError('self.attach.destroy_popup() not found')
@@ -410,63 +360,86 @@ class KeyboardMixin:
     tk_focusPrev: callable
     Append: callable
     insert: callable
+    state: KeyBoardState
 
     width: int
     height: int
+
     x: int
     y: int
-    def __init__(self, master, *, root: tkRoot, placement: PlacementSet = PlacementSet(Placement.Auto), keysize: int = None, keycolor: str = None):
+
+    _popup_width: Optional[int] = None
+    _popup_height: Optional[int] = None
+    _popup_relwidth: Optional[float] = None
+    _popup_relheight: Optional[float] = None
+    def __init__(self, master, *, root: tkRoot, keysize: int = None, keycolor: str = None,
+                 placement: PlacementSet = PlacementSet(Placement.Auto),
+                 popup_width: int = None, popup_height: int = None,
+                 popup_relwidth: float = None, popup_relheight: float = None):
         if not isinstance(self, BaseTextTkinterWidget) and isinstance(self, KeyboardMixin):
             raise TypeError(f'{self.__class__.__name__} must be used on a sub-class of {BaseTextTkinterWidget}')
 
         self.master = master
 
         assert (isinstance(root, tkRoot))
-        self.root = root
+        self.__root = root
 
         self.placement = placement
 
         self.keysize = keysize or -1
         self.keycolor = keycolor
 
-        self.state: KeyBoardState = KeyBoardState.Idle
+        self._popup_width = popup_width
+        self._popup_relwidth = popup_relwidth
+        self._popup_height = popup_height
+        self._popup_relheight = popup_relheight
 
-        self.Bind(Bindings.FocusIn, self._check_state)
-        self.Bind(Bindings.FocusOut, self._check_state)
-        self.Bind(Bindings.Key, self._check_state)
-        self.Bind(Bindings.ButtonPress, self._check_state)
+        self.state = KeyBoardState.Idle
+
+        self.Bind(Bindings.FocusIn, self._handle_FocusIn)
+        self.Bind(Bindings.FocusOut, self._handle_FocusOut)
+        self.Bind(Bindings.Key, self._handle_KeyPress)
+        self.Bind(Bindings.ButtonPress, self._handle_ButtonPress)
 
 
-    def _check_state(self, e: tkEvent): return self._handle_event_(TkinterEvent(e))
-    def _handle_event_(self, event: TkinterEvent):
+    # noinspection PyUnusedLocal
+    def _handle_FocusIn(self, e: tkEvent):
+        self._debug_event_(EventType.FocusIn, e)
+        if self.state == KeyBoardState.Idle:
+            self._call_popup()
+            self.state = KeyBoardState.Virtual
+    # noinspection PyUnusedLocal
+    def _handle_FocusOut(self, e: tkEvent):
+        self._debug_event_(EventType.FocusOut, e)
+        if self.state == KeyBoardState.Typing:
+            self.state = KeyBoardState.Idle
+
+        elif self.state == KeyBoardState.Virtual:
+            self.state = KeyBoardState.Typing
+            self.destroy_popup()
+    # noinspection PyUnusedLocal
+    def _handle_KeyPress(self, e: tkEvent):
+        self._debug_event_(EventType.KeyPress, e)
         if self.state == KeyBoardState.Virtual:
-            if event.type == EventType.FocusOut:
-                self.state = KeyBoardState.Typing
-                # self.destroy_popup()
+            self.destroy_popup()
+            self.state = KeyBoardState.Typing
+    # noinspection PyUnusedLocal
+    def _handle_ButtonPress(self, e: tkEvent):
+        self._debug_event_(EventType.ButtonPress, e)
+        if self.state != KeyBoardState.Virtual or self.kb is None:
+            self._call_popup()
+            self.state = KeyBoardState.Virtual
+    def _debug_event_(self, tag: EventType, event: tkEvent):
+        print('__state__', self.state)
+        print(f'__{tag.name}__', TkinterEvent(event).ToString())
+        print()
+        print()
 
-            elif event.type == EventType.KeyPress:
-                self.destroy_popup()
-                self.state = KeyBoardState.Typing
 
-            elif event.type == EventType.ButtonPress:
-                self._call_popup()
-                self.state = KeyBoardState.Virtual
-
-        elif self.state == KeyBoardState.Idle:
-            if event.type == EventType.FocusIn:
-                self._call_popup()
-                self.state = KeyBoardState.Virtual
-
-        elif self.state == KeyBoardState.Typing:
-            if event.type == EventType.FocusOut:
-                self.state = KeyBoardState.Idle
 
     def _call_popup(self):
-        try:
-            self.destroy_popup()
-        except AttributeError: pass
-
-        self.kb = PopupKeyboard(self.root, attach=self, x=self.x, y=self.y, keycolor=self.keycolor, keysize=self.keysize)
+        self.destroy_popup()
+        self.kb = PopupKeyboard(self.__root, attach=self, keycolor=self.keycolor, keysize=self.keysize, x=self.x, y=self.y)
 
     def destroy_popup(self):
         if self.kb:
@@ -474,45 +447,61 @@ class KeyboardMixin:
             self.kb = None
 
 
+    @property
+    def IsFixedSize(self) -> bool: return isinstance(self._popup_width, int) and isinstance(self._popup_height, int)
+    @property
+    def IsRelativeSize(self) -> bool: return isinstance(self._popup_relwidth, float) and isinstance(self._popup_relheight, float)
+    @property
+    def IsAutoSize(self) -> bool: return not (self.IsFixedSize or self.IsRelativeSize)
+
+
+    @property
+    def popup_width(self) -> Optional[int]: return self._popup_width
+    @property
+    def popup_height(self) -> Optional[int]: return self._popup_height
+    @property
+    def popup_relwidth(self) -> Optional[int]: return int(self.__root.width * self._popup_relwidth) if self._popup_relwidth is not None else None
+    @property
+    def popup_relheight(self) -> Optional[int]: return int(self.__root.height * self._popup_relheight) if self._popup_relheight is not None else None
+
+
+
     @staticmethod
-    def test_entry_placements(root: tkRoot) -> LabelFrame:
-        from .KeyboardEntry import TitledKeyboardEntry  # circular import
-        frame = LabelFrame(root, background='light blue', text='ENTRY')
+    def test_placements(cls, root: tkRoot, d: Dict[str, Dict[str, Placement]], title: str) -> LabelFrame:
+        frame = LabelFrame(root, background='light blue', text=title)
+        for key, value in d.items():
+            cls(frame, root=root, title=key, **value).Pack()
 
-        TitledKeyboardEntry(frame, root=root, title=dict(text='Center Below'), value=dict(keysize=7, placement=PlacementSet(Placement.Center, Placement.Bottom))).Pack()
-        TitledKeyboardEntry(frame, root=root, title=dict(text='Left Below'), value=dict(keysize=6, placement=PlacementSet(Placement.Left, Placement.Bottom))).Pack()
-        TitledKeyboardEntry(frame, root=root, title=dict(text='Right Below'), value=dict(keysize=5, placement=PlacementSet(Placement.Right, Placement.Bottom))).Pack()
-        TitledKeyboardEntry(frame, root=root, title=dict(text='Auto Below'), value=dict(keysize=4, placement=PlacementSet(Placement.Auto, Placement.Bottom))).Pack()
-
-        TitledKeyboardEntry(frame, root=root, title=dict(text='FULL Auto'), value=dict()).Pack()
-
-        TitledKeyboardEntry(frame, root=root, title=dict(text='Center Above'), value=dict(placement=PlacementSet(Placement.Center, Placement.Top))).Pack()
-        TitledKeyboardEntry(frame, root=root, title=dict(text='Left Above'), value=dict(placement=PlacementSet(Placement.Left, Placement.Top))).Pack()
-        TitledKeyboardEntry(frame, root=root, title=dict(text='Right Above'), value=dict(placement=PlacementSet(Placement.Right, Placement.Top))).Pack()
-        TitledKeyboardEntry(frame, root=root, title=dict(text='Auto Above'), value=dict(placement=PlacementSet(Placement.Auto, Placement.Top))).Pack()
         return frame
     @staticmethod
-    def test_comobobox_placements(root: tkRoot) -> LabelFrame:
-        from .KeyboardComboBoxThemed import TitledKeyboardComboBoxThemed  # circular import
-        frame = LabelFrame(root, background='light blue', text='COMBO_BOX')
+    def test_sizing(cls, root: tkRoot, d: Dict[str, Dict[str, Placement]], title: str) -> LabelFrame:
+        frame = LabelFrame(root, background='dark blue', text=title)
+        for key, value in d.items():
+            w = cls(frame, root=root, title=key, **value).Pack()
+            w.keysize = 5
 
-        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Center Below'), value=dict(keysize=7, placement=PlacementSet(Placement.Center, Placement.Bottom))).Pack()
-        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Left Below'), value=dict(keysize=6, placement=PlacementSet(Placement.Left, Placement.Bottom))).Pack()
-        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Right Below'), value=dict(keysize=5, placement=PlacementSet(Placement.Right, Placement.Bottom))).Pack()
-        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Auto Below'), value=dict(keysize=4, placement=PlacementSet(Placement.Auto, Placement.Bottom))).Pack()
-
-        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='FULL Auto'), value=dict()).Pack()
-
-        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Center Above'), value=dict(placement=PlacementSet(Placement.Center, Placement.Top))).Pack()
-        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Left Above'), value=dict(placement=PlacementSet(Placement.Left, Placement.Top))).Pack()
-        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Right Above'), value=dict(placement=PlacementSet(Placement.Right, Placement.Top))).Pack()
-        TitledKeyboardComboBoxThemed(frame, root=root, title=dict(text='Auto Above'), value=dict(placement=PlacementSet(Placement.Auto, Placement.Top))).Pack()
         return frame
     @staticmethod
     def test():
+        from .KeyboardEntry import TitledKeyboardEntry  # circular import
+        from .KeyboardComboBoxThemed import TitledKeyboardComboBoxThemed  # circular import
+        d = {
+                'Center Below': dict(placement=PlacementSet(Placement.Center, Placement.Bottom)),
+                'Left Below':   dict(placement=PlacementSet(Placement.Left, Placement.Bottom)),
+                'Right Below':  dict(placement=PlacementSet(Placement.Right, Placement.Bottom)),
+                'Auto Below':   dict(placement=PlacementSet(Placement.Auto, Placement.Bottom)),
+                'FULL Auto':    { },
+                'Center Above': dict(placement=PlacementSet(Placement.Center, Placement.Top)),
+                'Left Above':   dict(placement=PlacementSet(Placement.Left, Placement.Top)),
+                'Right Above':  dict(placement=PlacementSet(Placement.Right, Placement.Top)),
+                'Auto Above':   dict(placement=PlacementSet(Placement.Auto, Placement.Top)),
+                }
         root = tkRoot(Screen_Width=800, Screen_Height=480, x=200, y=200)
-        KeyboardMixin.test_entry_placements(root).Grid(0, 0)
-        KeyboardMixin.test_comobobox_placements(root).Grid(0, 1)
+        KeyboardMixin.test_placements(TitledKeyboardEntry, root, d, 'ENTRY').Grid(0, 0)
+        KeyboardMixin.test_placements(TitledKeyboardComboBoxThemed, root, d, 'COMBO_BOX').Grid(0, 1)
+
+        KeyboardMixin.test_sizing(TitledKeyboardEntry, root, d, 'SIZES').Grid(0, 2)
+        # KeyboardMixin.test_sizing(TitledKeyboardComboBoxThemed, root, d, 'SIZES').Grid(0, 2)
         root.mainloop()
 
 
@@ -534,13 +523,21 @@ class value_title_mixin:
     def value(self, value: str): self.Entry.txt = value
 
     @staticmethod
-    def AssertKeyBoardType(cls):
-        if not (issubclass(cls, BaseTextTkinterWidget) and issubclass(cls, KeyboardMixin)): raise TypeError(type(cls), (BaseTextTkinterWidget, KeyboardMixin))
+    def IsKeyBoard(cls): return isinstance(cls, BaseTextTkinterWidget) and isinstance(cls, KeyboardMixin)
+    @staticmethod
+    def IsKeyBoardType(cls: Type): return issubclass(cls, BaseTextTkinterWidget) and issubclass(cls, KeyboardMixin)
+    @staticmethod
+    def AssertKeyBoardType(cls: Type):
+        if not value_title_mixin.IsKeyBoardType(cls): raise TypeError(type(cls), (BaseTextTkinterWidget, KeyboardMixin))
 
     @staticmethod
     def AssertType(cls):
         if not (issubclass(cls, BaseTextTkinterWidget)): raise TypeError(type(cls), (BaseTextTkinterWidget,))
 
+    @staticmethod
+    def _ConvertTitle(value: Union[str, Dict[str, Any]]):
+        if isinstance(value, str): return dict(text=value)
+        return value
 
 
 class BaseTitled(Frame, value_title_mixin):
@@ -554,14 +551,19 @@ class BaseTitled(Frame, value_title_mixin):
                     BaseTitled.__init__(self, master, cls=cls, value=value, RowPadding=RowPadding, title=title, factor=factor, **kwargs)
 
     """
-    def __init__(self, master, *, cls, RowPadding: int, factor: int, value: Dict, title: Dict, **kwargs):
+    @overload
+    def __init__(self, master, cls: Type, RowPadding: int, factor: int, frame: Dict[str, Any], title: str, **value_kwargs): ...
+    @overload
+    def __init__(self, master, cls: Type, RowPadding: int, factor: int, frame: Dict[str, Any], title: Dict[str, Any], **value_kwargs): ...
+
+    def __init__(self, master, cls: Type, RowPadding: int, factor: int, frame: Dict[str, Any], title: Union[str, Dict[str, Any]], **value_kwargs):
         value_title_mixin.AssertType(cls)
-        Frame.__init__(self, master, **kwargs)
+        Frame.__init__(self, master, **frame)
         self.Grid_RowConfigure(0, weight=1).Grid_RowConfigure(1, weight=factor).Grid_ColumnConfigure(0, weight=1)
 
-        self.Title = Label(self, **title).Grid(row=0, column=0, padx=RowPadding, pady=RowPadding)
+        self.Title = Label(self, **self._ConvertTitle(title)).Grid(row=0, column=0, padx=RowPadding, pady=RowPadding)
         # noinspection PyArgumentList
-        self.Entry = cls(self, **value).Grid(row=1, column=0, padx=RowPadding, pady=RowPadding)
+        self.Entry = cls(self, **value_kwargs).Grid(row=1, column=0, padx=RowPadding, pady=RowPadding)
 class BaseTitledKeyboard(Frame, value_title_mixin):
     """
         When subclassed, pairs the class type with the title label, wrapped in a grid.
@@ -573,14 +575,18 @@ class BaseTitledKeyboard(Frame, value_title_mixin):
                     BaseTitledKeyboard.__init__(self, master, cls=cls, root=root, value=value, RowPadding=RowPadding, title=title, factor=factor, **kwargs)
 
     """
-    def __init__(self, master, *, cls, root: tkRoot, RowPadding: int, factor: int, value: Dict, title: Dict, **kwargs):
+    @overload
+    def __init__(self, master, cls: Type, root: tkRoot, RowPadding: int, factor: int, title: str, value: Dict, **value_kwargs): ...
+    @overload
+    def __init__(self, master, cls: Type, root: tkRoot, RowPadding: int, factor: int, title: Dict[str, Any], value: Dict, **value_kwargs): ...
+
+    def __init__(self, master, cls: Type, root: tkRoot, RowPadding: int, factor: int, frame: Dict[str, Any], title: Union[str, Dict[str, Any]], **value_kwargs):
         value_title_mixin.AssertKeyBoardType(cls)
-        Frame.__init__(self, master, **kwargs)
+        Frame.__init__(self, master, **frame)
         self.Grid_RowConfigure(0, weight=1).Grid_RowConfigure(1, weight=factor).Grid_ColumnConfigure(0, weight=1)
 
-        self.Title = Label(self, **title).Grid(row=0, column=0, padx=RowPadding, pady=RowPadding)
-        self.Entry = cls(self, root=root, **value).Grid(row=1, column=0, padx=RowPadding, pady=RowPadding)
-
+        self.Title = Label(self, **self._ConvertTitle(title)).Grid(row=0, column=0, padx=RowPadding, pady=RowPadding)
+        self.Entry = cls(self, root=root, **value_kwargs).Grid(row=1, column=0, padx=RowPadding, pady=RowPadding)
 
 
 
@@ -595,18 +601,22 @@ class BaseFramed(LabelFrame, value_title_mixin):
                     BaseFramed.__init__(self, master, cls=cls, value=value, **kwargs)
 
     """
-    def __init__(self, master, *, cls, value: Dict, **kwargs):
+    @overload
+    def __init__(self, master, cls: Type, title: str, **value_kwargs): ...
+    @overload
+    def __init__(self, master, cls: Type, title: Dict[str, Any], **value_kwargs): ...
+
+    def __init__(self, master, cls: Type, title: Union[str, Dict[str, Any]], **value_kwargs):
         value_title_mixin.AssertType(cls)
-        LabelFrame.__init__(self, master, **kwargs)
+        LabelFrame.__init__(self, master, **self._ConvertTitle(title))
 
         # noinspection PyArgumentList
-        self.Entry = cls(self, **value).PlaceFull()
+        self.Entry = cls(self, **value_kwargs).PlaceFull()
 
     @property
     def title(self) -> str: return self.txt
     @title.setter
     def title(self, value: str): self.txt = value
-
 class BaseFramedKeyboard(LabelFrame, value_title_mixin):
     """
         When subclassed, pairs the class type with the title label, wrapped in a LabelFrame.
@@ -618,11 +628,16 @@ class BaseFramedKeyboard(LabelFrame, value_title_mixin):
                     BaseFramedKeyboard.__init__(self, master, cls=cls, root=root, value=value, **kwargs)
 
     """
-    def __init__(self, master, *, cls, root: tkRoot, value: Dict, **kwargs):
-        value_title_mixin.AssertKeyBoardType(cls)
-        LabelFrame.__init__(self, master, **kwargs)
+    @overload
+    def __init__(self, master, cls: Type, root: tkRoot, title: str, **value_kwargs): ...
+    @overload
+    def __init__(self, master, cls: Type, root: tkRoot, title: Dict[str, Any], **value_kwargs): ...
 
-        self.Entry = cls(self, root=root, **value).PlaceFull()
+    def __init__(self, master, cls: Type, root: tkRoot, title: Union[str, Dict[str, Any]], **value_kwargs):
+        value_title_mixin.AssertKeyBoardType(cls)
+        LabelFrame.__init__(self, master, **self._ConvertTitle(title))
+
+        self.Entry = cls(self, root=root, **value_kwargs).PlaceFull()
 
     @property
     def title(self) -> str: return self.txt
