@@ -475,7 +475,7 @@ class CommandMixin:
         return self
 class ImageMixin:
     width: int
-    height: callable
+    height: int
     configure: callable
     update_idletasks: callable
     update: callable

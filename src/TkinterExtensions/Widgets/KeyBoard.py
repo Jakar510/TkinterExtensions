@@ -99,7 +99,6 @@ class PopupKeyboard(tkTopLevel):
         self._root_frame = Frame(self).Grid(row=0, column=0).Grid_ColumnConfigure(0, weight=1).Grid_RowConfigure(0, weight=1)
 
         if self._attach.IsAutoSize:
-            print('____IsAutoSize____')
             self._SetDimmensions()
 
         Row0: List[str] = [self._backspace] + [str(i) for i in range(10)] + [self._delete]
@@ -259,7 +258,6 @@ class PopupKeyboard(tkTopLevel):
             self._hid += ' '
             w.txt = self._hid.Value
     def _handle_backspace(self):
-        print('_handle_backspace_', self._attach)
         if isinstance(self._attach, Entry):
             index = self._attach.index(tk.INSERT)
             del self._hid[index]
