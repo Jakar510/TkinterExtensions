@@ -1,5 +1,7 @@
 # TkinterExtensions
 
+This has been merged into [New Package: PythonExtensions](https://github.com/Jakar510/PythonExtensions) and will no longer be maintained and will be removed from pypi in due time.
+
 Strongly typed widgets and event with multiple built in helper functions to speed up development.
 
 ## Tktiner Bindings
